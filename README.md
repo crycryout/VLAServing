@@ -2,6 +2,13 @@
 
 Pi05-related code snapshot extracted from the local LeRobot workspace and pushed here as a standalone reference.
 
+This repo now also contains a GR00T N1.6 serving-simulation port derived from the same reservation-based VLA serving mechanism, retuned for:
+
+- `denoising_step = 1`
+- `torch.compile`
+- `16`-action hard chunk budget
+- GR00T-side empirical AutoHorizon simulator
+
 ## Included code
 
 - `src/lerobot/policies/pi05/`
@@ -22,6 +29,12 @@ Pi05-related code snapshot extracted from the local LeRobot workspace and pushed
   - `50`-action exhaustion is treated as a hard failure.
 - `src/lerobot/eval/run_pi05_global_reservation_trials.py`
   - Random-arrival experiment runner for the mainline global-reservation scheduler.
+- `src/gr00t/eval/simulate_n1d6_global_reservation_serving.py`
+  - GR00T N1.6 port of the reservation-style no-queue serving simulator.
+  - Uses `16`-action hard exhaustion instead of PI05's `50`.
+  - Uses the official GR00T-side empirical horizon simulator (`4..12`, heavily peaked at `5`).
+- `src/gr00t/eval/run_n1d6_global_reservation_trials.py`
+  - Random-arrival experiment runner for the GR00T N1.6 reservation scheduler.
 
 ## Mainline serving version
 
@@ -46,6 +59,10 @@ This is the version kept after restoring the best PI05 result path from local ex
   - Main 10-group PI05 serving experiment output.
 - `results/pi05_global_reservation_horizon_alignment_cfg055_fast10_20260329.json`
   - Per-horizon early / exact / late alignment summary.
+- `results/groot_n15_official_horizon_simulator_fit_20260328.json`
+  - GR00T-side empirical AutoHorizon simulator fit used for the N1.6 serving port.
+- `results/groot_n1d6_global_reservation_final_cfg040_bins16_fast_20260329.json`
+  - Main retained GR00T N1.6 reservation-scheduler result.
 
 ## Key mainline result
 
@@ -62,6 +79,29 @@ From `results/pi05_global_reservation_final_cfg055_fast10_alignment_20260329.jso
   - `30Hz: 13`
 - `reply_over_chunk_actions_count = 0`
 - `miss_autohorizon_ratio = 11.52%`
+
+## GR00T N1.6 result
+
+From `results/groot_n1d6_global_reservation_final_cfg040_bins16_fast_20260329.json`:
+
+- model family: `4` GR00T N1.6 fine-tuned models
+- scheduler: `single_stage_compiled_full_e2e_global_reservation`
+- `denoising_step = 1`
+- hard rule: no robot may exhaust `16` actions before the next chunk is ready
+- total admitted robots: `31`
+- mean admitted per group: `3.1`
+- admitted frequencies:
+  - `5Hz: 8`
+  - `10Hz: 6`
+  - `15Hz: 7`
+  - `20Hz: 3`
+  - `25Hz: 5`
+  - `30Hz: 2`
+- `reply_over_chunk_actions_count = 0`
+- `miss_autohorizon_ratio = 7.77%`
+- all `10/10` groups satisfied:
+  - `min_robot_score >= 0.97`
+  - `fleet_score >= 0.985`
 
 ## Notes
 
