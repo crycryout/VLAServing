@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import bisect
 import json
 import math
 from pathlib import Path
@@ -47,8 +46,10 @@ class Config:
     truth_duration_s: float = 90.0
     truth_seeds: int = 4
     chunk_size: int = 16
-    phase_bins: int = 16
+    phase_bins: int = 8
     max_batch: int = 8
+    slot_period_ms: float = 100.0
+    slot_start_phase_ms: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -99,10 +100,7 @@ class RobotRuntime:
 
 def _load_batch_curve(path: Path) -> dict[int, float]:
     payload = json.loads(path.read_text())
-    curve: dict[int, float] = {}
-    for row in payload["results"]:
-        curve[int(row["batch_size"])] = float(row["service_ms_for_scheduler"])
-    return curve
+    return {int(row["batch_size"]): float(row["service_ms_for_scheduler"]) for row in payload["results"]}
 
 
 BATCH_SERVICE_MS = _load_batch_curve(BATCH_CURVE_PATH)
@@ -117,42 +115,15 @@ class HorizonProcess:
         self._start_states = np.array((5, 6, 9, 10, 11), dtype=np.int64)
         self._start_probs = np.array((0.966, 0.02, 0.002, 0.01, 0.002), dtype=np.float64)
         self._transition = {
-            4: (
-                np.array((4, 5, 6, 8, 9, 10, 11), dtype=np.int64),
-                np.array((0.3445255474, 0.5270072993, 0.0043795620, 0.0014598540, 0.0029197080, 0.0218978102, 0.0978102190), dtype=np.float64),
-            ),
-            5: (
-                np.array((4, 5, 6, 7, 8, 9, 10, 11, 12), dtype=np.int64),
-                np.array((0.0708333333, 0.8612179487, 0.0481837607, 0.0019230769, 0.0008547009, 0.0006410256, 0.0055555556, 0.0102564103, 0.0005341880), dtype=np.float64),
-            ),
-            6: (
-                np.array((4, 5, 6, 7, 8, 9, 10, 11), dtype=np.int64),
-                np.array((0.0031982942, 0.5010660981, 0.4797441365, 0.0053304904, 0.0053304904, 0.0031982942, 0.0010660981, 0.0010660981), dtype=np.float64),
-            ),
-            7: (
-                np.array((5, 6, 7, 8, 10), dtype=np.int64),
-                np.array((0.0566037736, 0.3207547170, 0.3207547170, 0.2641509434, 0.0377358491), dtype=np.float64),
-            ),
-            8: (
-                np.array((5, 6, 7, 8), dtype=np.int64),
-                np.array((0.1111111111, 0.0694444444, 0.1944444444, 0.6250000000), dtype=np.float64),
-            ),
-            9: (
-                np.array((5, 6, 7), dtype=np.int64),
-                np.array((0.5555555556, 0.3333333333, 0.1111111111), dtype=np.float64),
-            ),
-            10: (
-                np.array((4, 5, 6, 7, 8, 11), dtype=np.int64),
-                np.array((0.0821917808, 0.8082191781, 0.0547945205, 0.0273972603, 0.0136986301, 0.0136986301), dtype=np.float64),
-            ),
-            11: (
-                np.array((4, 5, 6), dtype=np.int64),
-                np.array((0.1761006289, 0.8176100629, 0.0062893082), dtype=np.float64),
-            ),
-            12: (
-                np.array((4, 5, 10), dtype=np.int64),
-                np.array((0.5, 0.25, 0.25), dtype=np.float64),
-            ),
+            4: (np.array((4, 5, 6, 8, 9, 10, 11), dtype=np.int64), np.array((0.3445255474, 0.5270072993, 0.0043795620, 0.0014598540, 0.0029197080, 0.0218978102, 0.0978102190), dtype=np.float64)),
+            5: (np.array((4, 5, 6, 7, 8, 9, 10, 11, 12), dtype=np.int64), np.array((0.0708333333, 0.8612179487, 0.0481837607, 0.0019230769, 0.0008547009, 0.0006410256, 0.0055555556, 0.0102564103, 0.0005341880), dtype=np.float64)),
+            6: (np.array((4, 5, 6, 7, 8, 9, 10, 11), dtype=np.int64), np.array((0.0031982942, 0.5010660981, 0.4797441365, 0.0053304904, 0.0053304904, 0.0031982942, 0.0010660981, 0.0010660981), dtype=np.float64)),
+            7: (np.array((5, 6, 7, 8, 10), dtype=np.int64), np.array((0.0566037736, 0.3207547170, 0.3207547170, 0.2641509434, 0.0377358491), dtype=np.float64)),
+            8: (np.array((5, 6, 7, 8), dtype=np.int64), np.array((0.1111111111, 0.0694444444, 0.1944444444, 0.6250000000), dtype=np.float64)),
+            9: (np.array((5, 6, 7), dtype=np.int64), np.array((0.5555555556, 0.3333333333, 0.1111111111), dtype=np.float64)),
+            10: (np.array((4, 5, 6, 7, 8, 11), dtype=np.int64), np.array((0.0821917808, 0.8082191781, 0.0547945205, 0.0273972603, 0.0136986301, 0.0136986301), dtype=np.float64)),
+            11: (np.array((4, 5, 6), dtype=np.int64), np.array((0.1761006289, 0.8176100629, 0.0062893082), dtype=np.float64)),
+            12: (np.array((4, 5, 10), dtype=np.int64), np.array((0.5, 0.25, 0.25), dtype=np.float64)),
         }
 
     def next(self) -> int:
@@ -187,8 +158,7 @@ def coarse_accept(specs: list[RobotSpec], partition: ResourcePartition) -> bool:
 
 
 def _slot_service_ms(batch_size: int) -> float:
-    batch_size = max(1, min(batch_size, MAX_BATCH))
-    return BATCH_SERVICE_MS[batch_size]
+    return BATCH_SERVICE_MS[max(1, min(batch_size, MAX_BATCH))]
 
 
 def _consumed_at_finish(job: ScheduledJob, finish_ms: float, chunk_size: int) -> int:
@@ -203,131 +173,74 @@ def _job_rank(job: ScheduledJob, finish_ms: float, chunk_size: int) -> tuple[flo
     return abs(consumed - job.horizon) * weight, abs(consumed - job.horizon)
 
 
-def _insert_slot(slots: list[Slot], slot: Slot) -> None:
-    starts = [s.start_ms for s in slots]
-    idx = bisect.bisect_left(starts, slot.start_ms)
-    slots.insert(idx, slot)
+def _slot_start_candidates(release_ms: float, hard_finish_ms: float, cfg: Config) -> list[float]:
+    earliest_start = release_ms
+    latest_start = hard_finish_ms - _slot_service_ms(1)
+    if latest_start < earliest_start - 1e-9:
+        return []
+    first_idx = math.ceil((earliest_start - cfg.slot_start_phase_ms) / cfg.slot_period_ms)
+    last_idx = math.floor((latest_start - cfg.slot_start_phase_ms) / cfg.slot_period_ms)
+    return [cfg.slot_start_phase_ms + i * cfg.slot_period_ms for i in range(first_idx, last_idx + 1)]
 
 
-def _candidate_gaps(slots: list[Slot], release_ms: float, hard_finish_ms: float):
-    prev_end = release_ms
-    if not slots:
-        yield prev_end, hard_finish_ms
-        return
-    for slot in slots:
-        if slot.finish_ms <= release_ms + 1e-9:
-            continue
-        if slot.start_ms >= hard_finish_ms - 1e-9:
-            break
-        gap_start = prev_end
-        gap_end = min(slot.start_ms, hard_finish_ms)
-        if gap_end - gap_start >= _slot_service_ms(1) - 1e-9:
-            yield gap_start, gap_end
-        prev_end = max(prev_end, slot.finish_ms)
-        if prev_end >= hard_finish_ms - 1e-9:
-            return
-    if hard_finish_ms - prev_end >= _slot_service_ms(1) - 1e-9:
-        yield prev_end, hard_finish_ms
-
-
-def _try_add_to_existing_slot(
-    slots: list[Slot],
-    slot_idx: int,
-    new_job: ScheduledJob,
-    chunk_size: int,
-) -> tuple[tuple, Slot] | None:
-    slot = slots[slot_idx]
-    if slot.start_ms < new_job.chunk_start_ms - 1e-9:
-        return None
+def _try_assign(slots_by_start: dict[float, Slot], start_ms: float, job: ScheduledJob, cfg: Config) -> tuple[tuple, Slot] | None:
+    slot = slots_by_start.get(start_ms)
+    if slot is None:
+        slot = Slot(start_ms=start_ms, finish_ms=start_ms + _slot_service_ms(1), jobs=[])
     new_batch = slot.batch_size + 1
-    if new_batch > MAX_BATCH:
+    if new_batch > cfg.max_batch:
         return None
-    new_finish = slot.start_ms + _slot_service_ms(new_batch)
-    hard_finish_new = new_job.chunk_start_ms + chunk_size * new_job.period_ms
+    new_finish = start_ms + _slot_service_ms(new_batch)
+    next_slot_start = start_ms + cfg.slot_period_ms
+    if new_finish > next_slot_start + 1e-9:
+        return None
+    hard_finish_new = job.chunk_start_ms + cfg.chunk_size * job.period_ms
     if new_finish > hard_finish_new + 1e-9:
-        return None
-    if slot_idx + 1 < len(slots) and new_finish > slots[slot_idx + 1].start_ms + 1e-9:
         return None
     old_cost = 0.0
     new_cost = 0.0
-    for job in slot.jobs:
-        old_cost += _job_rank(job, slot.finish_ms, chunk_size)[0]
-        hard_finish_existing = job.chunk_start_ms + chunk_size * job.period_ms
+    for existing in slot.jobs:
+        old_cost += _job_rank(existing, slot.finish_ms, cfg.chunk_size)[0]
+        hard_finish_existing = existing.chunk_start_ms + cfg.chunk_size * existing.period_ms
         if new_finish > hard_finish_existing + 1e-9:
             return None
-        new_cost += _job_rank(job, new_finish, chunk_size)[0]
-    new_cost += _job_rank(new_job, new_finish, chunk_size)[0]
-    new_slot = Slot(start_ms=slot.start_ms, finish_ms=new_finish, jobs=list(slot.jobs) + [new_job])
-    consumed = _consumed_at_finish(new_job, new_finish, chunk_size)
+        new_cost += _job_rank(existing, new_finish, cfg.chunk_size)[0]
+    new_cost += _job_rank(job, new_finish, cfg.chunk_size)[0]
+    new_slot = Slot(start_ms=start_ms, finish_ms=new_finish, jobs=list(slot.jobs) + [job])
+    consumed = _consumed_at_finish(job, new_finish, cfg.chunk_size)
     rank = (
         new_cost - old_cost,
-        _job_rank(new_job, new_finish, chunk_size)[0],
-        abs(consumed - new_job.horizon),
+        _job_rank(job, new_finish, cfg.chunk_size)[0],
+        abs(consumed - job.horizon),
+        -new_batch,
         new_finish,
-        0,
     )
     return rank, new_slot
 
 
-def _try_new_slot(
-    slots: list[Slot],
-    new_job: ScheduledJob,
-    chunk_size: int,
-) -> tuple[tuple, Slot] | None:
-    release_ms = new_job.chunk_start_ms
-    hard_finish_ms = new_job.chunk_start_ms + chunk_size * new_job.period_ms
-    target_finish = new_job.chunk_start_ms + new_job.horizon * new_job.period_ms
+def _find_best_assignment(slots_by_start: dict[float, Slot], job: ScheduledJob, cfg: Config) -> tuple[float, Slot] | None:
+    release_ms = job.chunk_start_ms
+    hard_finish_ms = job.chunk_start_ms + cfg.chunk_size * job.period_ms
+    starts = _slot_start_candidates(release_ms, hard_finish_ms, cfg)
     best = None
-    service_ms = _slot_service_ms(1)
-    for gap_start, gap_end in _candidate_gaps(slots, release_ms, hard_finish_ms):
-        earliest_start = gap_start
-        latest_start = gap_end - service_ms
-        if latest_start < earliest_start - 1e-9:
-            continue
-        desired_start = target_finish - service_ms
-        start = min(max(desired_start, earliest_start), latest_start)
-        finish = start + service_ms
-        if finish > hard_finish_ms + 1e-9:
-            continue
-        slot = Slot(start_ms=start, finish_ms=finish, jobs=[new_job])
-        consumed = _consumed_at_finish(new_job, finish, chunk_size)
-        rank = (
-            _job_rank(new_job, finish, chunk_size)[0],
-            abs(consumed - new_job.horizon),
-            finish,
-            1,
-        )
-        if best is None or rank < best[0]:
-            best = (rank, slot)
-    return best
-
-
-def _find_best_assignment(slots: list[Slot], job: ScheduledJob, chunk_size: int) -> tuple[str, int | None, Slot] | None:
-    best: tuple[tuple, str, int | None, Slot] | None = None
-    for idx in range(len(slots)):
-        candidate = _try_add_to_existing_slot(slots, idx, job, chunk_size)
+    for start_ms in starts:
+        candidate = _try_assign(slots_by_start, start_ms, job, cfg)
         if candidate is None:
             continue
-        rank, new_slot = candidate
+        rank, slot = candidate
         if best is None or rank < best[0]:
-            best = (rank, "merge", idx, new_slot)
-    new_slot_candidate = _try_new_slot(slots, job, chunk_size)
-    if new_slot_candidate is not None:
-        rank, new_slot = new_slot_candidate
-        if best is None or rank < best[0]:
-            best = (rank, "new", None, new_slot)
+            best = (rank, slot)
     if best is None:
         return None
-    return best[1], best[2], best[3]
+    return best[1].start_ms, best[1]
 
 
 def simulate(specs: list[RobotSpec], cfg: Config, horizon_params: AutoHorizonParams, metric: SuccessMetricParams, seed: int, duration_s: float) -> dict:
     duration_ms = duration_s * 1000.0
     processes = [HorizonProcess(np.random.default_rng(seed * 1000 + i)) for i in range(len(specs))]
     runtimes = [RobotRuntime(spec=s, period_ms=1000.0 / s.hz) for s in specs]
-    slots: list[Slot] = []
+    slots_by_start: dict[float, Slot] = {}
     chunk_ids = [0 for _ in specs]
-    slot_batch_hist: dict[int, int] = {}
 
     def schedule_chunk(robot_idx: int, chunk_start_ms: float) -> bool:
         if chunk_start_ms > duration_ms + 1e-9:
@@ -343,25 +256,24 @@ def simulate(specs: list[RobotSpec], cfg: Config, horizon_params: AutoHorizonPar
             horizon=h,
             next_horizon=nh,
         )
-        assignment = _find_best_assignment(slots, job, cfg.chunk_size)
+        assignment = _find_best_assignment(slots_by_start, job, cfg)
         if assignment is None:
             runtimes[robot_idx].reply_over_chunk_actions += 1
             return False
-        mode, idx, slot = assignment
+        start_ms, new_slot = assignment
+        slots_by_start[start_ms] = new_slot
         chunk_ids[robot_idx] += 1
         runtimes[robot_idx].requests_sent += 1
-        if mode == "merge":
-            assert idx is not None
-            slots[idx] = slot
-        else:
-            _insert_slot(slots, slot)
         return True
 
     for i, spec in enumerate(specs):
         schedule_chunk(i, spec.start_ms)
 
-    while slots:
-        slot = slots.pop(0)
+    slot_batch_hist: dict[int, int] = {}
+    ordered_starts = sorted(slots_by_start.keys())
+    while ordered_starts:
+        start_ms = ordered_starts.pop(0)
+        slot = slots_by_start.pop(start_ms)
         slot_batch_hist[slot.batch_size] = slot_batch_hist.get(slot.batch_size, 0) + 1
         latency_ms = slot.finish_ms - slot.start_ms
         for job in slot.jobs:
@@ -390,6 +302,7 @@ def simulate(specs: list[RobotSpec], cfg: Config, horizon_params: AutoHorizonPar
                 bucket["exact"] += 1
             if switch_time_ms <= duration_ms + 1e-9:
                 schedule_chunk(job.robot_idx, switch_time_ms)
+        ordered_starts = sorted(slots_by_start.keys())
 
     robot_scores = [geometric_mean(rt.chunk_scores) for rt in runtimes]
     p95s = [float(np.percentile(rt.latencies_ms, 95)) for rt in runtimes if rt.latencies_ms]
