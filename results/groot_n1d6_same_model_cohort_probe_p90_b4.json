@@ -1,0 +1,2202 @@
+{
+  "config": {
+    "groups": 2,
+    "max_requests_per_group": 80,
+    "global_threshold": 1.0,
+    "conservative_horizon": 5.0,
+    "admit_min_robot_score": 0.97,
+    "admit_fleet_score": 0.985,
+    "phase_bins": 4,
+    "phase_search_horizons": 2,
+    "max_batch": 8,
+    "slot_period_ms": 90.0,
+    "slot_start_phase_ms": 0.0,
+    "predict_duration_s": 10.0,
+    "predict_seeds": 2,
+    "truth_duration_s": 25.0,
+    "truth_seeds": 2,
+    "output_path": "/root/autodl-tmp/VLAServing/results/groot_n1d6_same_model_cohort_probe_p90_b4.json"
+  },
+  "summary": {
+    "groups": 2,
+    "model": "gr00t_n1d6-libero",
+    "mean_admitted_total": 11.0,
+    "total_admitted_robots": 22,
+    "mean_fleet_score": 0.990148926113069,
+    "mean_min_robot_score": 0.961575697414256,
+    "mean_max_p95_latency_ms": 78.62065063090995,
+    "mean_slot_batch_size": 2.309016393442623,
+    "slot_batch_hist": {
+      "0": 205,
+      "1": 212,
+      "2": 271,
+      "3": 245,
+      "4": 162,
+      "5": 83,
+      "6": 29,
+      "7": 13
+    },
+    "groups_min_robot_ge_threshold": 0,
+    "groups_fleet_ge_threshold": 2,
+    "admitted_frequency_histogram": {
+      "5": 8,
+      "10": 8,
+      "25": 6
+    },
+    "reply_over_chunk_actions_count": 0,
+    "non_bootstrap_replies_count": 2817,
+    "reply_over_chunk_actions_ratio": 0.0,
+    "miss_autohorizon_count": 471,
+    "chunk_count": 2817,
+    "miss_autohorizon_ratio": 0.16719914802981894,
+    "contains_25hz": true,
+    "contains_30hz": false
+  },
+  "groups_detail": [
+    {
+      "group_idx": 0,
+      "admitted_total": 10,
+      "rejected_requests": 2,
+      "admitted_robot_breakdown": [
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "count": 3
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "count": 4
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "count": 3
+        }
+      ],
+      "admitted_robots": [
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "start_ms": 960.0,
+          "name": "gr00t_n1d6_libero_25hz_0"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_5hz_1"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "start_ms": 960.0,
+          "name": "gr00t_n1d6_libero_25hz_2"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 800.0,
+          "name": "gr00t_n1d6_libero_10hz_3"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_10hz_4"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 4800.0,
+          "name": "gr00t_n1d6_libero_5hz_5"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 800.0,
+          "name": "gr00t_n1d6_libero_10hz_6"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "start_ms": 640.0,
+          "name": "gr00t_n1d6_libero_25hz_7"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 4800.0,
+          "name": "gr00t_n1d6_libero_5hz_8"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_10hz_9"
+        }
+      ],
+      "final_metrics": {
+        "fleet_score": 0.9898111882972664,
+        "min_robot_score": 0.9632520439776129,
+        "max_p95_latency_ms": 73.6480011837557,
+        "avg_weighted_deviation": 0.5553227272002903,
+        "requests_per_s": 26.92,
+        "robot_count": 10,
+        "reply_over_chunk_actions_count": 0,
+        "non_bootstrap_replies_count": 1346,
+        "reply_over_chunk_actions_ratio": 0.0,
+        "miss_autohorizon_count": 220,
+        "chunk_count": 1346,
+        "miss_autohorizon_ratio": 0.16344725111441308,
+        "slot_batch_hist": {
+          "0": 94,
+          "1": 115,
+          "2": 140,
+          "3": 122,
+          "4": 71,
+          "5": 49,
+          "6": 7,
+          "7": 2
+        },
+        "mean_slot_batch_size": 2.243333333333333,
+        "consumed_hist": {
+          "3": 39,
+          "4": 90,
+          "5": 1086,
+          "6": 66,
+          "7": 26,
+          "8": 4,
+          "9": 4,
+          "10": 6,
+          "11": 13,
+          "12": 12
+        },
+        "horizon_hist": {
+          "4": 135,
+          "5": 1076,
+          "6": 90,
+          "7": 5,
+          "8": 4,
+          "9": 1,
+          "10": 12,
+          "11": 22,
+          "12": 1
+        },
+        "per_horizon_alignment": {
+          "4": {
+            "early": 36,
+            "exact": 58,
+            "late": 41
+          },
+          "5": {
+            "early": 34,
+            "exact": 1010,
+            "late": 32
+          },
+          "6": {
+            "early": 35,
+            "exact": 35,
+            "late": 20
+          },
+          "7": {
+            "early": 0,
+            "exact": 5,
+            "late": 0
+          },
+          "8": {
+            "early": 2,
+            "exact": 2,
+            "late": 0
+          },
+          "9": {
+            "early": 0,
+            "exact": 1,
+            "late": 0
+          },
+          "10": {
+            "early": 3,
+            "exact": 5,
+            "late": 4
+          },
+          "11": {
+            "early": 2,
+            "exact": 9,
+            "late": 11
+          },
+          "12": {
+            "early": 0,
+            "exact": 1,
+            "late": 0
+          }
+        }
+      },
+      "admission_log": [
+        {
+          "request_idx": 0,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": true,
+          "start_ms": 960.0,
+          "fleet_size_after_accept": 1,
+          "predictive_eval": {
+            "fleet_score": 0.9854765055068697,
+            "min_robot_score": 0.9854765055068697,
+            "max_p95_latency_ms": 43.88061095960438,
+            "avg_weighted_deviation": 0.4180128729037257,
+            "requests_per_s": 5.050000000000001,
+            "robot_count": 1,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 101,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 13,
+            "chunk_count": 101,
+            "miss_autohorizon_ratio": 0.12871287128712872,
+            "slot_batch_hist": {
+              "0": 112,
+              "1": 101
+            },
+            "mean_slot_batch_size": 0.47417840375586856,
+            "consumed_hist": {
+              "3": 8,
+              "5": 89,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 8,
+              "5": 88,
+              "6": 1,
+              "11": 4
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 8,
+                "exact": 0,
+                "late": 0
+              },
+              "5": {
+                "early": 0,
+                "exact": 88,
+                "late": 0
+              },
+              "6": {
+                "early": 1,
+                "exact": 0,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 0,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 1,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 2,
+          "predictive_eval": {
+            "fleet_score": 0.9927115794526806,
+            "min_robot_score": 0.9854765055068697,
+            "max_p95_latency_ms": 47.61115345172584,
+            "avg_weighted_deviation": 0.34602499924578795,
+            "requests_per_s": 6.1,
+            "robot_count": 2,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 122,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 13,
+            "chunk_count": 122,
+            "miss_autohorizon_ratio": 0.10655737704918032,
+            "slot_batch_hist": {
+              "0": 144,
+              "1": 106,
+              "2": 8
+            },
+            "mean_slot_batch_size": 0.4728682170542636,
+            "consumed_hist": {
+              "3": 8,
+              "4": 1,
+              "5": 108,
+              "6": 1,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 9,
+              "5": 107,
+              "6": 2,
+              "11": 4
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 8,
+                "exact": 1,
+                "late": 0
+              },
+              "5": {
+                "early": 0,
+                "exact": 107,
+                "late": 0
+              },
+              "6": {
+                "early": 1,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 0,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 2,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": true,
+          "start_ms": 960.0,
+          "fleet_size_after_accept": 3,
+          "predictive_eval": {
+            "fleet_score": 0.9892635183881218,
+            "min_robot_score": 0.9811588748818059,
+            "max_p95_latency_ms": 51.7065804451704,
+            "avg_weighted_deviation": 0.42160744423041263,
+            "requests_per_s": 11.2,
+            "robot_count": 3,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 224,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 27,
+            "chunk_count": 224,
+            "miss_autohorizon_ratio": 0.12053571428571429,
+            "slot_batch_hist": {
+              "0": 120,
+              "1": 59,
+              "2": 72,
+              "3": 7
+            },
+            "mean_slot_batch_size": 0.8682170542635659,
+            "consumed_hist": {
+              "3": 10,
+              "4": 1,
+              "5": 209,
+              "6": 1,
+              "12": 3
+            },
+            "horizon_hist": {
+              "4": 17,
+              "5": 195,
+              "6": 9,
+              "11": 3
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 10,
+                "exact": 1,
+                "late": 6
+              },
+              "5": {
+                "early": 0,
+                "exact": 195,
+                "late": 0
+              },
+              "6": {
+                "early": 8,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 0,
+                "late": 3
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 3,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 800.0,
+          "fleet_size_after_accept": 4,
+          "predictive_eval": {
+            "fleet_score": 0.9919366957680817,
+            "min_robot_score": 0.9811588748818059,
+            "max_p95_latency_ms": 53.38724696775898,
+            "avg_weighted_deviation": 0.35675853150862546,
+            "requests_per_s": 13.25,
+            "robot_count": 4,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 265,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 27,
+            "chunk_count": 265,
+            "miss_autohorizon_ratio": 0.1018867924528302,
+            "slot_batch_hist": {
+              "0": 109,
+              "1": 66,
+              "2": 66,
+              "3": 21,
+              "4": 1
+            },
+            "mean_slot_batch_size": 1.0076045627376427,
+            "consumed_hist": {
+              "3": 11,
+              "4": 8,
+              "5": 240,
+              "6": 1,
+              "11": 2,
+              "12": 3
+            },
+            "horizon_hist": {
+              "4": 24,
+              "5": 227,
+              "6": 9,
+              "11": 5
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 11,
+                "exact": 8,
+                "late": 5
+              },
+              "5": {
+                "early": 0,
+                "exact": 227,
+                "late": 0
+              },
+              "6": {
+                "early": 8,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 2,
+                "late": 3
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 4,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 5,
+          "predictive_eval": {
+            "fleet_score": 0.9934909572499517,
+            "min_robot_score": 0.9811588748818059,
+            "max_p95_latency_ms": 55.067913490347564,
+            "avg_weighted_deviation": 0.31360502167333787,
+            "requests_per_s": 15.25,
+            "robot_count": 5,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 305,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 28,
+            "chunk_count": 305,
+            "miss_autohorizon_ratio": 0.09180327868852459,
+            "slot_batch_hist": {
+              "0": 94,
+              "1": 68,
+              "2": 72,
+              "3": 27,
+              "4": 3
+            },
+            "mean_slot_batch_size": 1.1553030303030303,
+            "consumed_hist": {
+              "3": 13,
+              "4": 12,
+              "5": 272,
+              "6": 2,
+              "11": 2,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 28,
+              "5": 261,
+              "6": 10,
+              "11": 6
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 13,
+                "exact": 12,
+                "late": 3
+              },
+              "5": {
+                "early": 0,
+                "exact": 261,
+                "late": 0
+              },
+              "6": {
+                "early": 8,
+                "exact": 2,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 2,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 5,
+          "model": "gr00t_n1d6-libero",
+          "hz": 30.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 6,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 4800.0,
+          "fleet_size_after_accept": 6,
+          "predictive_eval": {
+            "fleet_score": 0.9943004177136661,
+            "min_robot_score": 0.9791659793240648,
+            "max_p95_latency_ms": 61.05552027001977,
+            "avg_weighted_deviation": 0.3173644300654317,
+            "requests_per_s": 15.9,
+            "robot_count": 6,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 318,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 30,
+            "chunk_count": 318,
+            "miss_autohorizon_ratio": 0.09433962264150944,
+            "slot_batch_hist": {
+              "0": 94,
+              "1": 66,
+              "2": 75,
+              "3": 23,
+              "4": 7,
+              "5": 1
+            },
+            "mean_slot_batch_size": 1.1954887218045114,
+            "consumed_hist": {
+              "3": 12,
+              "4": 14,
+              "5": 279,
+              "6": 5,
+              "7": 1,
+              "11": 3,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 28,
+              "5": 272,
+              "6": 11,
+              "11": 7
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 12,
+                "exact": 13,
+                "late": 3
+              },
+              "5": {
+                "early": 1,
+                "exact": 269,
+                "late": 2
+              },
+              "6": {
+                "early": 7,
+                "exact": 3,
+                "late": 1
+              },
+              "11": {
+                "early": 0,
+                "exact": 3,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 7,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 800.0,
+          "fleet_size_after_accept": 7,
+          "predictive_eval": {
+            "fleet_score": 0.9955025545903953,
+            "min_robot_score": 0.9822351403007006,
+            "max_p95_latency_ms": 58.429246535524726,
+            "avg_weighted_deviation": 0.25744726544080443,
+            "requests_per_s": 17.700000000000003,
+            "robot_count": 7,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 354,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 27,
+            "chunk_count": 354,
+            "miss_autohorizon_ratio": 0.07627118644067797,
+            "slot_batch_hist": {
+              "0": 83,
+              "1": 61,
+              "2": 63,
+              "3": 37,
+              "4": 14
+            },
+            "mean_slot_batch_size": 1.372093023255814,
+            "consumed_hist": {
+              "3": 9,
+              "4": 17,
+              "5": 310,
+              "6": 6,
+              "7": 4,
+              "10": 2,
+              "11": 3,
+              "12": 3
+            },
+            "horizon_hist": {
+              "4": 32,
+              "5": 299,
+              "6": 14,
+              "7": 1,
+              "10": 1,
+              "11": 7
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 9,
+                "exact": 17,
+                "late": 6
+              },
+              "5": {
+                "early": 0,
+                "exact": 299,
+                "late": 0
+              },
+              "6": {
+                "early": 5,
+                "exact": 6,
+                "late": 3
+              },
+              "7": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "10": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 1,
+                "exact": 3,
+                "late": 3
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 8,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 9,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": true,
+          "start_ms": 640.0,
+          "fleet_size_after_accept": 8,
+          "predictive_eval": {
+            "fleet_score": 0.991944074295229,
+            "min_robot_score": 0.97379800226821,
+            "max_p95_latency_ms": 67.85364751704037,
+            "avg_weighted_deviation": 0.40865436314926135,
+            "requests_per_s": 22.799999999999997,
+            "robot_count": 8,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 456,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 56,
+            "chunk_count": 456,
+            "miss_autohorizon_ratio": 0.12280701754385964,
+            "slot_batch_hist": {
+              "0": 83,
+              "1": 50,
+              "2": 42,
+              "3": 44,
+              "4": 30,
+              "5": 14
+            },
+            "mean_slot_batch_size": 1.7338403041825095,
+            "consumed_hist": {
+              "3": 7,
+              "4": 24,
+              "5": 399,
+              "6": 10,
+              "7": 7,
+              "11": 4,
+              "12": 5
+            },
+            "horizon_hist": {
+              "4": 41,
+              "5": 381,
+              "6": 24,
+              "7": 1,
+              "10": 1,
+              "11": 8
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 19,
+                "late": 15
+              },
+              "5": {
+                "early": 5,
+                "exact": 371,
+                "late": 5
+              },
+              "6": {
+                "early": 13,
+                "exact": 6,
+                "late": 5
+              },
+              "7": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "10": {
+                "early": 0,
+                "exact": 0,
+                "late": 1
+              },
+              "11": {
+                "early": 0,
+                "exact": 3,
+                "late": 5
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 10,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 4800.0,
+          "fleet_size_after_accept": 9,
+          "predictive_eval": {
+            "fleet_score": 0.9919947932978943,
+            "min_robot_score": 0.9700635727158987,
+            "max_p95_latency_ms": 74.1495085414499,
+            "avg_weighted_deviation": 0.4435834494240641,
+            "requests_per_s": 23.3,
+            "robot_count": 9,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 466,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 60,
+            "chunk_count": 466,
+            "miss_autohorizon_ratio": 0.12875536480686695,
+            "slot_batch_hist": {
+              "0": 78,
+              "1": 47,
+              "2": 50,
+              "3": 49,
+              "4": 25,
+              "5": 13,
+              "7": 1
+            },
+            "mean_slot_batch_size": 1.7718631178707225,
+            "consumed_hist": {
+              "3": 12,
+              "4": 25,
+              "5": 394,
+              "6": 16,
+              "7": 10,
+              "11": 5,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 41,
+              "5": 388,
+              "6": 27,
+              "7": 1,
+              "10": 1,
+              "11": 8
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 11,
+                "exact": 18,
+                "late": 12
+              },
+              "5": {
+                "early": 8,
+                "exact": 373,
+                "late": 7
+              },
+              "6": {
+                "early": 9,
+                "exact": 10,
+                "late": 8
+              },
+              "7": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "10": {
+                "early": 0,
+                "exact": 0,
+                "late": 1
+              },
+              "11": {
+                "early": 0,
+                "exact": 4,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 11,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 10,
+          "predictive_eval": {
+            "fleet_score": 0.9924462412236726,
+            "min_robot_score": 0.9714022052509543,
+            "max_p95_latency_ms": 81.51782746426761,
+            "avg_weighted_deviation": 0.43710376805148593,
+            "requests_per_s": 25.25,
+            "robot_count": 10,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 505,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 60,
+            "chunk_count": 505,
+            "miss_autohorizon_ratio": 0.1188118811881188,
+            "slot_batch_hist": {
+              "0": 78,
+              "1": 43,
+              "2": 48,
+              "3": 48,
+              "4": 29,
+              "5": 16,
+              "6": 2,
+              "7": 2
+            },
+            "mean_slot_batch_size": 1.8984962406015038,
+            "consumed_hist": {
+              "3": 10,
+              "4": 31,
+              "5": 421,
+              "6": 23,
+              "7": 5,
+              "8": 7,
+              "10": 1,
+              "11": 3,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 43,
+              "5": 420,
+              "6": 28,
+              "7": 2,
+              "8": 4,
+              "10": 1,
+              "11": 7
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 9,
+                "exact": 21,
+                "late": 13
+              },
+              "5": {
+                "early": 11,
+                "exact": 399,
+                "late": 10
+              },
+              "6": {
+                "early": 9,
+                "exact": 15,
+                "late": 4
+              },
+              "7": {
+                "early": 0,
+                "exact": 2,
+                "late": 0
+              },
+              "8": {
+                "early": 0,
+                "exact": 4,
+                "late": 0
+              },
+              "10": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 3,
+                "late": 4
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "group_idx": 1,
+      "admitted_total": 12,
+      "rejected_requests": 14,
+      "admitted_robot_breakdown": [
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "count": 5
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "count": 4
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "count": 3
+        }
+      ],
+      "admitted_robots": [
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "start_ms": 960.0,
+          "name": "gr00t_n1d6_libero_25hz_0"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_5hz_1"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_10hz_2"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 800.0,
+          "name": "gr00t_n1d6_libero_10hz_3"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_5hz_4"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "start_ms": 640.0,
+          "name": "gr00t_n1d6_libero_25hz_5"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_5hz_6"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 1600.0,
+          "name": "gr00t_n1d6_libero_5hz_7"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "start_ms": 320.0,
+          "name": "gr00t_n1d6_libero_25hz_8"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "start_ms": 3200.0,
+          "name": "gr00t_n1d6_libero_5hz_9"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 0.0,
+          "name": "gr00t_n1d6_libero_10hz_10"
+        },
+        {
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "start_ms": 0.0,
+          "name": "gr00t_n1d6_libero_10hz_11"
+        }
+      ],
+      "final_metrics": {
+        "fleet_score": 0.9904866639288716,
+        "min_robot_score": 0.9598993508508991,
+        "max_p95_latency_ms": 83.5933000780642,
+        "avg_weighted_deviation": 0.5870415643931997,
+        "requests_per_s": 29.42,
+        "robot_count": 12,
+        "reply_over_chunk_actions_count": 0,
+        "non_bootstrap_replies_count": 1471,
+        "reply_over_chunk_actions_ratio": 0.0,
+        "miss_autohorizon_count": 251,
+        "chunk_count": 1471,
+        "miss_autohorizon_ratio": 0.17063222297756628,
+        "slot_batch_hist": {
+          "0": 111,
+          "1": 97,
+          "2": 131,
+          "3": 123,
+          "4": 91,
+          "5": 34,
+          "6": 22,
+          "7": 11
+        },
+        "mean_slot_batch_size": 2.3725806451612903,
+        "consumed_hist": {
+          "3": 41,
+          "4": 119,
+          "5": 1136,
+          "6": 96,
+          "7": 36,
+          "8": 6,
+          "9": 7,
+          "10": 9,
+          "11": 11,
+          "12": 10
+        },
+        "horizon_hist": {
+          "4": 143,
+          "5": 1156,
+          "6": 120,
+          "7": 10,
+          "8": 9,
+          "9": 1,
+          "10": 11,
+          "11": 21
+        },
+        "per_horizon_alignment": {
+          "4": {
+            "early": 38,
+            "exact": 66,
+            "late": 39
+          },
+          "5": {
+            "early": 55,
+            "exact": 1062,
+            "late": 39
+          },
+          "6": {
+            "early": 36,
+            "exact": 64,
+            "late": 20
+          },
+          "7": {
+            "early": 0,
+            "exact": 8,
+            "late": 2
+          },
+          "8": {
+            "early": 3,
+            "exact": 2,
+            "late": 4
+          },
+          "9": {
+            "early": 0,
+            "exact": 1,
+            "late": 0
+          },
+          "10": {
+            "early": 3,
+            "exact": 7,
+            "late": 1
+          },
+          "11": {
+            "early": 1,
+            "exact": 10,
+            "late": 10
+          }
+        }
+      },
+      "admission_log": [
+        {
+          "request_idx": 0,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": true,
+          "start_ms": 960.0,
+          "fleet_size_after_accept": 1,
+          "predictive_eval": {
+            "fleet_score": 0.9854765055068697,
+            "min_robot_score": 0.9854765055068697,
+            "max_p95_latency_ms": 43.88061095960438,
+            "avg_weighted_deviation": 0.4180128729037257,
+            "requests_per_s": 5.050000000000001,
+            "robot_count": 1,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 101,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 13,
+            "chunk_count": 101,
+            "miss_autohorizon_ratio": 0.12871287128712872,
+            "slot_batch_hist": {
+              "0": 112,
+              "1": 101
+            },
+            "mean_slot_batch_size": 0.47417840375586856,
+            "consumed_hist": {
+              "3": 8,
+              "5": 89,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 8,
+              "5": 88,
+              "6": 1,
+              "11": 4
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 8,
+                "exact": 0,
+                "late": 0
+              },
+              "5": {
+                "early": 0,
+                "exact": 88,
+                "late": 0
+              },
+              "6": {
+                "early": 1,
+                "exact": 0,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 0,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 1,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 2,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 2,
+          "predictive_eval": {
+            "fleet_score": 0.9927115794526806,
+            "min_robot_score": 0.9854765055068697,
+            "max_p95_latency_ms": 47.61115345172584,
+            "avg_weighted_deviation": 0.34602499924578795,
+            "requests_per_s": 6.1,
+            "robot_count": 2,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 122,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 13,
+            "chunk_count": 122,
+            "miss_autohorizon_ratio": 0.10655737704918032,
+            "slot_batch_hist": {
+              "0": 144,
+              "1": 106,
+              "2": 8
+            },
+            "mean_slot_batch_size": 0.4728682170542636,
+            "consumed_hist": {
+              "3": 8,
+              "4": 1,
+              "5": 108,
+              "6": 1,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 9,
+              "5": 107,
+              "6": 2,
+              "11": 4
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 8,
+                "exact": 1,
+                "late": 0
+              },
+              "5": {
+                "early": 0,
+                "exact": 107,
+                "late": 0
+              },
+              "6": {
+                "early": 1,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 0,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 3,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 4,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 3,
+          "predictive_eval": {
+            "fleet_score": 0.9951351061215521,
+            "min_robot_score": 0.9854765055068697,
+            "max_p95_latency_ms": 50.68272369680926,
+            "avg_weighted_deviation": 0.262219483170417,
+            "requests_per_s": 8.05,
+            "robot_count": 3,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 161,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 13,
+            "chunk_count": 161,
+            "miss_autohorizon_ratio": 0.08074534161490683,
+            "slot_batch_hist": {
+              "0": 132,
+              "1": 94,
+              "2": 29,
+              "3": 3
+            },
+            "mean_slot_batch_size": 0.624031007751938,
+            "consumed_hist": {
+              "3": 7,
+              "4": 3,
+              "5": 143,
+              "6": 3,
+              "7": 1,
+              "10": 2,
+              "12": 2
+            },
+            "horizon_hist": {
+              "4": 11,
+              "5": 142,
+              "6": 4,
+              "11": 4
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 3,
+                "late": 1
+              },
+              "5": {
+                "early": 0,
+                "exact": 142,
+                "late": 0
+              },
+              "6": {
+                "early": 0,
+                "exact": 3,
+                "late": 1
+              },
+              "11": {
+                "early": 2,
+                "exact": 0,
+                "late": 2
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 5,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 6,
+          "model": "gr00t_n1d6-libero",
+          "hz": 20.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 7,
+          "model": "gr00t_n1d6-libero",
+          "hz": 20.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 8,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 9,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 800.0,
+          "fleet_size_after_accept": 4,
+          "predictive_eval": {
+            "fleet_score": 0.9963110428518367,
+            "min_robot_score": 0.9853260761343585,
+            "max_p95_latency_ms": 51.7065804451704,
+            "avg_weighted_deviation": 0.21001333502157618,
+            "requests_per_s": 10.05,
+            "robot_count": 4,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 201,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 13,
+            "chunk_count": 201,
+            "miss_autohorizon_ratio": 0.06467661691542288,
+            "slot_batch_hist": {
+              "0": 123,
+              "1": 88,
+              "2": 40,
+              "3": 11
+            },
+            "mean_slot_batch_size": 0.767175572519084,
+            "consumed_hist": {
+              "3": 7,
+              "4": 10,
+              "5": 175,
+              "6": 3,
+              "11": 2,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 18,
+              "5": 173,
+              "6": 4,
+              "11": 6
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 10,
+                "late": 1
+              },
+              "5": {
+                "early": 0,
+                "exact": 173,
+                "late": 0
+              },
+              "6": {
+                "early": 1,
+                "exact": 3,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 2,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 10,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 5,
+          "predictive_eval": {
+            "fleet_score": 0.9971011129155356,
+            "min_robot_score": 0.9855901044970422,
+            "max_p95_latency_ms": 58.429246535524726,
+            "avg_weighted_deviation": 0.18568060833182512,
+            "requests_per_s": 11.05,
+            "robot_count": 5,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 221,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 12,
+            "chunk_count": 221,
+            "miss_autohorizon_ratio": 0.05429864253393665,
+            "slot_batch_hist": {
+              "0": 124,
+              "1": 95,
+              "2": 35,
+              "3": 8,
+              "4": 8
+            },
+            "mean_slot_batch_size": 0.8185185185185185,
+            "consumed_hist": {
+              "3": 6,
+              "4": 12,
+              "5": 193,
+              "6": 4,
+              "7": 1,
+              "11": 2,
+              "12": 3
+            },
+            "horizon_hist": {
+              "4": 20,
+              "5": 191,
+              "6": 5,
+              "11": 5
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 6,
+                "exact": 12,
+                "late": 2
+              },
+              "5": {
+                "early": 0,
+                "exact": 191,
+                "late": 0
+              },
+              "6": {
+                "early": 0,
+                "exact": 4,
+                "late": 1
+              },
+              "11": {
+                "early": 0,
+                "exact": 2,
+                "late": 3
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 11,
+          "model": "gr00t_n1d6-libero",
+          "hz": 30.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 12,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": true,
+          "start_ms": 640.0,
+          "fleet_size_after_accept": 6,
+          "predictive_eval": {
+            "fleet_score": 0.9916844384768577,
+            "min_robot_score": 0.9709518526777685,
+            "max_p95_latency_ms": 63.14144702628255,
+            "avg_weighted_deviation": 0.44872491704494066,
+            "requests_per_s": 16.15,
+            "robot_count": 6,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 323,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 46,
+            "chunk_count": 323,
+            "miss_autohorizon_ratio": 0.14241486068111456,
+            "slot_batch_hist": {
+              "0": 100,
+              "1": 77,
+              "2": 56,
+              "3": 25,
+              "4": 11,
+              "5": 3
+            },
+            "mean_slot_batch_size": 1.1875,
+            "consumed_hist": {
+              "3": 7,
+              "4": 19,
+              "5": 278,
+              "6": 8,
+              "7": 3,
+              "8": 1,
+              "9": 1,
+              "11": 2,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 26,
+              "5": 268,
+              "6": 20,
+              "7": 1,
+              "8": 1,
+              "10": 1,
+              "11": 6
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 12,
+                "late": 7
+              },
+              "5": {
+                "early": 7,
+                "exact": 257,
+                "late": 4
+              },
+              "6": {
+                "early": 14,
+                "exact": 4,
+                "late": 2
+              },
+              "7": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "8": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "10": {
+                "early": 1,
+                "exact": 0,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 2,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 13,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 7,
+          "predictive_eval": {
+            "fleet_score": 0.99295012043353,
+            "min_robot_score": 0.9725430354481817,
+            "max_p95_latency_ms": 69.15566183743067,
+            "avg_weighted_deviation": 0.41850256586566514,
+            "requests_per_s": 17.2,
+            "robot_count": 7,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 344,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 47,
+            "chunk_count": 344,
+            "miss_autohorizon_ratio": 0.13662790697674418,
+            "slot_batch_hist": {
+              "0": 99,
+              "1": 79,
+              "2": 50,
+              "3": 32,
+              "4": 12,
+              "5": 3,
+              "6": 1
+            },
+            "mean_slot_batch_size": 1.2463768115942029,
+            "consumed_hist": {
+              "3": 8,
+              "4": 20,
+              "5": 294,
+              "6": 8,
+              "7": 5,
+              "9": 1,
+              "10": 2,
+              "11": 2,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 27,
+              "5": 285,
+              "6": 21,
+              "7": 1,
+              "8": 1,
+              "10": 2,
+              "11": 7
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 8,
+                "exact": 13,
+                "late": 6
+              },
+              "5": {
+                "early": 7,
+                "exact": 275,
+                "late": 3
+              },
+              "6": {
+                "early": 13,
+                "exact": 5,
+                "late": 3
+              },
+              "7": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "8": {
+                "early": 1,
+                "exact": 0,
+                "late": 0
+              },
+              "10": {
+                "early": 1,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 1,
+                "exact": 2,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 14,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 1600.0,
+          "fleet_size_after_accept": 8,
+          "predictive_eval": {
+            "fleet_score": 0.9933758790040754,
+            "min_robot_score": 0.9727104229162586,
+            "max_p95_latency_ms": 79.20008599758148,
+            "avg_weighted_deviation": 0.42342182496359737,
+            "requests_per_s": 18.049999999999997,
+            "robot_count": 8,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 361,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 49,
+            "chunk_count": 361,
+            "miss_autohorizon_ratio": 0.13573407202216067,
+            "slot_batch_hist": {
+              "0": 98,
+              "1": 75,
+              "2": 47,
+              "3": 31,
+              "4": 12,
+              "5": 5,
+              "6": 2,
+              "7": 2
+            },
+            "mean_slot_batch_size": 1.3272058823529411,
+            "consumed_hist": {
+              "3": 5,
+              "4": 22,
+              "5": 306,
+              "6": 17,
+              "7": 3,
+              "9": 1,
+              "10": 1,
+              "11": 2,
+              "12": 4
+            },
+            "horizon_hist": {
+              "4": 28,
+              "5": 301,
+              "6": 22,
+              "7": 1,
+              "8": 1,
+              "10": 2,
+              "11": 6
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 5,
+                "exact": 15,
+                "late": 8
+              },
+              "5": {
+                "early": 7,
+                "exact": 285,
+                "late": 9
+              },
+              "6": {
+                "early": 13,
+                "exact": 8,
+                "late": 1
+              },
+              "7": {
+                "early": 0,
+                "exact": 1,
+                "late": 0
+              },
+              "8": {
+                "early": 1,
+                "exact": 0,
+                "late": 0
+              },
+              "10": {
+                "early": 1,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 0,
+                "exact": 2,
+                "late": 4
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 15,
+          "model": "gr00t_n1d6-libero",
+          "hz": 20.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 16,
+          "model": "gr00t_n1d6-libero",
+          "hz": 30.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 17,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 18,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": true,
+          "start_ms": 320.0,
+          "fleet_size_after_accept": 9,
+          "predictive_eval": {
+            "fleet_score": 0.9912413287532554,
+            "min_robot_score": 0.9724636740738429,
+            "max_p95_latency_ms": 79.20008599758148,
+            "avg_weighted_deviation": 0.4961071126897578,
+            "requests_per_s": 23.35,
+            "robot_count": 9,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 467,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 72,
+            "chunk_count": 467,
+            "miss_autohorizon_ratio": 0.15417558886509636,
+            "slot_batch_hist": {
+              "0": 89,
+              "1": 56,
+              "2": 59,
+              "3": 43,
+              "4": 20,
+              "5": 9,
+              "6": 3,
+              "7": 3
+            },
+            "mean_slot_batch_size": 1.6560283687943262,
+            "consumed_hist": {
+              "3": 8,
+              "4": 28,
+              "5": 390,
+              "6": 19,
+              "7": 12,
+              "8": 1,
+              "9": 2,
+              "10": 2,
+              "11": 2,
+              "12": 2,
+              "13": 1
+            },
+            "horizon_hist": {
+              "4": 31,
+              "5": 390,
+              "6": 32,
+              "7": 3,
+              "8": 2,
+              "10": 3,
+              "11": 6
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 15,
+                "late": 9
+              },
+              "5": {
+                "early": 14,
+                "exact": 365,
+                "late": 11
+              },
+              "6": {
+                "early": 16,
+                "exact": 9,
+                "late": 7
+              },
+              "7": {
+                "early": 0,
+                "exact": 3,
+                "late": 0
+              },
+              "8": {
+                "early": 2,
+                "exact": 0,
+                "late": 0
+              },
+              "10": {
+                "early": 2,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 1,
+                "exact": 2,
+                "late": 3
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 19,
+          "model": "gr00t_n1d6-libero",
+          "hz": 5.0,
+          "accepted": true,
+          "start_ms": 3200.0,
+          "fleet_size_after_accept": 10,
+          "predictive_eval": {
+            "fleet_score": 0.9920054605542545,
+            "min_robot_score": 0.9705466230785342,
+            "max_p95_latency_ms": 79.20008599758148,
+            "avg_weighted_deviation": 0.4829815593728899,
+            "requests_per_s": 24.200000000000003,
+            "robot_count": 10,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 484,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 73,
+            "chunk_count": 484,
+            "miss_autohorizon_ratio": 0.15082644628099173,
+            "slot_batch_hist": {
+              "0": 83,
+              "1": 59,
+              "2": 61,
+              "3": 42,
+              "4": 24,
+              "5": 6,
+              "6": 5,
+              "7": 3
+            },
+            "mean_slot_batch_size": 1.7102473498233215,
+            "consumed_hist": {
+              "3": 8,
+              "4": 29,
+              "5": 403,
+              "6": 22,
+              "7": 12,
+              "8": 1,
+              "9": 2,
+              "10": 2,
+              "11": 2,
+              "12": 3
+            },
+            "horizon_hist": {
+              "4": 33,
+              "5": 404,
+              "6": 33,
+              "7": 3,
+              "8": 2,
+              "10": 3,
+              "11": 6
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 17,
+                "late": 9
+              },
+              "5": {
+                "early": 13,
+                "exact": 378,
+                "late": 13
+              },
+              "6": {
+                "early": 16,
+                "exact": 10,
+                "late": 7
+              },
+              "7": {
+                "early": 0,
+                "exact": 3,
+                "late": 0
+              },
+              "8": {
+                "early": 2,
+                "exact": 0,
+                "late": 0
+              },
+              "10": {
+                "early": 2,
+                "exact": 1,
+                "late": 0
+              },
+              "11": {
+                "early": 1,
+                "exact": 2,
+                "late": 3
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 20,
+          "model": "gr00t_n1d6-libero",
+          "hz": 30.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 21,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 0.0,
+          "fleet_size_after_accept": 11,
+          "predictive_eval": {
+            "fleet_score": 0.9927958456536552,
+            "min_robot_score": 0.9719877653508029,
+            "max_p95_latency_ms": 81.51782746426761,
+            "avg_weighted_deviation": 0.43880486361027493,
+            "requests_per_s": 26.3,
+            "robot_count": 11,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 526,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 71,
+            "chunk_count": 526,
+            "miss_autohorizon_ratio": 0.13498098859315588,
+            "slot_batch_hist": {
+              "0": 99,
+              "1": 40,
+              "2": 51,
+              "3": 52,
+              "4": 28,
+              "5": 13,
+              "6": 5,
+              "7": 3
+            },
+            "mean_slot_batch_size": 1.8075601374570447,
+            "consumed_hist": {
+              "3": 8,
+              "4": 32,
+              "5": 440,
+              "6": 20,
+              "7": 13,
+              "8": 1,
+              "9": 2,
+              "10": 4,
+              "11": 4,
+              "12": 2
+            },
+            "horizon_hist": {
+              "4": 37,
+              "5": 439,
+              "6": 33,
+              "7": 3,
+              "8": 2,
+              "10": 5,
+              "11": 7
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 8,
+                "exact": 21,
+                "late": 8
+              },
+              "5": {
+                "early": 11,
+                "exact": 414,
+                "late": 14
+              },
+              "6": {
+                "early": 18,
+                "exact": 9,
+                "late": 6
+              },
+              "7": {
+                "early": 0,
+                "exact": 3,
+                "late": 0
+              },
+              "8": {
+                "early": 1,
+                "exact": 1,
+                "late": 0
+              },
+              "10": {
+                "early": 2,
+                "exact": 3,
+                "late": 0
+              },
+              "11": {
+                "early": 1,
+                "exact": 4,
+                "late": 2
+              }
+            }
+          }
+        },
+        {
+          "request_idx": 22,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 23,
+          "model": "gr00t_n1d6-libero",
+          "hz": 25.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 24,
+          "model": "gr00t_n1d6-libero",
+          "hz": 15.0,
+          "accepted": false
+        },
+        {
+          "request_idx": 25,
+          "model": "gr00t_n1d6-libero",
+          "hz": 10.0,
+          "accepted": true,
+          "start_ms": 0.0,
+          "fleet_size_after_accept": 12,
+          "predictive_eval": {
+            "fleet_score": 0.9939655673205487,
+            "min_robot_score": 0.9741598050465046,
+            "max_p95_latency_ms": 79.20008599758148,
+            "avg_weighted_deviation": 0.3686515332684835,
+            "requests_per_s": 28.299999999999997,
+            "robot_count": 12,
+            "reply_over_chunk_actions_count": 0,
+            "non_bootstrap_replies_count": 566,
+            "reply_over_chunk_actions_ratio": 0.0,
+            "miss_autohorizon_count": 70,
+            "chunk_count": 566,
+            "miss_autohorizon_ratio": 0.12367491166077739,
+            "slot_batch_hist": {
+              "0": 85,
+              "1": 42,
+              "2": 58,
+              "3": 45,
+              "4": 39,
+              "5": 17,
+              "6": 3,
+              "7": 2
+            },
+            "mean_slot_batch_size": 1.9450171821305842,
+            "consumed_hist": {
+              "3": 7,
+              "4": 42,
+              "5": 468,
+              "6": 17,
+              "7": 17,
+              "9": 1,
+              "10": 5,
+              "11": 7,
+              "12": 2
+            },
+            "horizon_hist": {
+              "4": 40,
+              "5": 469,
+              "6": 37,
+              "7": 3,
+              "8": 2,
+              "10": 5,
+              "11": 10
+            },
+            "per_horizon_alignment": {
+              "4": {
+                "early": 7,
+                "exact": 25,
+                "late": 8
+              },
+              "5": {
+                "early": 17,
+                "exact": 448,
+                "late": 4
+              },
+              "6": {
+                "early": 12,
+                "exact": 13,
+                "late": 12
+              },
+              "7": {
+                "early": 0,
+                "exact": 3,
+                "late": 0
+              },
+              "8": {
+                "early": 2,
+                "exact": 0,
+                "late": 0
+              },
+              "10": {
+                "early": 1,
+                "exact": 2,
+                "late": 2
+              },
+              "11": {
+                "early": 3,
+                "exact": 5,
+                "late": 2
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "service_curve_ms": {
+    "1": 43.88061095960438,
+    "2": 47.61115345172584,
+    "3": 51.7065804451704,
+    "4": 58.429246535524726,
+    "5": 67.85364751704037,
+    "6": 79.44235485047102,
+    "7": 83.5933000780642,
+    "8": 96.4333435986191
+  },
+  "peak_request_throughput": 83.73876845946982
+}

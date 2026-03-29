@@ -46,10 +46,16 @@ class Config:
     truth_duration_s: float = 90.0
     truth_seeds: int = 4
     chunk_size: int = 16
-    phase_bins: int = 8
     max_batch: int = 8
-    slot_period_ms: float = 100.0
     slot_start_phase_ms: float = 0.0
+    low_hz_max: float = 15.0
+    high_hz_min: float = 25.0
+    low_phase_bins: int = 4
+    mid_phase_bins: int = 3
+    high_phase_bins: int = 2
+    low_slot_period_ms: float = 200.0
+    mid_slot_period_ms: float = 160.0
+    high_slot_period_ms: float = 120.0
 
 
 @dataclass(frozen=True)
@@ -161,6 +167,23 @@ def _slot_service_ms(batch_size: int) -> float:
     return BATCH_SERVICE_MS[max(1, min(batch_size, MAX_BATCH))]
 
 
+def _tier_for_hz(hz: float, cfg: Config) -> str:
+    if hz >= cfg.high_hz_min:
+        return "high"
+    if hz <= cfg.low_hz_max:
+        return "low"
+    return "mid"
+
+
+def _slot_period_for_hz(hz: float, cfg: Config) -> float:
+    tier = _tier_for_hz(hz, cfg)
+    if tier == "high":
+        return cfg.high_slot_period_ms
+    if tier == "low":
+        return cfg.low_slot_period_ms
+    return cfg.mid_slot_period_ms
+
+
 def _consumed_at_finish(job: ScheduledJob, finish_ms: float, chunk_size: int) -> int:
     elapsed = max(0.0, finish_ms - job.chunk_start_ms)
     consumed = int(math.ceil(elapsed / job.period_ms - 1e-9))
@@ -173,14 +196,15 @@ def _job_rank(job: ScheduledJob, finish_ms: float, chunk_size: int) -> tuple[flo
     return abs(consumed - job.horizon) * weight, abs(consumed - job.horizon)
 
 
-def _slot_start_candidates(release_ms: float, hard_finish_ms: float, cfg: Config) -> list[float]:
+def _slot_start_candidates(release_ms: float, hard_finish_ms: float, hz: float, cfg: Config) -> list[float]:
+    slot_period_ms = _slot_period_for_hz(hz, cfg)
     earliest_start = release_ms
     latest_start = hard_finish_ms - _slot_service_ms(1)
     if latest_start < earliest_start - 1e-9:
         return []
-    first_idx = math.ceil((earliest_start - cfg.slot_start_phase_ms) / cfg.slot_period_ms)
-    last_idx = math.floor((latest_start - cfg.slot_start_phase_ms) / cfg.slot_period_ms)
-    return [cfg.slot_start_phase_ms + i * cfg.slot_period_ms for i in range(first_idx, last_idx + 1)]
+    first_idx = math.ceil((earliest_start - cfg.slot_start_phase_ms) / slot_period_ms)
+    last_idx = math.floor((latest_start - cfg.slot_start_phase_ms) / slot_period_ms)
+    return [cfg.slot_start_phase_ms + i * slot_period_ms for i in range(first_idx, last_idx + 1)]
 
 
 def _try_assign(slots_by_start: dict[float, Slot], start_ms: float, job: ScheduledJob, cfg: Config) -> tuple[tuple, Slot] | None:
@@ -191,9 +215,17 @@ def _try_assign(slots_by_start: dict[float, Slot], start_ms: float, job: Schedul
     if new_batch > cfg.max_batch:
         return None
     new_finish = start_ms + _slot_service_ms(new_batch)
-    next_slot_start = start_ms + cfg.slot_period_ms
-    if new_finish > next_slot_start + 1e-9:
-        return None
+    ordered_starts = sorted(slots_by_start.keys())
+    prev_starts = [s for s in ordered_starts if s < start_ms]
+    next_starts = [s for s in ordered_starts if s > start_ms]
+    if prev_starts:
+        prev_slot = slots_by_start[prev_starts[-1]]
+        if prev_slot.finish_ms > start_ms + 1e-9:
+            return None
+    if next_starts:
+        next_slot = slots_by_start[next_starts[0]]
+        if new_finish > next_slot.start_ms + 1e-9:
+            return None
     hard_finish_new = job.chunk_start_ms + cfg.chunk_size * job.period_ms
     if new_finish > hard_finish_new + 1e-9:
         return None
@@ -221,7 +253,7 @@ def _try_assign(slots_by_start: dict[float, Slot], start_ms: float, job: Schedul
 def _find_best_assignment(slots_by_start: dict[float, Slot], job: ScheduledJob, cfg: Config) -> tuple[float, Slot] | None:
     release_ms = job.chunk_start_ms
     hard_finish_ms = job.chunk_start_ms + cfg.chunk_size * job.period_ms
-    starts = _slot_start_candidates(release_ms, hard_finish_ms, cfg)
+    starts = _slot_start_candidates(release_ms, hard_finish_ms, 1000.0 / job.period_ms, cfg)
     best = None
     for start_ms in starts:
         candidate = _try_assign(slots_by_start, start_ms, job, cfg)

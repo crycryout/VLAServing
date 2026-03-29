@@ -24,11 +24,17 @@ class Config:
     conservative_horizon: float = 5.0
     admit_min_robot_score: float = 0.97
     admit_fleet_score: float = 0.985
-    phase_bins: int = 8
-    phase_search_horizons: int = 2
     max_batch: int = 8
-    slot_period_ms: float = 100.0
     slot_start_phase_ms: float = 0.0
+    phase_search_horizons: int = 2
+    low_hz_max: float = 15.0
+    high_hz_min: float = 25.0
+    low_phase_bins: int = 4
+    mid_phase_bins: int = 3
+    high_phase_bins: int = 2
+    low_slot_period_ms: float = 200.0
+    mid_slot_period_ms: float = 160.0
+    high_slot_period_ms: float = 120.0
     predict_duration_s: float = 20.0
     predict_seeds: int = 2
     truth_duration_s: float = 90.0
@@ -73,10 +79,16 @@ def run_trials(cfg: Config) -> dict:
         predict_seeds=cfg.predict_seeds,
         truth_duration_s=cfg.truth_duration_s,
         truth_seeds=cfg.truth_seeds,
-        phase_bins=cfg.phase_bins,
         max_batch=cfg.max_batch,
-        slot_period_ms=cfg.slot_period_ms,
         slot_start_phase_ms=cfg.slot_start_phase_ms,
+        low_hz_max=cfg.low_hz_max,
+        high_hz_min=cfg.high_hz_min,
+        low_phase_bins=cfg.low_phase_bins,
+        mid_phase_bins=cfg.mid_phase_bins,
+        high_phase_bins=cfg.high_phase_bins,
+        low_slot_period_ms=cfg.low_slot_period_ms,
+        mid_slot_period_ms=cfg.mid_slot_period_ms,
+        high_slot_period_ms=cfg.high_slot_period_ms,
     )
     horizon = module.AutoHorizonParams(conservative_horizon=cfg.conservative_horizon)
     metric = module.SuccessMetricParams()
@@ -122,9 +134,23 @@ def run_trials(cfg: Config) -> dict:
                 truth_cache[key] = result
         return result
 
+    def phase_bins_for_hz(hz: float) -> int:
+        if hz >= cfg.high_hz_min:
+            return max(1, cfg.high_phase_bins)
+        if hz <= cfg.low_hz_max:
+            return max(1, cfg.low_phase_bins)
+        return max(1, cfg.mid_phase_bins)
+
+    def slot_period_for_hz(hz: float) -> float:
+        if hz >= cfg.high_hz_min:
+            return cfg.high_slot_period_ms
+        if hz <= cfg.low_hz_max:
+            return cfg.low_slot_period_ms
+        return cfg.mid_slot_period_ms
+
     def candidate_phases(hz: float) -> list[float]:
         cycle_ms = cfg.phase_search_horizons * 16.0 * (1000.0 / hz)
-        bins = max(1, cfg.phase_bins)
+        bins = phase_bins_for_hz(hz)
         return [i * cycle_ms / bins for i in range(bins)]
 
     def choose_phase(specs: list[Any], hz: float, idx: int) -> tuple[bool, dict | None, Any | None]:
