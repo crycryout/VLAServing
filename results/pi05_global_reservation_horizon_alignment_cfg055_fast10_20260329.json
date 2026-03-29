@@ -1,0 +1,85 @@
+{
+  "source": "/root/autodl-tmp/pi05_global_reservation_final_cfg055_fast10_alignment_20260329.json",
+  "summary": {
+    "groups": 10,
+    "mean_admitted_total": 12.0,
+    "total_admitted_robots": 120,
+    "mean_fleet_score": 0.9945428910424307,
+    "mean_min_robot_score": 0.9800501295198932,
+    "mean_max_p95_latency_ms": 44.59212875366211,
+    "groups_min_robot_ge_threshold": 10,
+    "groups_fleet_ge_threshold": 10,
+    "admitted_frequency_histogram": {
+      "5": 29,
+      "10": 17,
+      "15": 19,
+      "20": 18,
+      "25": 24,
+      "30": 13
+    },
+    "reply_over_chunk_actions_count": 0,
+    "non_bootstrap_replies_count": 3897,
+    "reply_over_chunk_actions_ratio": 0.0,
+    "miss_autohorizon_count": 449,
+    "chunk_count": 3897,
+    "miss_autohorizon_ratio": 0.11521683346163716,
+    "contains_25hz": true,
+    "contains_30hz": true
+  },
+  "per_horizon_alignment": {
+    "15": {
+      "total": 44,
+      "early_count": 3,
+      "early_ratio": 0.06818181818181818,
+      "exact_count": 32,
+      "exact_ratio": 0.7272727272727273,
+      "late_count": 9,
+      "late_ratio": 0.20454545454545456
+    },
+    "16": {
+      "total": 455,
+      "early_count": 25,
+      "early_ratio": 0.054945054945054944,
+      "exact_count": 383,
+      "exact_ratio": 0.8417582417582418,
+      "late_count": 47,
+      "late_ratio": 0.10329670329670329
+    },
+    "17": {
+      "total": 1112,
+      "early_count": 45,
+      "early_ratio": 0.040467625899280574,
+      "exact_count": 969,
+      "exact_ratio": 0.8714028776978417,
+      "late_count": 98,
+      "late_ratio": 0.08812949640287769
+    },
+    "18": {
+      "total": 663,
+      "early_count": 34,
+      "early_ratio": 0.05128205128205128,
+      "exact_count": 552,
+      "exact_ratio": 0.832579185520362,
+      "late_count": 77,
+      "late_ratio": 0.11613876319758673
+    },
+    "19": {
+      "total": 142,
+      "early_count": 10,
+      "early_ratio": 0.07042253521126761,
+      "exact_count": 116,
+      "exact_ratio": 0.8169014084507042,
+      "late_count": 16,
+      "late_ratio": 0.11267605633802817
+    },
+    "50": {
+      "total": 1481,
+      "early_count": 85,
+      "early_ratio": 0.05739365293720459,
+      "exact_count": 1396,
+      "exact_ratio": 0.9426063470627954,
+      "late_count": 0,
+      "late_ratio": 0.0
+    }
+  }
+}
