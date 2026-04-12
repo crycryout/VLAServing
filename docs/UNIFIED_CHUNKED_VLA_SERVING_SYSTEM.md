@@ -139,6 +139,8 @@ Then choose:
 - shared state: resident shared prefix
 - phase correction budget: `4`
 - admission: quota-fair admission
+- standalone note:
+  [GR00T_N1D6_GPU_VIRTUALIZATION.md](./GR00T_N1D6_GPU_VIRTUALIZATION.md)
 - validated references:
   [gr00t_shared_prefix_phase_lock_batch_mps_20260412.json](../results/gr00t_shared_prefix_phase_lock_batch_mps_20260412.json)
   [gr00t_batch_only_fair_admission_20260412.json](../results/gr00t_batch_only_fair_admission_20260412.json)
