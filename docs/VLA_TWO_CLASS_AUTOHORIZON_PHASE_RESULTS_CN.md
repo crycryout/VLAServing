@@ -8,6 +8,15 @@
 - 系统允许在合法窗口内主动控制相位
 - 关注 `Pi05` 和 `GR00T N1.6` 两条工作负载
 
+需要先说明一个容易混淆的点：
+
+- 对 `Pi05` 来说，“二类 AutoHorizon + 主动相位控制”本身就已经是当前主线系统。
+- 对 `GR00T N1.6` 来说，这里同时包含两层结果：
+  - 一层是“只看通用二类 horizon + 通用 phase policy”的对照结果；
+  - 另一层是“在同样的二类 horizon 语义下，再叠加 `shared-prefix + same-model phase-lock batching + fair admission` 后的真实最强 serving 结果”。
+
+如果不把这两层分开看，就会误以为 `GR00T` 目前只能 serve `4` 个机器人。实际不是这样。
+
 这里不讨论：
 
 - 旧的非两类 `Pi05` 语义
@@ -111,7 +120,31 @@
 - 如果 `horizon > 8`，允许在 `[8,16]` 内主动调相位
 - 结构上使用 `shared-prefix residency`
 
-### 4.2 仅用通用 phase policy 时的结果
+### 4.2 先看最终结论：GR00T 当前已经能稳定 serve 两位数机器人
+
+在当前最强、也是当前主线采用的 `GR00T N1.6` runtime 下：
+
+- `4` 机器人稳定：
+  - `43.8806 ms p95`
+  - `reply_over = 0`
+- `8` 机器人稳定：
+  - `47.6112 ms p95`
+  - `reply_over = 0`
+- `16` 机器人稳定：
+  - `58.4292 ms p95`
+  - `mean_batch_size = 4.0`
+  - `reply_over = 0`
+- `24` 机器人不再稳定：
+  - `79.4424 ms p95`
+  - `reply_over = 18`
+
+因此当前明确成立的结论是：
+
+- `GR00T N1.6` 在当前配置下，已经可以稳定 serve `16` 个机器人
+- 也就是已经达到“两位数机器人”的 serving 规模
+- 文档里出现的“`4` 个机器人”只是通用 phase policy 对照实验的 admission 结果，不是系统的最终能力上界
+
+### 4.3 仅用通用 phase policy 时的结果
 
 如果只用通用的二类 horizon + 相位策略，而不引入 `GR00T` 专门的 same-model phase-lock runtime，那么结果如下。
 
@@ -141,8 +174,9 @@
 
 - 对 `GR00T N1.6`，泛化的主动调相位不是主要收益来源
 - 它只能改善质量，不能直接扩容
+- 这里的 `4.0` 不是 `GR00T` 系统最终只能 serve `4` 个机器人，而是说明“只靠通用相位策略本身不够”
 
-### 4.3 引入 GR00T 专门 runtime 后的结果
+### 4.4 引入 GR00T 专门 runtime 后的结果
 
 `GR00T N1.6` 真正有效的做法是：
 
@@ -164,7 +198,15 @@
 | 场景 | 结果 |
 | --- | --- |
 | `4` 机器人 | `43.8806 ms p95`，`reply_over = 0`，稳定 |
+| `8` 机器人 | `47.6112 ms p95`，`batch = 2.0`，`reply_over = 0`，稳定 |
 | `16` 机器人 | `58.4292 ms p95`，`batch = 4.0`，`reply_over = 0`，稳定 |
+| `24` 机器人 | `79.4424 ms p95`，但 `reply_over = 18`，不稳定 |
+
+这组结果要明确理解成：
+
+- `GR00T N1.6` 的当前最强主线已经不是 4 机器人，而是 16 机器人稳定 serving
+- `24` 机器人是当前已知的失稳点
+- 所以当前稳定容量区间大致落在 `16` 左右，而不是 `4`
 
 #### fair admission
 
@@ -177,6 +219,17 @@
 代价是：
 
 - `mean_final_robot_count: 22.83 -> 15.67`
+
+这里也要分清两个数字：
+
+- `22.83` 是 greedy batch-first 下的平均最终机器人数量，但它带来更明显的 bias 和更差的尾时延
+- `15.67` 是 quota-fair admission 下的平均最终机器人数量，它牺牲了一部分容量，换来了更公平、更稳定的服务
+
+因此：
+
+- 如果讨论“最公平、最稳”的 admission 结果，可以引用 `15.67`
+- 如果讨论“系统曾经能推到两位数机器人数”，那这个数字本身也明显是两位数
+- 但如果讨论“固定结构下明确验证过的稳定 serving 规模”，当前最硬的数字是 `16` 机器人
 
 这说明：
 
@@ -214,7 +267,7 @@
 可以收敛成下面两句：
 
 - 对 `Pi05`，二类 `AutoHorizon` 加主动相位控制是有效的，但主要收益来自更宽的 `[25,50]` legal replan window，本身不会继续显著提升 fixed-4 或 admission 容量。
-- 对 `GR00T N1.6`，二类 horizon + 通用 phase shift 只能改善分数，真正决定性的方法是 `shared-prefix + same-model phase-lock batching + fair admission`。
+- 对 `GR00T N1.6`，二类 horizon + 通用 phase shift 只能改善分数，真正决定性的方法是 `shared-prefix + same-model phase-lock batching + fair admission`，并且当前已经明确验证能稳定 serve `16` 个机器人。
 
 ## 7. 对应脚本与结果文件
 
