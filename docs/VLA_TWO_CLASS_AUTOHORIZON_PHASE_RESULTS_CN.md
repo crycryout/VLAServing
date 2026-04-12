@@ -208,28 +208,47 @@
 - `24` 机器人是当前已知的失稳点
 - 所以当前稳定容量区间大致落在 `16` 左右，而不是 `4`
 
-#### fair admission
+#### greedy admission 与 fair admission
 
-相对 greedy batch-first admission：
+这里应该把两种 admission 都写出来。
 
-- `accept-rate gap: 0.2921 -> 0.0994`
-- `final-count gap: 18 -> 2`
-- `mean p95: 90.0133 ms -> 58.4292 ms`
+| admission 策略 | mean final robot count | p95 | mean reply over | stable group ratio | accept-rate gap | final-count gap |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `greedy batch-first` | `22.83` | `90.0133 ms` | `0.0` | `1.0` | `0.2921` | `18` |
+| `quota-fair` | `15.67` | `58.4292 ms` | `0.0` | `1.0` | `0.0994` | `2` |
 
-代价是：
+如果只看“能 admit 更多机器人”：
 
-- `mean_final_robot_count: 22.83 -> 15.67`
+- `greedy batch-first` 的确更强
+- 它平均最终能维持 `22.83` 个机器人
+- 这是当前文档里必须明确写出来的更强容量结果
 
-这里也要分清两个数字：
+但它的问题也同样明显：
 
-- `22.83` 是 greedy batch-first 下的平均最终机器人数量，但它带来更明显的 bias 和更差的尾时延
-- `15.67` 是 quota-fair admission 下的平均最终机器人数量，它牺牲了一部分容量，换来了更公平、更稳定的服务
+- `accept-rate gap = 0.2921`
+- `final-count gap = 18`
+- 最终不同模型类型之间的保有量严重不均衡
+- 例如最终直方图里：
+  - `30Hz::30hz_bridge = 38`
+  - `20Hz::20hz_fractal = 27`
+  - `10Hz::10hz_libero = 27`
+  - `10Hz::10hz_rel30k = 45`
 
-因此：
+而 `quota-fair` 的作用是：
 
-- 如果讨论“最公平、最稳”的 admission 结果，可以引用 `15.67`
-- 如果讨论“系统曾经能推到两位数机器人数”，那这个数字本身也明显是两位数
-- 但如果讨论“固定结构下明确验证过的稳定 serving 规模”，当前最硬的数字是 `16` 机器人
+- 把 `accept-rate gap` 从 `0.2921` 降到 `0.0994`
+- 把 `final-count gap` 从 `18` 降到 `2`
+- 把最终机器人数量压到更均衡的：
+  - `30Hz::30hz_bridge = 24`
+  - `20Hz::20hz_fractal = 22`
+  - `10Hz::10hz_libero = 24`
+  - `10Hz::10hz_rel30k = 24`
+
+因此这里要分清三件事：
+
+- 如果讨论“最大 admit 数量”，应引用 `greedy batch-first = 22.83`
+- 如果讨论“公平且稳”的 admission，应引用 `quota-fair = 15.67`
+- 如果讨论“固定结构下已经明确验证过的稳定 serving 规模”，当前最硬的数字仍然是 `16` 机器人固定 serving
 
 这说明：
 
