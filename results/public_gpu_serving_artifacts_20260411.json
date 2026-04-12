@@ -1,0 +1,68 @@
+{
+  "environment": {
+    "glet_root": "/root/autodl-tmp/glet",
+    "glet_bin_exists": true,
+    "template_resource_dir": "/tmp/glet-mini"
+  },
+  "pi05_request_rate_mismatch": {
+    "mean_request_rps": [
+      1.0227272727272727,
+      0.6818181818181819,
+      0.34090909090909094,
+      0.34090909090909094
+    ],
+    "nearest_integer_rps": [
+      1,
+      1,
+      0,
+      0
+    ],
+    "scaled_x10_integer_rps": [
+      10,
+      7,
+      3,
+      3
+    ],
+    "note": "glet offline scheduler only accepts integer request rates, while Pi0.5 AutoHorizon mean request rates are sub-1 RPS for the 10Hz robots."
+  },
+  "gr00t_mean_request_rps": [
+    5.823043919693446,
+    3.882029279795631,
+    1.9410146398978154,
+    1.9410146398978154
+  ],
+  "cases": {
+    "sanity_single_vgg16": {
+      "exit_code": 0,
+      "timed_out": false,
+      "output_exists": true,
+      "model_list": "0,100,0,vgg16,31,553.571472\n",
+      "stdout_tail": "on\nreceived: 40\nreturning new_mean: 56\ninit_setup ------------------------------------------------\ntask (name : [req, SLO])\n9 : [56, 1000]\n9configured SLO: 1000\n\ninitDevMems: dev0 will be setted up as 24564MBs\n[initSaturateTrp] Called for task  9\nGPUID: 32764, type: 4090\ngetMaxBatch: called for task id: 9and SLO:  1000\ngetMaxBatch: for saturated rate \n[getMaxBatch] original ret_batch is 31\ngetMaxBatch: returning max_batch: 31\n[initSaturateTrp] setted up resource pntg: 100, as trp:  782.131\naddModeltoSchedulemodel: 9 scheduled?: 0\n[getEstimate] function called for task id : 9rate: 56\n[getEstimate] max_part : 100\n[estimateTrp] rate: 56 called for model id: 9  \n[getMaxReturnPart] received model id: 9\nmax_part: 100 limit: 782.131 rate: 56\n[getMinPart] model_id: 9 given_pntg: 100\n[getMinPart]  local_max_part: 100\nGPUID: 0, type: 4090\ngetMaxBatch: called for task id: 9and SLO:  1000\ngetMaxBatch: for residue rate : 56\n[getMaxBatch] original ret_batch is 31\ngetMaxBatch: returning max_batch: 31\n[getMinPart]  max_batch 31\n[getMinPart] part: 100latency: 39.6353 duty_cycle: 553.571 SLO: 1000\nprev_part: 100\n[getMinPart] min_part: 100, for task id: 9 \n[estimateTrp]residue node- latency: 39.635292, batch_size: 31, rate: 56, part: 100  \n[getMinPartSum] minpart output type: 4090\n[estimateTrp] rate: 56 called for model id: 9  \n[getMaxReturnPart] received model id: 9\nmax_part: 100 limit: 782.131 rate: 56\n[getMinPart] model_id: 9 given_pntg: 100\n[getMinPart]  local_max_part: 100\nGPUID: 0, type: 4090\ngetMaxBatch: called for task id: 9and SLO:  1000\ngetMaxBatch: for residue rate : 56\n[getMaxBatch] original ret_batch is 31\ngetMaxBatch: returning max_batch: 31\n[getMinPart]  max_batch 31\n[getMinPart] part: 100latency: 39.6353 duty_cycle: 553.571 SLO: 1000\nprev_part: 100\n[getMinPart] min_part: 100, for task id: 9 \n[estimateTrp]residue node- latency: 39.635292, batch_size: 31, rate: 56, part: 100  \n[checkFit] Recieved type 4090 1 nodes for checking \n[ 100, ]\n[checkFit] checking for part: 100 \nisModelLoaded: checking model 9 is loaded for gpu [0,0]\ndoesFitMemLimitcalled for gpu: 0 searching for 100\ndoesFitMemLimit: comparing left memory: 22107.6 and model_mem: 2920\ndoesFitMemLimit: with addtional 1230\ncheckForInterferencethe real node : [0,100]\nfindBestFit: comparing: 100 with node: 100\n[checkFit] SUCCEEDED \n[Allocatefit] fitting part: 100 \nisModelLoaded: checking model 9 is loaded for gpu [0,0]\ndoesFitMemLimitcalled for gpu: 0 searching for 100\ndoesFitMemLimit: comparing left memory: 22107.6 and model_mem: 2920\ndoesFitMemLimit: with addtional 1230\ncheckForInterferencethe real node : [0,100]\nfindBestFit: comparing: 100 with node: 100\n[allocateFit] found pntg: 100, input pntg: 100 \naddGPUMemUsagecalled\nisModelLoaded: checking model 9 is loaded for gpu [0,0]\nisModelLoaded: checking model 9 is loaded for gpu [0,0]\ndoesFitMemLimitcalled for gpu: 0 searching for 100\ndoesFitMemLimit: comparing left memory: 22107.6 and model_mem: 2920\ndoesFitMemLimit: with addtional 1230\ngpu0 used_memory updated to 4150\ngpu0 remaining memory: 20414\ngpu0 loaded parts: [100, 0]\n[allocateFit] Allocated successfully!! remaining rate of task 9 : 0 \nAFTER checkFit: \nresults ------------------------------------------------\n<GPU 0, 4090>\n[100,]\nID: 0\noccupancy : 0.0715992\npartition: 100\ndedup_num: 0\nduty cycle: 553.571\nmodel_id : 9, throughput : 56, request rate: 56, SLO : 1000, batch_size : 31\nexpected latency(ms): 39.6353\n\nresults ------------------------------------------------\n<GPU 0, 4090>\n[100,]\nID: 0\noccupancy : 0.0715992\npartition: 100\ndedup_num: 0\nduty cycle: 553.571\nmodel_id : 9, throughput : 56, request rate: 56, SLO : 1000, batch_size : 31\nexpected latency(ms): 39.6353\n\n[main] Success\ncomputation time(ms): 0.480423 \nresults ------------------------------------------------\n<GPU 0, 4090>\n[100,]\nID: 0\noccupancy : 0.0715992\npartition: 100\ndedup_num: 0\nduty cycle: 553.571\nmodel_id : 9, throughput : 56, request rate: 56, SLO : 1000, batch_size : 31\nexpected latency(ms): 39.6353\n\n",
+      "workdir": "/tmp/glet-sanity_single_vgg16-16ce7hc8"
+    },
+    "gr00t_two_model_gpulet": {
+      "exit_code": 124,
+      "timed_out": true,
+      "output_exists": false,
+      "model_list": "",
+      "stdout_tail": "Reading App JSON File: /tmp/glet-gr00t_two_model_gpulet-vtks8ug5/sched-config.json \nReading 2 sizes\nread part: 50\npushed part: 50\nread part: 100\nended\nsetupDevicePerfModel: called for /tmp/glet-gr00t_two_model_gpulet-vtks8ug5/device-config.json\nsetupTable called for /tmp/glet-gr00t_two_model_gpulet-vtks8ug5/4090/latency.csv\ndevice : 4090 memory: 24564\nsetupPerModelMemConfig called\nsetupPerModelMemConfig model: lenet1 mem_size: 50\nsetupPerModelMemConfig model: lenet2 mem_size: 50\nsetupPerModelMemConfig model: lenet3 mem_size: 50\nsetupPerModelMemConfig model: lenet4 mem_size: 50\nsetupPerModelMemConfig model: lenet5 mem_size: 50\nsetupPerModelMemConfig model: lenet6 mem_size: 50\nsetupPerModelMemConfig model: googlenet mem_size: 1720\nsetupPerModelMemConfig model: resnet50 mem_size: 6268\nsetupPerModelMemConfig model: ssd-mobilenetv1 mem_size: 640\nsetupPerModelMemConfig model: vgg16 mem_size: 6268\nsetupPerModelMemConfig model: densenet161 mem_size: 1220\nsetupPerModelMemConfig model: mobilenet_v2 mem_size: 464\nsetupPerModelMemConfig model: mnasnet1_0 mem_size: 1550\nsetupPerModelMemConfig model: bert mem_size: 500\nsetupPerTaskInputDimension: reading JSON File: /tmp/glet-gr00t_two_model_gpulet-vtks8ug5/proxy_config.json\nreceived: 6\nreturning new_mean: 14\nreceived: 4\n",
+      "workdir": "/tmp/glet-gr00t_two_model_gpulet-vtks8ug5"
+    },
+    "gr00t_four_model_gpulet": {
+      "exit_code": 124,
+      "timed_out": true,
+      "output_exists": false,
+      "model_list": "",
+      "stdout_tail": "Reading App JSON File: /tmp/glet-gr00t_four_model_gpulet-43o5utrg/sched-config.json \nReading 2 sizes\nread part: 50\npushed part: 50\nread part: 100\nended\nsetupDevicePerfModel: called for /tmp/glet-gr00t_four_model_gpulet-43o5utrg/device-config.json\nsetupTable called for /tmp/glet-gr00t_four_model_gpulet-43o5utrg/4090/latency.csv\ndevice : 4090 memory: 24564\nsetupPerModelMemConfig called\nsetupPerModelMemConfig model: lenet1 mem_size: 50\nsetupPerModelMemConfig model: lenet2 mem_size: 50\nsetupPerModelMemConfig model: lenet3 mem_size: 50\nsetupPerModelMemConfig model: lenet4 mem_size: 50\nsetupPerModelMemConfig model: lenet5 mem_size: 50\nsetupPerModelMemConfig model: lenet6 mem_size: 50\nsetupPerModelMemConfig model: googlenet mem_size: 8767\nsetupPerModelMemConfig model: resnet50 mem_size: 6268\nsetupPerModelMemConfig model: ssd-mobilenetv1 mem_size: 640\nsetupPerModelMemConfig model: vgg16 mem_size: 6268\nsetupPerModelMemConfig model: densenet161 mem_size: 8767\nsetupPerModelMemConfig model: mobilenet_v2 mem_size: 464\nsetupPerModelMemConfig model: mnasnet1_0 mem_size: 1550\nsetupPerModelMemConfig model: bert mem_size: 500\nsetupPerTaskInputDimension: reading JSON File: /tmp/glet-gr00t_four_model_gpulet-43o5utrg/proxy_config.json\nreceived: 6\nreturning new_mean: 14\nreceived: 4\n",
+      "workdir": "/tmp/glet-gr00t_four_model_gpulet-43o5utrg"
+    },
+    "pi05_four_model_scaledx10_gpulet": {
+      "exit_code": 124,
+      "timed_out": true,
+      "output_exists": false,
+      "model_list": "",
+      "stdout_tail": "Reading App JSON File: /tmp/glet-pi05_four_model_scaledx10_gpulet-u8l1rxb0/sched-config.json \nReading 2 sizes\nread part: 50\npushed part: 50\nread part: 100\nended\nsetupDevicePerfModel: called for /tmp/glet-pi05_four_model_scaledx10_gpulet-u8l1rxb0/device-config.json\nsetupTable called for /tmp/glet-pi05_four_model_scaledx10_gpulet-u8l1rxb0/4090/latency.csv\ndevice : 4090 memory: 24564\nsetupPerModelMemConfig called\nsetupPerModelMemConfig model: lenet1 mem_size: 50\nsetupPerModelMemConfig model: lenet2 mem_size: 50\nsetupPerModelMemConfig model: lenet3 mem_size: 50\nsetupPerModelMemConfig model: lenet4 mem_size: 50\nsetupPerModelMemConfig model: lenet5 mem_size: 50\nsetupPerModelMemConfig model: lenet6 mem_size: 50\nsetupPerModelMemConfig model: googlenet mem_size: 7665\nsetupPerModelMemConfig model: resnet50 mem_size: 7665\nsetupPerModelMemConfig model: ssd-mobilenetv1 mem_size: 640\nsetupPerModelMemConfig model: vgg16 mem_size: 7665\nsetupPerModelMemConfig model: densenet161 mem_size: 7665\nsetupPerModelMemConfig model: mobilenet_v2 mem_size: 464\nsetupPerModelMemConfig model: mnasnet1_0 mem_size: 1550\nsetupPerModelMemConfig model: bert mem_size: 500\nsetupPerTaskInputDimension: reading JSON File: /tmp/glet-pi05_four_model_scaledx10_gpulet-u8l1rxb0/proxy_config.json\nreceived: 10\nreturning new_mean: 19\nreceived: 7\nreturning new_mean: 15\nreceived: 3\n",
+      "workdir": "/tmp/glet-pi05_four_model_scaledx10_gpulet-u8l1rxb0"
+    }
+  }
+}

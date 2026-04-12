@@ -17,7 +17,7 @@ Related scripts and results:
 We distinguish two levels of reproduction:
 
 1. `paper-faithful reproduction`
-   - A unified evaluation driven by real local measurements of inference latency, shell memory footprint, H2D copy time, AutoHorizon dynamics, and action-exhaustion constraints.
+   - A unified evaluation driven by real local measurements of inference latency, shell memory footprint, H2D copy time, current Pi0.5 `25/50` control semantics, GR00T chunk dynamics, and action-exhaustion constraints.
    - This level was completed for `Clockwork-like`, `REEF-like`, `Paella-like`, `GPUlet-like`, and our `VLA-aware` scheduler on both `Pi0.5` and `GR00T N1.6`.
 
 2. `artifact-level / public-code reproduction`
@@ -94,21 +94,15 @@ This is already evidence that the public GPUlet scheduler is not a good fit for 
   - multi-finetuned-model shell residency,
   - predictive prefetch,
   - H2D bandwidth as a schedulable resource,
-  - AutoHorizon's per-chunk stochastic target,
+  - Pi0.5's legal replan window under the current `25/50` control semantics,
   - action-exhaustion hard deadlines.
 
 Two additional mismatches are explicit in the public-code run:
 
 1. `Pi0.5` request-rate mismatch
-   - The mean AutoHorizon-derived request rates are:
-     - `30Hz -> 1.0227 RPS`
-     - `20Hz -> 0.6818 RPS`
-     - `10Hz -> 0.3409 RPS`
-     - `10Hz -> 0.3409 RPS`
    - The public scheduler only accepts integer request rates.
-   - Nearest-integer approximation collapses them to:
-     - `[1, 1, 0, 0]`
-   - This loses the two 10Hz robots entirely.
+   - Pi0.5 VLA request rates under chunked control semantics are fractional and model-dependent.
+   - This means the public scheduler cannot faithfully encode the real Pi0.5 workload even before model-state management is considered.
 
 2. Static search complexity under VLA-like profile inputs
    - Even coarse two-part cases like `[50, 100]` on one GPU did not finish within `30s`.
@@ -197,4 +191,4 @@ This is consistent with the stronger measured conclusion from the unified evalua
   - model-state residency and prefetch,
   - CPU-GPU bandwidth,
   - hard action-exhaustion deadlines,
-  - and AutoHorizon's stochastic soft target.
+  - and the control-semantic legal replan window.

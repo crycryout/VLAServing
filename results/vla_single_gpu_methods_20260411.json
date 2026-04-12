@@ -1,0 +1,3896 @@
+{
+  "meta": {
+    "deadline_ms": 100.0,
+    "duration_s": 90.0,
+    "seeds": [
+      1101,
+      1102,
+      1103
+    ],
+    "methods": [
+      "oracle_full_resident",
+      "reef_like_temporal",
+      "clockwork_like",
+      "paella_like",
+      "usher_like",
+      "distserve_like",
+      "gpulet_like",
+      "vla_aware"
+    ],
+    "notes": [
+      "Clockwork/REEF/Paella are paper-faithful reproductions of core scheduling ideas, not source-level artifact replays.",
+      "USHER-like uses fixed spatial partitions with reactive cold-model replacement and no predictive model-state management.",
+      "DistServe-like uses a two-stage disaggregated pipeline on one GPU; this is intentionally conservative because VLA inference is not naturally prefill/decode separable.",
+      "GPUlet uses a swap-aware coarse schedule search with batch and partition candidates.",
+      "Request time is derived from AutoHorizon target minus the 100ms response budget."
+    ]
+  },
+  "pi05": {
+    "request_level": {
+      "oracle_full_resident": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 87,
+                "sla_miss_count": 3,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.2413793103448276,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.18052673334023,
+                "fleet_score": 0.9845191108762602
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 58,
+                "sla_miss_count": 3,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.05172413793103448,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 103.51800317764024,
+                "latency_max_ms": 136.3938388824463,
+                "fleet_score": 0.997050416011771
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 32,
+                "sla_miss_count": 1,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.03125,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.21331214904785,
+                "fleet_score": 0.9980568806027608
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 30,
+                "sla_miss_count": 2,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.03333333333333333,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 118.35136531194576,
+                "latency_max_ms": 152.90884081520926,
+                "fleet_score": 0.9979274736384169
+              }
+            ],
+            "summary": {
+              "requests_total": 207,
+              "sla_miss_count": 9,
+              "hard_miss_count": 1,
+              "sla_miss_rate": 0.043478260869565216,
+              "hard_miss_rate": 0.004830917874396135,
+              "miss_autohorizon_ratio": 0.12560386473429952,
+              "fleet_score": 0.9920454265820066,
+              "min_robot_score": 0.9845191108762602,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 100.0,
+              "latency_p99_ms": 142.77332546228658,
+              "latency_max_ms": 152.90884081520926
+            },
+            "method_stats": {
+              "total_h2d_gib": 0.0,
+              "swap_count": 0,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 29.94
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 85,
+                "sla_miss_count": 6,
+                "hard_miss_count": 2,
+                "miss_autohorizon_ratio": 0.2235294117647059,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 108.50123545328714,
+                "latency_max_ms": 133.33333333333212,
+                "fleet_score": 0.986165612941417
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 60,
+                "sla_miss_count": 3,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.05,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.3400768280029,
+                "latency_max_ms": 143.06164741516113,
+                "fleet_score": 0.9968092751252177
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 32,
+                "sla_miss_count": 0,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.0,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 100.0,
+                "fleet_score": 1.0
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 23,
+                "sla_miss_count": 1,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.0,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.06164741516113,
+                "fleet_score": 1.0
+              }
+            ],
+            "summary": {
+              "requests_total": 200,
+              "sla_miss_count": 10,
+              "hard_miss_count": 3,
+              "sla_miss_rate": 0.05,
+              "hard_miss_rate": 0.015,
+              "miss_autohorizon_ratio": 0.11,
+              "fleet_score": 0.9931441971891185,
+              "min_robot_score": 0.986165612941417,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 100.15228284200015,
+              "latency_p99_ms": 136.445816745758,
+              "latency_max_ms": 143.06164741516113
+            },
+            "method_stats": {
+              "total_h2d_gib": 0.0,
+              "swap_count": 0,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 29.94
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 91,
+                "sla_miss_count": 5,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.25274725274725274,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 109.85616175334872,
+                "latency_max_ms": 162.80675633748615,
+                "fleet_score": 0.9832712611603903
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 64,
+                "sla_miss_count": 2,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.03125,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.18052673339844,
+                "fleet_score": 0.998180386179013
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 32,
+                "sla_miss_count": 2,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.09375,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 108.87054557800073,
+                "latency_max_ms": 143.21331214904603,
+                "fleet_score": 0.993443893036657
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 3,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.06896551724137931,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 131.83692092894924,
+                "latency_max_ms": 143.06164741516113,
+                "fleet_score": 0.9958527274751763
+              }
+            ],
+            "summary": {
+              "requests_total": 216,
+              "sla_miss_count": 12,
+              "hard_miss_count": 1,
+              "sla_miss_rate": 0.05555555555555555,
+              "hard_miss_rate": 0.004629629629629629,
+              "miss_autohorizon_ratio": 0.1388888888888889,
+              "fleet_score": 0.9908625544755011,
+              "min_robot_score": 0.9832712611603903,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 114.62230761845422,
+              "latency_p99_ms": 143.16269483566285,
+              "latency_max_ms": 162.80675633748615
+            },
+            "method_stats": {
+              "total_h2d_gib": 0.0,
+              "swap_count": 0,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 29.94
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 207.66666666666666,
+          "max_requests_total": 216.0,
+          "min_requests_total": 200.0,
+          "mean_sla_miss_count": 10.333333333333334,
+          "max_sla_miss_count": 12.0,
+          "min_sla_miss_count": 9.0,
+          "mean_hard_miss_count": 1.6666666666666667,
+          "max_hard_miss_count": 3.0,
+          "min_hard_miss_count": 1.0,
+          "mean_sla_miss_rate": 0.04967793880837359,
+          "max_sla_miss_rate": 0.05555555555555555,
+          "min_sla_miss_rate": 0.043478260869565216,
+          "mean_hard_miss_rate": 0.008153515834675254,
+          "max_hard_miss_rate": 0.015,
+          "min_hard_miss_rate": 0.004629629629629629,
+          "mean_miss_autohorizon_ratio": 0.12483091787439614,
+          "max_miss_autohorizon_ratio": 0.1388888888888889,
+          "min_miss_autohorizon_ratio": 0.11,
+          "mean_fleet_score": 0.9920173927488753,
+          "max_fleet_score": 0.9931441971891185,
+          "min_fleet_score": 0.9908625544755011,
+          "mean_min_robot_score": 0.9846519949926892,
+          "max_min_robot_score": 0.986165612941417,
+          "min_min_robot_score": 0.9832712611603903,
+          "mean_latency_p50_ms": 100.0,
+          "max_latency_p50_ms": 100.0,
+          "min_latency_p50_ms": 100.0,
+          "mean_latency_p95_ms": 104.92486348681813,
+          "max_latency_p95_ms": 114.62230761845422,
+          "min_latency_p95_ms": 100.0,
+          "mean_latency_p99_ms": 140.79394568123578,
+          "max_latency_p99_ms": 143.16269483566285,
+          "min_latency_p99_ms": 136.445816745758,
+          "mean_latency_max_ms": 152.9257481892855,
+          "max_latency_max_ms": 162.80675633748615,
+          "min_latency_max_ms": 143.06164741516113
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 29.94,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 0.0,
+          "mean_total_h2d_gib": 0.0
+        }
+      },
+      "reef_like_temporal": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 68,
+                "sla_miss_count": 57,
+                "hard_miss_count": 27,
+                "miss_autohorizon_ratio": 0.47058823529411764,
+                "latency_p50_ms": 364.82569607233745,
+                "latency_p95_ms": 837.2144522014943,
+                "latency_max_ms": 967.8914813241017,
+                "fleet_score": 0.7068113946561299
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 44,
+                "sla_miss_count": 41,
+                "hard_miss_count": 21,
+                "miss_autohorizon_ratio": 0.45454545454545453,
+                "latency_p50_ms": 375.95135939323336,
+                "latency_p95_ms": 685.082205969602,
+                "latency_max_ms": 893.0616474151611,
+                "fleet_score": 0.7898217888595999
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 29,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.6896551724137931,
+                "latency_p50_ms": 364.8405447814439,
+                "latency_p95_ms": 712.3500462117225,
+                "latency_max_ms": 886.3161126799532,
+                "fleet_score": 0.8507680239261424
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 27,
+                "sla_miss_count": 27,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.6296296296296297,
+                "latency_p50_ms": 364.6888800475572,
+                "latency_p95_ms": 682.4402462199621,
+                "latency_max_ms": 744.7934374189936,
+                "fleet_score": 0.8711185131201605
+              }
+            ],
+            "summary": {
+              "requests_total": 168,
+              "sla_miss_count": 154,
+              "hard_miss_count": 67,
+              "sla_miss_rate": 0.9166666666666666,
+              "hard_miss_rate": 0.39880952380952384,
+              "miss_autohorizon_ratio": 0.5297619047619048,
+              "fleet_score": 0.7769978674418908,
+              "min_robot_score": 0.7068113946561299,
+              "latency_p50_ms": 364.84054478144026,
+              "latency_p95_ms": 767.470411312525,
+              "latency_p99_ms": 899.1210261897696,
+              "latency_max_ms": 967.8914813241017
+            },
+            "method_stats": {
+              "total_h2d_gib": 1152.6899999999998,
+              "swap_count": 154,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 7.485
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 66,
+                "sla_miss_count": 53,
+                "hard_miss_count": 28,
+                "miss_autohorizon_ratio": 0.4393939393939394,
+                "latency_p50_ms": 364.82569607233745,
+                "latency_p95_ms": 726.8251973006691,
+                "latency_max_ms": 819.8011107471757,
+                "fleet_score": 0.7683641394408897
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 51,
+                "sla_miss_count": 45,
+                "hard_miss_count": 19,
+                "miss_autohorizon_ratio": 0.5098039215686274,
+                "latency_p50_ms": 364.8077593657945,
+                "latency_p95_ms": 644.8306556583157,
+                "latency_max_ms": 678.5778475615916,
+                "fleet_score": 0.7844931408134096
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 28,
+                "sla_miss_count": 28,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.6785714285714286,
+                "latency_p50_ms": 364.8405447814439,
+                "latency_p95_ms": 652.0062945759244,
+                "latency_max_ms": 737.8682975014672,
+                "fleet_score": 0.863147000901357
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 22,
+                "sla_miss_count": 22,
+                "hard_miss_count": 13,
+                "miss_autohorizon_ratio": 0.4090909090909091,
+                "latency_p50_ms": 364.6888800475572,
+                "latency_p95_ms": 655.3221179380453,
+                "latency_max_ms": 779.8205989255657,
+                "fleet_score": 0.9107286137170576
+              }
+            ],
+            "summary": {
+              "requests_total": 167,
+              "sla_miss_count": 148,
+              "hard_miss_count": 69,
+              "sla_miss_rate": 0.8862275449101796,
+              "hard_miss_rate": 0.41317365269461076,
+              "miss_autohorizon_ratio": 0.49700598802395207,
+              "fleet_score": 0.8063385033814722,
+              "min_robot_score": 0.7683641394408897,
+              "latency_p50_ms": 364.82569607233745,
+              "latency_p95_ms": 670.6469124163732,
+              "latency_p99_ms": 793.4139729449096,
+              "latency_max_ms": 819.8011107471757
+            },
+            "method_stats": {
+              "total_h2d_gib": 1107.7800000000004,
+              "swap_count": 148,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 7.485
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 69,
+                "sla_miss_count": 60,
+                "hard_miss_count": 23,
+                "miss_autohorizon_ratio": 0.5362318840579711,
+                "latency_p50_ms": 364.82569607233745,
+                "latency_p95_ms": 819.9085708338055,
+                "latency_max_ms": 858.541564542691,
+                "fleet_score": 0.6653519354652409
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 50,
+                "sla_miss_count": 48,
+                "hard_miss_count": 16,
+                "miss_autohorizon_ratio": 0.64,
+                "latency_p50_ms": 364.8077593657945,
+                "latency_p95_ms": 717.0351678007764,
+                "latency_max_ms": 1118.4626964741437,
+                "fleet_score": 0.730633069942146
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 28,
+                "sla_miss_count": 28,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.6785714285714286,
+                "latency_p50_ms": 364.8405447814439,
+                "latency_p95_ms": 810.4066766771253,
+                "latency_max_ms": 853.1195953713959,
+                "fleet_score": 0.8275284489860095
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 27,
+                "sla_miss_count": 27,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.6666666666666666,
+                "latency_p50_ms": 364.6888800475572,
+                "latency_p95_ms": 655.6792376717647,
+                "latency_max_ms": 886.6194421477267,
+                "fleet_score": 0.8453220337195945
+              }
+            ],
+            "summary": {
+              "requests_total": 174,
+              "sla_miss_count": 163,
+              "hard_miss_count": 57,
+              "sla_miss_rate": 0.9367816091954023,
+              "hard_miss_rate": 0.3275862068965517,
+              "miss_autohorizon_ratio": 0.6091954022988506,
+              "fleet_score": 0.7346989194695244,
+              "min_robot_score": 0.6653519354652409,
+              "latency_p50_ms": 364.84054478144026,
+              "latency_p95_ms": 819.8809429292698,
+              "latency_p99_ms": 866.122591496051,
+              "latency_max_ms": 1118.4626964741437
+            },
+            "method_stats": {
+              "total_h2d_gib": 1220.054999999999,
+              "swap_count": 163,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 7.485
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 169.66666666666666,
+          "max_requests_total": 174.0,
+          "min_requests_total": 167.0,
+          "mean_sla_miss_count": 155.0,
+          "max_sla_miss_count": 163.0,
+          "min_sla_miss_count": 148.0,
+          "mean_hard_miss_count": 64.33333333333333,
+          "max_hard_miss_count": 69.0,
+          "min_hard_miss_count": 57.0,
+          "mean_sla_miss_rate": 0.9132252735907495,
+          "max_sla_miss_rate": 0.9367816091954023,
+          "min_sla_miss_rate": 0.8862275449101796,
+          "mean_hard_miss_rate": 0.37985646113356203,
+          "max_hard_miss_rate": 0.41317365269461076,
+          "min_hard_miss_rate": 0.3275862068965517,
+          "mean_miss_autohorizon_ratio": 0.5453210983615692,
+          "max_miss_autohorizon_ratio": 0.6091954022988506,
+          "min_miss_autohorizon_ratio": 0.49700598802395207,
+          "mean_fleet_score": 0.7726784300976292,
+          "max_fleet_score": 0.8063385033814722,
+          "min_fleet_score": 0.7346989194695244,
+          "mean_min_robot_score": 0.7135091565207535,
+          "max_min_robot_score": 0.7683641394408897,
+          "min_min_robot_score": 0.6653519354652409,
+          "mean_latency_p50_ms": 364.8355952117393,
+          "max_latency_p50_ms": 364.84054478144026,
+          "min_latency_p50_ms": 364.82569607233745,
+          "mean_latency_p95_ms": 752.6660888860561,
+          "max_latency_p95_ms": 819.8809429292698,
+          "min_latency_p95_ms": 670.6469124163732,
+          "mean_latency_p99_ms": 852.8858635435768,
+          "max_latency_p99_ms": 899.1210261897696,
+          "min_latency_p99_ms": 793.4139729449096,
+          "mean_latency_max_ms": 968.7184295151404,
+          "max_latency_max_ms": 1118.4626964741437,
+          "min_latency_max_ms": 819.8011107471757
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 7.485,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 155.0,
+          "mean_total_h2d_gib": 1160.1749999999997
+        }
+      },
+      "clockwork_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 86,
+                "sla_miss_count": 12,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.19767441860465115,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 339.337049430389,
+                "latency_max_ms": 364.82569607233745,
+                "fleet_score": 0.9871258248318782
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 56,
+                "sla_miss_count": 9,
+                "hard_miss_count": 7,
+                "miss_autohorizon_ratio": 0.03571428571428571,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8077593657931,
+                "latency_max_ms": 364.8077593657945,
+                "fleet_score": 0.9927413865948346
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 31,
+                "sla_miss_count": 13,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.16129032258064516,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8405447814439,
+                "latency_max_ms": 378.04556290576875,
+                "fleet_score": 0.9792227545498383
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 12,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.06896551724137931,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.6888800475572,
+                "latency_max_ms": 364.6888800475572,
+                "fleet_score": 0.9876097107011687
+              }
+            ],
+            "summary": {
+              "requests_total": 202,
+              "sla_miss_count": 46,
+              "hard_miss_count": 35,
+              "sla_miss_rate": 0.22772277227722773,
+              "hard_miss_rate": 0.17326732673267325,
+              "miss_autohorizon_ratio": 0.12871287128712872,
+              "fleet_score": 0.9875300086845226,
+              "min_robot_score": 0.9792227545498383,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 364.8398023459851,
+              "latency_p99_ms": 364.8405447814439,
+              "latency_max_ms": 378.04556290576875
+            },
+            "method_stats": {
+              "total_h2d_gib": 224.55000000000018,
+              "swap_count": 30,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "20hz_quantiles",
+                "10hz_a_logits"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 82,
+                "sla_miss_count": 13,
+                "hard_miss_count": 5,
+                "miss_autohorizon_ratio": 0.3048780487804878,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 362.6074923132784,
+                "latency_max_ms": 392.5855874207082,
+                "fleet_score": 0.9624351623561013
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 58,
+                "sla_miss_count": 10,
+                "hard_miss_count": 5,
+                "miss_autohorizon_ratio": 0.10344827586206896,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8077593657945,
+                "latency_max_ms": 364.8077593657945,
+                "fleet_score": 0.97894947919561
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 30,
+                "sla_miss_count": 12,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.1,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8405447814439,
+                "latency_max_ms": 364.8405447814439,
+                "fleet_score": 0.9864932203955091
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 23,
+                "sla_miss_count": 13,
+                "hard_miss_count": 11,
+                "miss_autohorizon_ratio": 0.08695652173913043,
+                "latency_p50_ms": 364.68888004755354,
+                "latency_p95_ms": 364.6888800475572,
+                "latency_max_ms": 364.6888800475572,
+                "fleet_score": 0.9884610998802017
+              }
+            ],
+            "summary": {
+              "requests_total": 193,
+              "sla_miss_count": 48,
+              "hard_miss_count": 30,
+              "sla_miss_rate": 0.24870466321243523,
+              "hard_miss_rate": 0.15544041450777202,
+              "miss_autohorizon_ratio": 0.18652849740932642,
+              "fleet_score": 0.9741809747912827,
+              "min_robot_score": 0.9624351623561013,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 364.840544781441,
+              "latency_p99_ms": 365.0815744953922,
+              "latency_max_ms": 392.5855874207082
+            },
+            "method_stats": {
+              "total_h2d_gib": 232.0350000000002,
+              "swap_count": 31,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "10hz_a_logits",
+                "10hz_b_autoh"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 90,
+                "sla_miss_count": 9,
+                "hard_miss_count": 4,
+                "miss_autohorizon_ratio": 0.24444444444444444,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8256960723338,
+                "latency_max_ms": 425.954907261068,
+                "fleet_score": 0.9672724888091028
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 62,
+                "sla_miss_count": 13,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.06451612903225806,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8077593657945,
+                "latency_max_ms": 404.1257894052469,
+                "fleet_score": 0.9859987766214349
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 31,
+                "sla_miss_count": 13,
+                "hard_miss_count": 6,
+                "miss_autohorizon_ratio": 0.22580645161290322,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8405447814439,
+                "latency_max_ms": 364.8405447814439,
+                "fleet_score": 0.9610667882710031
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 28,
+                "sla_miss_count": 18,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.35714285714285715,
+                "latency_p50_ms": 191.88673941294473,
+                "latency_p95_ms": 364.6888800475572,
+                "latency_max_ms": 364.6888800475572,
+                "fleet_score": 0.960804092022348
+              }
+            ],
+            "summary": {
+              "requests_total": 211,
+              "sla_miss_count": 53,
+              "hard_miss_count": 28,
+              "sla_miss_rate": 0.25118483412322273,
+              "hard_miss_rate": 0.13270142180094788,
+              "miss_autohorizon_ratio": 0.2037914691943128,
+              "fleet_score": 0.9709534762538896,
+              "min_robot_score": 0.960804092022348,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 364.84054478144117,
+              "latency_p99_ms": 364.8405447814439,
+              "latency_max_ms": 425.954907261068
+            },
+            "method_stats": {
+              "total_h2d_gib": 247.00500000000022,
+              "swap_count": 33,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "10hz_a_logits",
+                "20hz_quantiles"
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 202.0,
+          "max_requests_total": 211.0,
+          "min_requests_total": 193.0,
+          "mean_sla_miss_count": 49.0,
+          "max_sla_miss_count": 53.0,
+          "min_sla_miss_count": 46.0,
+          "mean_hard_miss_count": 31.0,
+          "max_hard_miss_count": 35.0,
+          "min_hard_miss_count": 28.0,
+          "mean_sla_miss_rate": 0.24253742320429525,
+          "max_sla_miss_rate": 0.25118483412322273,
+          "min_sla_miss_rate": 0.22772277227722773,
+          "mean_hard_miss_rate": 0.15380305434713104,
+          "max_hard_miss_rate": 0.17326732673267325,
+          "min_hard_miss_rate": 0.13270142180094788,
+          "mean_miss_autohorizon_ratio": 0.17301094596358932,
+          "max_miss_autohorizon_ratio": 0.2037914691943128,
+          "min_miss_autohorizon_ratio": 0.12871287128712872,
+          "mean_fleet_score": 0.9775548199098983,
+          "max_fleet_score": 0.9875300086845226,
+          "min_fleet_score": 0.9709534762538896,
+          "mean_min_robot_score": 0.9674873363094291,
+          "max_min_robot_score": 0.9792227545498383,
+          "min_min_robot_score": 0.960804092022348,
+          "mean_latency_p50_ms": 100.0,
+          "max_latency_p50_ms": 100.0,
+          "min_latency_p50_ms": 100.0,
+          "mean_latency_p95_ms": 364.8402973029558,
+          "max_latency_p95_ms": 364.84054478144117,
+          "min_latency_p95_ms": 364.8398023459851,
+          "mean_latency_p99_ms": 364.9208880194267,
+          "max_latency_p99_ms": 365.0815744953922,
+          "min_latency_p99_ms": 364.8405447814439,
+          "mean_latency_max_ms": 398.8620191958483,
+          "max_latency_max_ms": 425.954907261068,
+          "min_latency_max_ms": 378.04556290576875
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 22.455000000000002,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 31.333333333333332,
+          "mean_total_h2d_gib": 234.5300000000002
+        }
+      },
+      "paella_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 86,
+                "sla_miss_count": 12,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.19767441860465115,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 339.337049430389,
+                "latency_max_ms": 364.82569607233745,
+                "fleet_score": 0.9871258248318782
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 56,
+                "sla_miss_count": 9,
+                "hard_miss_count": 7,
+                "miss_autohorizon_ratio": 0.03571428571428571,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8077593657931,
+                "latency_max_ms": 364.8077593657945,
+                "fleet_score": 0.9927413865948346
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 31,
+                "sla_miss_count": 13,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.16129032258064516,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8405447814439,
+                "latency_max_ms": 378.04556290576875,
+                "fleet_score": 0.9792227545498383
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 12,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.06896551724137931,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.6888800475572,
+                "latency_max_ms": 364.6888800475572,
+                "fleet_score": 0.9876097107011687
+              }
+            ],
+            "summary": {
+              "requests_total": 202,
+              "sla_miss_count": 46,
+              "hard_miss_count": 35,
+              "sla_miss_rate": 0.22772277227722773,
+              "hard_miss_rate": 0.17326732673267325,
+              "miss_autohorizon_ratio": 0.12871287128712872,
+              "fleet_score": 0.9875300086845226,
+              "min_robot_score": 0.9792227545498383,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 364.8398023459851,
+              "latency_p99_ms": 364.8405447814439,
+              "latency_max_ms": 378.04556290576875
+            },
+            "method_stats": {
+              "total_h2d_gib": 224.55000000000018,
+              "swap_count": 30,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "20hz_quantiles",
+                "10hz_a_logits"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 82,
+                "sla_miss_count": 13,
+                "hard_miss_count": 5,
+                "miss_autohorizon_ratio": 0.3048780487804878,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 362.6074923132784,
+                "latency_max_ms": 392.5855874207082,
+                "fleet_score": 0.9624351623561013
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 58,
+                "sla_miss_count": 10,
+                "hard_miss_count": 5,
+                "miss_autohorizon_ratio": 0.10344827586206896,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8077593657945,
+                "latency_max_ms": 364.8077593657945,
+                "fleet_score": 0.97894947919561
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 30,
+                "sla_miss_count": 12,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.1,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8405447814439,
+                "latency_max_ms": 364.8405447814439,
+                "fleet_score": 0.9864932203955091
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 23,
+                "sla_miss_count": 13,
+                "hard_miss_count": 11,
+                "miss_autohorizon_ratio": 0.08695652173913043,
+                "latency_p50_ms": 364.68888004755354,
+                "latency_p95_ms": 364.6888800475572,
+                "latency_max_ms": 364.6888800475572,
+                "fleet_score": 0.9884610998802017
+              }
+            ],
+            "summary": {
+              "requests_total": 193,
+              "sla_miss_count": 48,
+              "hard_miss_count": 30,
+              "sla_miss_rate": 0.24870466321243523,
+              "hard_miss_rate": 0.15544041450777202,
+              "miss_autohorizon_ratio": 0.18652849740932642,
+              "fleet_score": 0.9741809747912827,
+              "min_robot_score": 0.9624351623561013,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 364.840544781441,
+              "latency_p99_ms": 365.0815744953922,
+              "latency_max_ms": 392.5855874207082
+            },
+            "method_stats": {
+              "total_h2d_gib": 232.0350000000002,
+              "swap_count": 31,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "10hz_a_logits",
+                "10hz_b_autoh"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 90,
+                "sla_miss_count": 9,
+                "hard_miss_count": 4,
+                "miss_autohorizon_ratio": 0.24444444444444444,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8256960723338,
+                "latency_max_ms": 425.954907261068,
+                "fleet_score": 0.9672724888091028
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 62,
+                "sla_miss_count": 13,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.06451612903225806,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8077593657945,
+                "latency_max_ms": 404.1257894052469,
+                "fleet_score": 0.9859987766214349
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 31,
+                "sla_miss_count": 13,
+                "hard_miss_count": 6,
+                "miss_autohorizon_ratio": 0.22580645161290322,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 364.8405447814439,
+                "latency_max_ms": 364.8405447814439,
+                "fleet_score": 0.9610667882710031
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 28,
+                "sla_miss_count": 18,
+                "hard_miss_count": 9,
+                "miss_autohorizon_ratio": 0.35714285714285715,
+                "latency_p50_ms": 191.88673941294473,
+                "latency_p95_ms": 364.6888800475572,
+                "latency_max_ms": 364.6888800475572,
+                "fleet_score": 0.960804092022348
+              }
+            ],
+            "summary": {
+              "requests_total": 211,
+              "sla_miss_count": 53,
+              "hard_miss_count": 28,
+              "sla_miss_rate": 0.25118483412322273,
+              "hard_miss_rate": 0.13270142180094788,
+              "miss_autohorizon_ratio": 0.2037914691943128,
+              "fleet_score": 0.9709534762538896,
+              "min_robot_score": 0.960804092022348,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 364.84054478144117,
+              "latency_p99_ms": 364.8405447814439,
+              "latency_max_ms": 425.954907261068
+            },
+            "method_stats": {
+              "total_h2d_gib": 247.00500000000022,
+              "swap_count": 33,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "10hz_a_logits",
+                "20hz_quantiles"
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 202.0,
+          "max_requests_total": 211.0,
+          "min_requests_total": 193.0,
+          "mean_sla_miss_count": 49.0,
+          "max_sla_miss_count": 53.0,
+          "min_sla_miss_count": 46.0,
+          "mean_hard_miss_count": 31.0,
+          "max_hard_miss_count": 35.0,
+          "min_hard_miss_count": 28.0,
+          "mean_sla_miss_rate": 0.24253742320429525,
+          "max_sla_miss_rate": 0.25118483412322273,
+          "min_sla_miss_rate": 0.22772277227722773,
+          "mean_hard_miss_rate": 0.15380305434713104,
+          "max_hard_miss_rate": 0.17326732673267325,
+          "min_hard_miss_rate": 0.13270142180094788,
+          "mean_miss_autohorizon_ratio": 0.17301094596358932,
+          "max_miss_autohorizon_ratio": 0.2037914691943128,
+          "min_miss_autohorizon_ratio": 0.12871287128712872,
+          "mean_fleet_score": 0.9775548199098983,
+          "max_fleet_score": 0.9875300086845226,
+          "min_fleet_score": 0.9709534762538896,
+          "mean_min_robot_score": 0.9674873363094291,
+          "max_min_robot_score": 0.9792227545498383,
+          "min_min_robot_score": 0.960804092022348,
+          "mean_latency_p50_ms": 100.0,
+          "max_latency_p50_ms": 100.0,
+          "min_latency_p50_ms": 100.0,
+          "mean_latency_p95_ms": 364.8402973029558,
+          "max_latency_p95_ms": 364.84054478144117,
+          "min_latency_p95_ms": 364.8398023459851,
+          "mean_latency_p99_ms": 364.9208880194267,
+          "max_latency_p99_ms": 365.0815744953922,
+          "min_latency_p99_ms": 364.8405447814439,
+          "mean_latency_max_ms": 398.8620191958483,
+          "max_latency_max_ms": 425.954907261068,
+          "min_latency_max_ms": 378.04556290576875
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 22.455000000000002,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 31.333333333333332,
+          "mean_total_h2d_gib": 234.5300000000002
+        }
+      },
+      "usher_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 86,
+                "sla_miss_count": 86,
+                "hard_miss_count": 35,
+                "miss_autohorizon_ratio": 0.5930232558139535,
+                "latency_p50_ms": 104.43357817946526,
+                "latency_p95_ms": 150.4257867246779,
+                "latency_max_ms": 472.05301935707394,
+                "fleet_score": 0.9523315326847416
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 56,
+                "sla_miss_count": 56,
+                "hard_miss_count": 23,
+                "miss_autohorizon_ratio": 0.5892857142857143,
+                "latency_p50_ms": 104.39021565459552,
+                "latency_p95_ms": 426.01744828699157,
+                "latency_max_ms": 426.0174482869934,
+                "fleet_score": 0.9647236434142212
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 30,
+                "sla_miss_count": 30,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.6666666666666666,
+                "latency_p50_ms": 150.47749293297966,
+                "latency_p95_ms": 472.1047255653757,
+                "latency_max_ms": 472.1047255653757,
+                "fleet_score": 0.9488652155388995
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 29,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.6551724137931034,
+                "latency_p50_ms": 149.94936565491662,
+                "latency_p95_ms": 471.5765982873054,
+                "latency_max_ms": 471.57659828731266,
+                "fleet_score": 0.9367827359247624
+              }
+            ],
+            "summary": {
+              "requests_total": 201,
+              "sla_miss_count": 201,
+              "hard_miss_count": 78,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.3880597014925373,
+              "miss_autohorizon_ratio": 0.6119402985074627,
+              "fleet_score": 0.9529818342193925,
+              "min_robot_score": 0.9367827359247624,
+              "latency_p50_ms": 104.43357817946526,
+              "latency_p95_ms": 471.5765982873054,
+              "latency_p99_ms": 472.1047255653757,
+              "latency_max_ms": 472.1047255653757
+            },
+            "method_stats": {
+              "total_h2d_gib": 239.5200000000002,
+              "swap_count": 32,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "10hz_a_logits",
+                "10hz_b_autoh",
+                "30hz_official_ft"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 85,
+                "sla_miss_count": 85,
+                "hard_miss_count": 37,
+                "miss_autohorizon_ratio": 0.5647058823529412,
+                "latency_p50_ms": 104.43357817946526,
+                "latency_p95_ms": 104.43357817946526,
+                "latency_max_ms": 104.43357817946526,
+                "fleet_score": 0.965803503093361
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 58,
+                "sla_miss_count": 58,
+                "hard_miss_count": 22,
+                "miss_autohorizon_ratio": 0.6206896551724138,
+                "latency_p50_ms": 104.39021565459916,
+                "latency_p95_ms": 426.01744828699185,
+                "latency_max_ms": 471.99056011712673,
+                "fleet_score": 0.9513483756856965
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 29,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.6551724137931034,
+                "latency_p50_ms": 150.47749293297966,
+                "latency_p95_ms": 472.10472556537496,
+                "latency_max_ms": 472.1047255653757,
+                "fleet_score": 0.9559344033518204
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 23,
+                "sla_miss_count": 23,
+                "hard_miss_count": 14,
+                "miss_autohorizon_ratio": 0.391304347826087,
+                "latency_p50_ms": 425.7300539774169,
+                "latency_p95_ms": 471.57659828731266,
+                "latency_max_ms": 471.57659828731266,
+                "fleet_score": 0.9503857556797795
+              }
+            ],
+            "summary": {
+              "requests_total": 195,
+              "sla_miss_count": 195,
+              "hard_miss_count": 83,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.4256410256410256,
+              "miss_autohorizon_ratio": 0.5743589743589743,
+              "fleet_score": 0.9581932339391028,
+              "min_robot_score": 0.9503857556797795,
+              "latency_p50_ms": 104.43357817946526,
+              "latency_p95_ms": 471.99056011712673,
+              "latency_p99_ms": 472.104725565374,
+              "latency_max_ms": 472.1047255653757
+            },
+            "method_stats": {
+              "total_h2d_gib": 232.0350000000002,
+              "swap_count": 31,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "30hz_official_ft",
+                "10hz_b_autoh",
+                "10hz_a_logits"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 90,
+                "sla_miss_count": 90,
+                "hard_miss_count": 32,
+                "miss_autohorizon_ratio": 0.6444444444444445,
+                "latency_p50_ms": 104.43357817946526,
+                "latency_p95_ms": 302.0250499726227,
+                "latency_max_ms": 472.05301935706666,
+                "fleet_score": 0.9601410974552123
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 62,
+                "sla_miss_count": 62,
+                "hard_miss_count": 20,
+                "miss_autohorizon_ratio": 0.6774193548387096,
+                "latency_p50_ms": 150.3633274847307,
+                "latency_p95_ms": 426.01744828699157,
+                "latency_max_ms": 471.990560117134,
+                "fleet_score": 0.9304659524800285
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 31,
+                "sla_miss_count": 31,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.6774193548387096,
+                "latency_p50_ms": 150.47749293297966,
+                "latency_p95_ms": 472.1047255653739,
+                "latency_max_ms": 472.1047255653757,
+                "fleet_score": 0.9216880026848562
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 28,
+                "sla_miss_count": 28,
+                "hard_miss_count": 10,
+                "miss_autohorizon_ratio": 0.6428571428571429,
+                "latency_p50_ms": 149.94936565490934,
+                "latency_p95_ms": 471.5765982873054,
+                "latency_max_ms": 471.5765982873054,
+                "fleet_score": 0.9484619083499175
+              }
+            ],
+            "summary": {
+              "requests_total": 211,
+              "sla_miss_count": 211,
+              "hard_miss_count": 72,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.3412322274881517,
+              "miss_autohorizon_ratio": 0.6587677725118484,
+              "fleet_score": 0.9440943023897416,
+              "min_robot_score": 0.9216880026848562,
+              "latency_p50_ms": 104.43357817946526,
+              "latency_p95_ms": 471.5765982873054,
+              "latency_p99_ms": 472.1047255653739,
+              "latency_max_ms": 472.1047255653757
+            },
+            "method_stats": {
+              "total_h2d_gib": 254.49000000000024,
+              "swap_count": 34,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 22.455000000000002,
+              "resident_models_final": [
+                "10hz_a_logits",
+                "30hz_official_ft",
+                "20hz_quantiles"
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 202.33333333333334,
+          "max_requests_total": 211.0,
+          "min_requests_total": 195.0,
+          "mean_sla_miss_count": 202.33333333333334,
+          "max_sla_miss_count": 211.0,
+          "min_sla_miss_count": 195.0,
+          "mean_hard_miss_count": 77.66666666666667,
+          "max_hard_miss_count": 83.0,
+          "min_hard_miss_count": 72.0,
+          "mean_sla_miss_rate": 1.0,
+          "max_sla_miss_rate": 1.0,
+          "min_sla_miss_rate": 1.0,
+          "mean_hard_miss_rate": 0.38497765154057156,
+          "max_hard_miss_rate": 0.4256410256410256,
+          "min_hard_miss_rate": 0.3412322274881517,
+          "mean_miss_autohorizon_ratio": 0.6150223484594285,
+          "max_miss_autohorizon_ratio": 0.6587677725118484,
+          "min_miss_autohorizon_ratio": 0.5743589743589743,
+          "mean_fleet_score": 0.9517564568494122,
+          "max_fleet_score": 0.9581932339391028,
+          "min_fleet_score": 0.9440943023897416,
+          "mean_min_robot_score": 0.9362854980964661,
+          "max_min_robot_score": 0.9503857556797795,
+          "min_min_robot_score": 0.9216880026848562,
+          "mean_latency_p50_ms": 104.43357817946526,
+          "max_latency_p50_ms": 104.43357817946526,
+          "min_latency_p50_ms": 104.43357817946526,
+          "mean_latency_p95_ms": 471.7145855639125,
+          "max_latency_p95_ms": 471.99056011712673,
+          "min_latency_p95_ms": 471.5765982873054,
+          "mean_latency_p99_ms": 472.1047255653745,
+          "max_latency_p99_ms": 472.1047255653757,
+          "min_latency_p99_ms": 472.1047255653739,
+          "mean_latency_max_ms": 472.1047255653757,
+          "max_latency_max_ms": 472.1047255653757,
+          "min_latency_max_ms": 472.1047255653757
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 22.455000000000002,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 32.333333333333336,
+          "mean_total_h2d_gib": 242.0150000000002
+        }
+      },
+      "distserve_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 42,
+                "sla_miss_count": 38,
+                "hard_miss_count": 31,
+                "miss_autohorizon_ratio": 0.4523809523809524,
+                "latency_p50_ms": 1231.87975810645,
+                "latency_p95_ms": 2022.1337079158045,
+                "latency_max_ms": 2365.2130914398003,
+                "fleet_score": 0.4228107401551445
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 33,
+                "sla_miss_count": 32,
+                "hard_miss_count": 17,
+                "miss_autohorizon_ratio": 0.45454545454545453,
+                "latency_p50_ms": 1291.8734722576628,
+                "latency_p95_ms": 1641.1238885929436,
+                "latency_max_ms": 1991.5751617945498,
+                "fleet_score": 0.5613310549346269
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 23,
+                "sla_miss_count": 23,
+                "hard_miss_count": 7,
+                "miss_autohorizon_ratio": 0.6956521739130435,
+                "latency_p50_ms": 1198.5464247731343,
+                "latency_p95_ms": 1898.2263752648803,
+                "latency_max_ms": 2024.9514978612206,
+                "fleet_score": 0.6093841269930983
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 22,
+                "sla_miss_count": 22,
+                "hard_miss_count": 7,
+                "miss_autohorizon_ratio": 0.6818181818181818,
+                "latency_p50_ms": 1275.105389719757,
+                "latency_p95_ms": 1894.1764828504715,
+                "latency_max_ms": 1898.2052884858276,
+                "fleet_score": 0.5959174786329205
+              }
+            ],
+            "summary": {
+              "requests_total": 120,
+              "sla_miss_count": 115,
+              "hard_miss_count": 62,
+              "sla_miss_rate": 0.9583333333333334,
+              "hard_miss_rate": 0.5166666666666667,
+              "miss_autohorizon_ratio": 0.5416666666666666,
+              "fleet_score": 0.5220850676420202,
+              "min_robot_score": 0.4228107401551445,
+              "latency_p50_ms": 1231.87975810645,
+              "latency_p95_ms": 1933.2081335274445,
+              "latency_p99_ms": 2246.933959431228,
+              "latency_max_ms": 2365.2130914398003
+            },
+            "method_stats": {
+              "total_h2d_gib": 1721.5499999999922,
+              "swap_count": 230,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 14.97,
+              "stage_partitions": [
+                0.5,
+                0.5
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 41,
+                "sla_miss_count": 37,
+                "hard_miss_count": 32,
+                "miss_autohorizon_ratio": 0.4634146341463415,
+                "latency_p50_ms": 1267.3549584508582,
+                "latency_p95_ms": 1958.010245902784,
+                "latency_max_ms": 2458.370778259785,
+                "fleet_score": 0.425198828618585
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 35,
+                "sla_miss_count": 35,
+                "hard_miss_count": 17,
+                "miss_autohorizon_ratio": 0.6571428571428571,
+                "latency_p50_ms": 1316.041294924471,
+                "latency_p95_ms": 2063.546424773125,
+                "latency_max_ms": 2098.546424773158,
+                "fleet_score": 0.3927551138996336
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 24,
+                "sla_miss_count": 24,
+                "hard_miss_count": 6,
+                "miss_autohorizon_ratio": 0.75,
+                "latency_p50_ms": 1136.9472205060993,
+                "latency_p95_ms": 1977.7133300734333,
+                "latency_max_ms": 2290.1021904980225,
+                "fleet_score": 0.5844919175861167
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 17,
+                "sla_miss_count": 17,
+                "hard_miss_count": 12,
+                "miss_autohorizon_ratio": 0.29411764705882354,
+                "latency_p50_ms": 1298.546424773118,
+                "latency_p95_ms": 1918.2287182403816,
+                "latency_max_ms": 1998.2287182403816,
+                "fleet_score": 0.7544192348010139
+              }
+            ],
+            "summary": {
+              "requests_total": 117,
+              "sla_miss_count": 113,
+              "hard_miss_count": 67,
+              "sla_miss_rate": 0.9658119658119658,
+              "hard_miss_rate": 0.5726495726495726,
+              "miss_autohorizon_ratio": 0.5555555555555556,
+              "fleet_score": 0.48173576497745557,
+              "min_robot_score": 0.3927551138996336,
+              "latency_p50_ms": 1298.546424773118,
+              "latency_p95_ms": 2008.5464247731377,
+              "latency_p99_ms": 2325.1953472891264,
+              "latency_max_ms": 2458.370778259785
+            },
+            "method_stats": {
+              "total_h2d_gib": 1691.6099999999926,
+              "swap_count": 226,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 14.97,
+              "stage_partitions": [
+                0.5,
+                0.5
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 42,
+                "sla_miss_count": 41,
+                "hard_miss_count": 31,
+                "miss_autohorizon_ratio": 0.5952380952380952,
+                "latency_p50_ms": 1231.8797581064628,
+                "latency_p95_ms": 1665.1971663285442,
+                "latency_max_ms": 2333.368023465402,
+                "fleet_score": 0.3415083646656859
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 38,
+                "sla_miss_count": 36,
+                "hard_miss_count": 12,
+                "miss_autohorizon_ratio": 0.7368421052631579,
+                "latency_p50_ms": 1299.042846716773,
+                "latency_p95_ms": 1998.5464247731356,
+                "latency_max_ms": 2048.5464247731297,
+                "fleet_score": 0.34591946057667283
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 24,
+                "sla_miss_count": 24,
+                "hard_miss_count": 6,
+                "miss_autohorizon_ratio": 0.75,
+                "latency_p50_ms": 1345.5864228791725,
+                "latency_p95_ms": 2083.225203777155,
+                "latency_max_ms": 2098.228718240349,
+                "fleet_score": 0.4996046186930259
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 21,
+                "sla_miss_count": 21,
+                "hard_miss_count": 8,
+                "miss_autohorizon_ratio": 0.6190476190476191,
+                "latency_p50_ms": 1425.5522207947433,
+                "latency_p95_ms": 1998.2052884857803,
+                "latency_max_ms": 2323.6432854749364,
+                "fleet_score": 0.6022538292199665
+              }
+            ],
+            "summary": {
+              "requests_total": 125,
+              "sla_miss_count": 122,
+              "hard_miss_count": 57,
+              "sla_miss_rate": 0.976,
+              "hard_miss_rate": 0.456,
+              "miss_autohorizon_ratio": 0.672,
+              "fleet_score": 0.405705126684975,
+              "min_robot_score": 0.3415083646656859,
+              "latency_p50_ms": 1299.0428467167549,
+              "latency_p95_ms": 1998.478197515673,
+              "latency_p99_ms": 2269.5437893386365,
+              "latency_max_ms": 2333.368023465402
+            },
+            "method_stats": {
+              "total_h2d_gib": 1826.3399999999908,
+              "swap_count": 244,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 14.97,
+              "stage_partitions": [
+                0.5,
+                0.5
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 120.66666666666667,
+          "max_requests_total": 125.0,
+          "min_requests_total": 117.0,
+          "mean_sla_miss_count": 116.66666666666667,
+          "max_sla_miss_count": 122.0,
+          "min_sla_miss_count": 113.0,
+          "mean_hard_miss_count": 62.0,
+          "max_hard_miss_count": 67.0,
+          "min_hard_miss_count": 57.0,
+          "mean_sla_miss_rate": 0.9667150997150996,
+          "max_sla_miss_rate": 0.976,
+          "min_sla_miss_rate": 0.9583333333333334,
+          "mean_hard_miss_rate": 0.5151054131054131,
+          "max_hard_miss_rate": 0.5726495726495726,
+          "min_hard_miss_rate": 0.456,
+          "mean_miss_autohorizon_ratio": 0.5897407407407408,
+          "max_miss_autohorizon_ratio": 0.672,
+          "min_miss_autohorizon_ratio": 0.5416666666666666,
+          "mean_fleet_score": 0.4698419864348169,
+          "max_fleet_score": 0.5220850676420202,
+          "min_fleet_score": 0.405705126684975,
+          "mean_min_robot_score": 0.3856914062401547,
+          "max_min_robot_score": 0.4228107401551445,
+          "min_min_robot_score": 0.3415083646656859,
+          "mean_latency_p50_ms": 1276.4896765321075,
+          "max_latency_p50_ms": 1299.0428467167549,
+          "min_latency_p50_ms": 1231.87975810645,
+          "mean_latency_p95_ms": 1980.0775852720851,
+          "max_latency_p95_ms": 2008.5464247731377,
+          "min_latency_p95_ms": 1933.2081335274445,
+          "mean_latency_p99_ms": 2280.5576986863302,
+          "max_latency_p99_ms": 2325.1953472891264,
+          "min_latency_p99_ms": 2246.933959431228,
+          "mean_latency_max_ms": 2385.6506310549958,
+          "max_latency_max_ms": 2458.370778259785,
+          "min_latency_max_ms": 2333.368023465402
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 14.97,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 233.33333333333334,
+          "mean_total_h2d_gib": 1746.4999999999918
+        }
+      },
+      "vla_aware": {
+        "best_shared_fraction": 0.0,
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 87,
+                "sla_miss_count": 3,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.2413793103448276,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.18052673334023,
+                "fleet_score": 0.9845191108762602
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 58,
+                "sla_miss_count": 3,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.05172413793103448,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 103.51800317764024,
+                "latency_max_ms": 136.3938388824463,
+                "fleet_score": 0.997050416011771
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 32,
+                "sla_miss_count": 1,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.03125,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.21331214904785,
+                "fleet_score": 0.9980568806027608
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 30,
+                "sla_miss_count": 2,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.03333333333333333,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 118.35136531194576,
+                "latency_max_ms": 152.90884081520926,
+                "fleet_score": 0.9979274736384169
+              }
+            ],
+            "summary": {
+              "requests_total": 207,
+              "sla_miss_count": 9,
+              "hard_miss_count": 1,
+              "sla_miss_rate": 0.043478260869565216,
+              "hard_miss_rate": 0.004830917874396135,
+              "miss_autohorizon_ratio": 0.12560386473429952,
+              "fleet_score": 0.9920454265820066,
+              "min_robot_score": 0.9845191108762602,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 100.0,
+              "latency_p99_ms": 142.77332546228658,
+              "latency_max_ms": 152.90884081520926
+            },
+            "method_stats": {
+              "total_h2d_gib": 291.9150000000003,
+              "swap_count": 0,
+              "prefetch_count": 39,
+              "gpu_memory_gib": 22.455000000000002,
+              "shared_fraction": 0.0
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 85,
+                "sla_miss_count": 6,
+                "hard_miss_count": 2,
+                "miss_autohorizon_ratio": 0.2235294117647059,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 108.50123545328714,
+                "latency_max_ms": 133.33333333333212,
+                "fleet_score": 0.986165612941417
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 60,
+                "sla_miss_count": 3,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.05,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.3400768280029,
+                "latency_max_ms": 143.06164741516113,
+                "fleet_score": 0.9968092751252177
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 32,
+                "sla_miss_count": 0,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.0,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 100.0,
+                "fleet_score": 1.0
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 23,
+                "sla_miss_count": 1,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.0,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.06164741516113,
+                "fleet_score": 1.0
+              }
+            ],
+            "summary": {
+              "requests_total": 200,
+              "sla_miss_count": 10,
+              "hard_miss_count": 3,
+              "sla_miss_rate": 0.05,
+              "hard_miss_rate": 0.015,
+              "miss_autohorizon_ratio": 0.11,
+              "fleet_score": 0.9931441971891185,
+              "min_robot_score": 0.986165612941417,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 100.15228284200015,
+              "latency_p99_ms": 136.445816745758,
+              "latency_max_ms": 143.06164741516113
+            },
+            "method_stats": {
+              "total_h2d_gib": 276.9450000000003,
+              "swap_count": 0,
+              "prefetch_count": 37,
+              "gpu_memory_gib": 22.455000000000002,
+              "shared_fraction": 0.0
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_official_ft",
+                "hz": 30.0,
+                "requests": 91,
+                "sla_miss_count": 5,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.25274725274725274,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 109.85616175334872,
+                "latency_max_ms": 162.80675633748615,
+                "fleet_score": 0.9832712611603903
+              },
+              {
+                "model": "20hz_quantiles",
+                "hz": 20.0,
+                "requests": 64,
+                "sla_miss_count": 2,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.03125,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 100.0,
+                "latency_max_ms": 143.18052673339844,
+                "fleet_score": 0.998180386179013
+              },
+              {
+                "model": "10hz_a_logits",
+                "hz": 10.0,
+                "requests": 32,
+                "sla_miss_count": 2,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.09375,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 108.87054557800073,
+                "latency_max_ms": 143.21331214904603,
+                "fleet_score": 0.993443893036657
+              },
+              {
+                "model": "10hz_b_autoh",
+                "hz": 10.0,
+                "requests": 29,
+                "sla_miss_count": 3,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.06896551724137931,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 131.83692092894924,
+                "latency_max_ms": 143.06164741516113,
+                "fleet_score": 0.9958527274751763
+              }
+            ],
+            "summary": {
+              "requests_total": 216,
+              "sla_miss_count": 12,
+              "hard_miss_count": 1,
+              "sla_miss_rate": 0.05555555555555555,
+              "hard_miss_rate": 0.004629629629629629,
+              "miss_autohorizon_ratio": 0.1388888888888889,
+              "fleet_score": 0.9908625544755011,
+              "min_robot_score": 0.9832712611603903,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 114.62230761845422,
+              "latency_p99_ms": 143.16269483566285,
+              "latency_max_ms": 162.80675633748615
+            },
+            "method_stats": {
+              "total_h2d_gib": 329.3400000000004,
+              "swap_count": 0,
+              "prefetch_count": 44,
+              "gpu_memory_gib": 22.455000000000002,
+              "shared_fraction": 0.0
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 207.66666666666666,
+          "max_requests_total": 216.0,
+          "min_requests_total": 200.0,
+          "mean_sla_miss_count": 10.333333333333334,
+          "max_sla_miss_count": 12.0,
+          "min_sla_miss_count": 9.0,
+          "mean_hard_miss_count": 1.6666666666666667,
+          "max_hard_miss_count": 3.0,
+          "min_hard_miss_count": 1.0,
+          "mean_sla_miss_rate": 0.04967793880837359,
+          "max_sla_miss_rate": 0.05555555555555555,
+          "min_sla_miss_rate": 0.043478260869565216,
+          "mean_hard_miss_rate": 0.008153515834675254,
+          "max_hard_miss_rate": 0.015,
+          "min_hard_miss_rate": 0.004629629629629629,
+          "mean_miss_autohorizon_ratio": 0.12483091787439614,
+          "max_miss_autohorizon_ratio": 0.1388888888888889,
+          "min_miss_autohorizon_ratio": 0.11,
+          "mean_fleet_score": 0.9920173927488753,
+          "max_fleet_score": 0.9931441971891185,
+          "min_fleet_score": 0.9908625544755011,
+          "mean_min_robot_score": 0.9846519949926892,
+          "max_min_robot_score": 0.986165612941417,
+          "min_min_robot_score": 0.9832712611603903,
+          "mean_latency_p50_ms": 100.0,
+          "max_latency_p50_ms": 100.0,
+          "min_latency_p50_ms": 100.0,
+          "mean_latency_p95_ms": 104.92486348681813,
+          "max_latency_p95_ms": 114.62230761845422,
+          "min_latency_p95_ms": 100.0,
+          "mean_latency_p99_ms": 140.79394568123578,
+          "max_latency_p99_ms": 143.16269483566285,
+          "min_latency_p99_ms": 136.445816745758,
+          "mean_latency_max_ms": 152.9257481892855,
+          "max_latency_max_ms": 162.80675633748615,
+          "min_latency_max_ms": 143.06164741516113
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 22.455000000000002,
+          "mean_prefetch_count": 40.0,
+          "mean_shared_fraction": 0.0,
+          "mean_swap_count": 0.0,
+          "mean_total_h2d_gib": 299.4000000000003
+        }
+      }
+    },
+    "gpulet_like": {
+      "temporal_only": {
+        "feasible_under_100ms": false,
+        "representative_cycle_ms": null,
+        "reason": "queue/cycle plus repeated model switching exceeds 100ms"
+      },
+      "spatial_only": {
+        "feasible_under_100ms": false,
+        "gpu_memory_gib": 7.485,
+        "used_partition": 1.0,
+        "schedule": null,
+        "reason": "per-model partitions or shell memory exceed single-GPU budget"
+      },
+      "spatio_temporal": {
+        "feasible_under_100ms": false,
+        "gpu_memory_gib": 0.0,
+        "schedule": null,
+        "reason": "gpulet cycle/duty-window exceeds 100ms once swap-aware shells are included"
+      }
+    }
+  },
+  "gr00t_n1d6": {
+    "request_level": {
+      "oracle_full_resident": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 506,
+                "sla_miss_count": 171,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.6699604743083004,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 137.60000000000446,
+                "latency_max_ms": 177.1333333333314,
+                "fleet_score": 0.8815315654073596
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 330,
+                "sla_miss_count": 145,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.44242424242424244,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 138.65527223737155,
+                "latency_max_ms": 175.3612219192146,
+                "fleet_score": 0.928013614989879
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 172,
+                "sla_miss_count": 69,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.4069767441860465,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 143.79999999999563,
+                "latency_max_ms": 179.62788858587646,
+                "fleet_score": 0.9351167564490301
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 170,
+                "sla_miss_count": 88,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.5176470588235295,
+                "latency_p50_ms": 102.37363881316196,
+                "latency_p95_ms": 143.88061095960438,
+                "latency_max_ms": 179.62788858587646,
+                "fleet_score": 0.9182989455531497
+              }
+            ],
+            "summary": {
+              "requests_total": 1178,
+              "sla_miss_count": 473,
+              "hard_miss_count": 0,
+              "sla_miss_rate": 0.40152801358234297,
+              "hard_miss_rate": 0.0,
+              "miss_autohorizon_ratio": 0.5458404074702886,
+              "fleet_score": 0.9073868005254645,
+              "min_robot_score": 0.8815315654073596,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 139.45272237374084,
+              "latency_p99_ms": 159.05861095960012,
+              "latency_max_ms": 179.62788858587646
+            },
+            "method_stats": {
+              "total_h2d_gib": 0.0,
+              "swap_count": 0,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 29.365385845303535
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 502,
+                "sla_miss_count": 154,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.6354581673306773,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 139.45272237372757,
+                "latency_max_ms": 177.21394429294014,
+                "fleet_score": 0.8858393132263511
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 331,
+                "sla_miss_count": 154,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.46827794561933533,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 139.45272237372592,
+                "latency_max_ms": 169.1612219192175,
+                "fleet_score": 0.9247949642973043
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 173,
+                "sla_miss_count": 85,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.4913294797687861,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 143.79999999999708,
+                "latency_max_ms": 177.1333333333314,
+                "fleet_score": 0.9194984353306946
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 165,
+                "sla_miss_count": 86,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.5272727272727272,
+                "latency_p50_ms": 104.2666666666646,
+                "latency_p95_ms": 143.80000000000237,
+                "latency_max_ms": 164.8139442929387,
+                "fleet_score": 0.9171144901152168
+              }
+            ],
+            "summary": {
+              "requests_total": 1171,
+              "sla_miss_count": 479,
+              "hard_miss_count": 0,
+              "sla_miss_rate": 0.40905209222886424,
+              "hard_miss_rate": 0.0,
+              "miss_autohorizon_ratio": 0.5516652433817251,
+              "fleet_score": 0.9060540172170762,
+              "min_robot_score": 0.8858393132263511,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 139.53333333333285,
+              "latency_p99_ms": 164.81394429293792,
+              "latency_max_ms": 177.21394429294014
+            },
+            "method_stats": {
+              "total_h2d_gib": 0.0,
+              "swap_count": 0,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 29.365385845303535
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 507,
+                "sla_miss_count": 157,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.6528599605522682,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 137.6000000000131,
+                "latency_max_ms": 177.13333333333867,
+                "fleet_score": 0.8844596155702518
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 336,
+                "sla_miss_count": 170,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.5059523809523809,
+                "latency_p50_ms": 103.09999999999945,
+                "latency_p95_ms": 142.02788858588065,
+                "latency_max_ms": 171.09455525253725,
+                "fleet_score": 0.9184278307545061
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 171,
+                "sla_miss_count": 79,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.4678362573099415,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 142.9139442929445,
+                "latency_max_ms": 177.1333333333314,
+                "fleet_score": 0.9265905997626082
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 168,
+                "sla_miss_count": 81,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.49404761904761907,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 152.5469523762964,
+                "latency_max_ms": 185.827888585889,
+                "fleet_score": 0.9233702287153482
+              }
+            ],
+            "summary": {
+              "requests_total": 1182,
+              "sla_miss_count": 487,
+              "hard_miss_count": 0,
+              "sla_miss_rate": 0.4120135363790186,
+              "hard_miss_rate": 0.0,
+              "miss_autohorizon_ratio": 0.5617597292724196,
+              "fleet_score": 0.9055488689392039,
+              "min_robot_score": 0.8844596155702518,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 142.0278885858861,
+              "latency_p99_ms": 164.82926037527477,
+              "latency_max_ms": 185.827888585889
+            },
+            "method_stats": {
+              "total_h2d_gib": 0.0,
+              "swap_count": 0,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 29.365385845303535
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 1177.0,
+          "max_requests_total": 1182.0,
+          "min_requests_total": 1171.0,
+          "mean_sla_miss_count": 479.6666666666667,
+          "max_sla_miss_count": 487.0,
+          "min_sla_miss_count": 473.0,
+          "mean_hard_miss_count": 0.0,
+          "max_hard_miss_count": 0.0,
+          "min_hard_miss_count": 0.0,
+          "mean_sla_miss_rate": 0.4075312140634086,
+          "max_sla_miss_rate": 0.4120135363790186,
+          "min_sla_miss_rate": 0.40152801358234297,
+          "mean_hard_miss_rate": 0.0,
+          "max_hard_miss_rate": 0.0,
+          "min_hard_miss_rate": 0.0,
+          "mean_miss_autohorizon_ratio": 0.5530884600414777,
+          "max_miss_autohorizon_ratio": 0.5617597292724196,
+          "min_miss_autohorizon_ratio": 0.5458404074702886,
+          "mean_fleet_score": 0.9063298955605816,
+          "max_fleet_score": 0.9073868005254645,
+          "min_fleet_score": 0.9055488689392039,
+          "mean_min_robot_score": 0.8839434980679876,
+          "max_min_robot_score": 0.8858393132263511,
+          "min_min_robot_score": 0.8815315654073596,
+          "mean_latency_p50_ms": 100.0,
+          "max_latency_p50_ms": 100.0,
+          "min_latency_p50_ms": 100.0,
+          "mean_latency_p95_ms": 140.3379814309866,
+          "max_latency_p95_ms": 142.0278885858861,
+          "min_latency_p95_ms": 139.45272237374084,
+          "mean_latency_p99_ms": 162.90060520927094,
+          "max_latency_p99_ms": 164.82926037527477,
+          "min_latency_p99_ms": 159.05861095960012,
+          "mean_latency_max_ms": 180.88990715490186,
+          "max_latency_max_ms": 185.827888585889,
+          "min_latency_max_ms": 177.21394429294014
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 29.365385845303535,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 0.0,
+          "mean_total_h2d_gib": 0.0
+        }
+      },
+      "reef_like_temporal": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 78,
+                "sla_miss_count": 78,
+                "hard_miss_count": 76,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 1195.1513406289123,
+                "latency_p95_ms": 1228.4846739622508,
+                "latency_max_ms": 1228.4846739622517,
+                "fleet_score": 0.15190413365877256
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 77,
+                "sla_miss_count": 77,
+                "hard_miss_count": 76,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 1111.818007295573,
+                "latency_p95_ms": 1111.8180072955874,
+                "latency_max_ms": 1111.818007295591,
+                "fleet_score": 0.16900467906443095
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 68,
+                "sla_miss_count": 68,
+                "hard_miss_count": 2,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 861.8180072955852,
+                "latency_p95_ms": 1124.8749251293118,
+                "latency_max_ms": 1124.8749251293193,
+                "fleet_score": 0.24990189134932667
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 67,
+                "sla_miss_count": 67,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 861.8180072955874,
+                "latency_p95_ms": 1124.8749251293184,
+                "latency_max_ms": 1141.5360384230526,
+                "fleet_score": 0.23431268828331905
+              }
+            ],
+            "summary": {
+              "requests_total": 290,
+              "sla_miss_count": 290,
+              "hard_miss_count": 154,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.5310344827586206,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.19411213382459064,
+              "min_robot_score": 0.15190413365877256,
+              "latency_p50_ms": 961.8180072955838,
+              "latency_p95_ms": 1195.1513406289232,
+              "latency_p99_ms": 1228.4846739622515,
+              "latency_max_ms": 1228.4846739622517
+            },
+            "method_stats": {
+              "total_h2d_gib": 2104.6022456511855,
+              "swap_count": 290,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 8.560757867991924
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 77,
+                "sla_miss_count": 77,
+                "hard_miss_count": 75,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 1195.1513406289123,
+                "latency_p95_ms": 1228.484673962248,
+                "latency_max_ms": 1228.4846739622517,
+                "fleet_score": 0.15184673881609162
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 75,
+                "sla_miss_count": 75,
+                "hard_miss_count": 74,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 1111.818007295573,
+                "latency_p95_ms": 1111.8180072955886,
+                "latency_max_ms": 1224.8749251293048,
+                "fleet_score": 0.19488403241449465
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 70,
+                "sla_miss_count": 70,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 861.8180072955838,
+                "latency_p95_ms": 1124.8749251293193,
+                "latency_max_ms": 1224.8749251293166,
+                "fleet_score": 0.2258640288305759
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 69,
+                "sla_miss_count": 69,
+                "hard_miss_count": 2,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 861.8180072955838,
+                "latency_p95_ms": 1059.6521579958257,
+                "latency_max_ms": 1141.5360384230526,
+                "fleet_score": 0.2474899810109019
+              }
+            ],
+            "summary": {
+              "requests_total": 291,
+              "sla_miss_count": 291,
+              "hard_miss_count": 151,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.5189003436426117,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.20004191389619239,
+              "min_robot_score": 0.15184673881609162,
+              "latency_p50_ms": 961.8180072955729,
+              "latency_p95_ms": 1195.1513406289232,
+              "latency_p99_ms": 1228.484673962248,
+              "latency_max_ms": 1228.4846739622517
+            },
+            "method_stats": {
+              "total_h2d_gib": 2120.4794719591737,
+              "swap_count": 291,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 8.560757867991924
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 75,
+                "sla_miss_count": 75,
+                "hard_miss_count": 72,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 1195.1513406289123,
+                "latency_p95_ms": 1228.4846739622508,
+                "latency_max_ms": 1228.4846739622517,
+                "fleet_score": 0.15441457883497026
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 74,
+                "sla_miss_count": 74,
+                "hard_miss_count": 73,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 1111.8180072955802,
+                "latency_p95_ms": 1111.8180072955874,
+                "latency_max_ms": 1111.8180072955874,
+                "fleet_score": 0.15795770890815689
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 71,
+                "sla_miss_count": 71,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 861.8180072955802,
+                "latency_p95_ms": 993.3464662124479,
+                "latency_max_ms": 1124.8749251293193,
+                "fleet_score": 0.26021629143130537
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 69,
+                "sla_miss_count": 69,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 861.8180072955874,
+                "latency_p95_ms": 1124.8749251293164,
+                "latency_max_ms": 1155.7839287771076,
+                "fleet_score": 0.23326255230753531
+              }
+            ],
+            "summary": {
+              "requests_total": 289,
+              "sla_miss_count": 289,
+              "hard_miss_count": 147,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.5086505190311419,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.1948349108814734,
+              "min_robot_score": 0.15441457883497026,
+              "latency_p50_ms": 961.8180072955874,
+              "latency_p95_ms": 1195.1513406289232,
+              "latency_p99_ms": 1228.4846739622508,
+              "latency_max_ms": 1228.4846739622517
+            },
+            "method_stats": {
+              "total_h2d_gib": 2110.674424663186,
+              "swap_count": 289,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 8.560757867991924
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 290.0,
+          "max_requests_total": 291.0,
+          "min_requests_total": 289.0,
+          "mean_sla_miss_count": 290.0,
+          "max_sla_miss_count": 291.0,
+          "min_sla_miss_count": 289.0,
+          "mean_hard_miss_count": 150.66666666666666,
+          "max_hard_miss_count": 154.0,
+          "min_hard_miss_count": 147.0,
+          "mean_sla_miss_rate": 1.0,
+          "max_sla_miss_rate": 1.0,
+          "min_sla_miss_rate": 1.0,
+          "mean_hard_miss_rate": 0.519528448477458,
+          "max_hard_miss_rate": 0.5310344827586206,
+          "min_hard_miss_rate": 0.5086505190311419,
+          "mean_miss_autohorizon_ratio": 1.0,
+          "max_miss_autohorizon_ratio": 1.0,
+          "min_miss_autohorizon_ratio": 1.0,
+          "mean_fleet_score": 0.1963296528674188,
+          "max_fleet_score": 0.20004191389619239,
+          "min_fleet_score": 0.19411213382459064,
+          "mean_min_robot_score": 0.15272181710327815,
+          "max_min_robot_score": 0.15441457883497026,
+          "min_min_robot_score": 0.15184673881609162,
+          "mean_latency_p50_ms": 961.8180072955814,
+          "max_latency_p50_ms": 961.8180072955874,
+          "min_latency_p50_ms": 961.8180072955729,
+          "mean_latency_p95_ms": 1195.1513406289232,
+          "max_latency_p95_ms": 1195.1513406289232,
+          "min_latency_p95_ms": 1195.1513406289232,
+          "mean_latency_p99_ms": 1228.48467396225,
+          "max_latency_p99_ms": 1228.4846739622515,
+          "min_latency_p99_ms": 1228.484673962248,
+          "mean_latency_max_ms": 1228.4846739622517,
+          "max_latency_max_ms": 1228.4846739622517,
+          "min_latency_max_ms": 1228.4846739622517
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 8.560757867991924,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 290.0,
+          "mean_total_h2d_gib": 2111.9187140911818
+        }
+      },
+      "clockwork_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 237,
+                "sla_miss_count": 209,
+                "hard_miss_count": 4,
+                "miss_autohorizon_ratio": 0.9282700421940928,
+                "latency_p50_ms": 333.41394429293723,
+                "latency_p95_ms": 410.54727762627226,
+                "latency_max_ms": 443.8806109596044,
+                "fleet_score": 0.30627112517999505
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 213,
+                "sla_miss_count": 202,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9483568075117371,
+                "latency_p50_ms": 267.8520858140546,
+                "latency_p95_ms": 357.1892009013845,
+                "latency_max_ms": 467.85208581406187,
+                "fleet_score": 0.5375062489195462
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 105,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9545454545454546,
+                "latency_p50_ms": 411.73269677366386,
+                "latency_p95_ms": 511.73269677366363,
+                "latency_max_ms": 611.7326967736662,
+                "fleet_score": 0.5353329859005825
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 105,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9545454545454546,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 511.732696773665,
+                "latency_max_ms": 611.7326967736662,
+                "fleet_score": 0.5297715703562308
+              }
+            ],
+            "summary": {
+              "requests_total": 670,
+              "sla_miss_count": 621,
+              "hard_miss_count": 4,
+              "sla_miss_rate": 0.926865671641791,
+              "hard_miss_rate": 0.005970149253731343,
+              "miss_autohorizon_ratio": 0.9432835820895522,
+              "fleet_score": 0.43919011934132146,
+              "min_robot_score": 0.30627112517999505,
+              "latency_p50_ms": 334.5187524807261,
+              "latency_p95_ms": 435.70417162811316,
+              "latency_p99_ms": 511.73269677366625,
+              "latency_max_ms": 611.7326967736662
+            },
+            "method_stats": {
+              "total_h2d_gib": 1763.5658768489957,
+              "swap_count": 208,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "10hz_rel30k",
+                "10hz_libero"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 252,
+                "sla_miss_count": 210,
+                "hard_miss_count": 3,
+                "miss_autohorizon_ratio": 0.9285714285714286,
+                "latency_p50_ms": 301.1854191473976,
+                "latency_p95_ms": 410.5472776262686,
+                "latency_max_ms": 443.8806109596044,
+                "fleet_score": 0.3396310406448666
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 216,
+                "sla_miss_count": 200,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9259259259259259,
+                "latency_p50_ms": 261.6520858140648,
+                "latency_p95_ms": 393.8806109596044,
+                "latency_max_ms": 466.6084757135941,
+                "fleet_score": 0.5587856006543588
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 111,
+                "sla_miss_count": 104,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9369369369369369,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 511.73269677366625,
+                "latency_max_ms": 611.732696773659,
+                "fleet_score": 0.5198329068672929
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 101,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9181818181818182,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 502.80986045816513,
+                "latency_max_ms": 511.73269677366625,
+                "fleet_score": 0.5454739060164867
+              }
+            ],
+            "summary": {
+              "requests_total": 689,
+              "sla_miss_count": 615,
+              "hard_miss_count": 3,
+              "sla_miss_rate": 0.8925979680696662,
+              "hard_miss_rate": 0.0043541364296081275,
+              "miss_autohorizon_ratio": 0.9274310595065312,
+              "fleet_score": 0.4585950628694701,
+              "min_robot_score": 0.3396310406448666,
+              "latency_p50_ms": 306.85691783373113,
+              "latency_p95_ms": 439.61394429292704,
+              "latency_p99_ms": 511.73269677366625,
+              "latency_max_ms": 611.732696773659
+            },
+            "method_stats": {
+              "total_h2d_gib": 1718.323264695704,
+              "swap_count": 203,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "20hz_fractal",
+                "10hz_rel30k"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 240,
+                "sla_miss_count": 217,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.9416666666666667,
+                "latency_p50_ms": 301.1854191473976,
+                "latency_p95_ms": 400.637927616954,
+                "latency_max_ms": 438.28972323287235,
+                "fleet_score": 0.3096931211730394
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 218,
+                "sla_miss_count": 212,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9724770642201835,
+                "latency_p50_ms": 267.8520858140564,
+                "latency_p95_ms": 350.0806109596015,
+                "latency_max_ms": 442.55638989953695,
+                "fleet_score": 0.5378678936738183
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 105,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9545454545454546,
+                "latency_p50_ms": 411.7326967736642,
+                "latency_p95_ms": 511.73269677366096,
+                "latency_max_ms": 511.73269677366625,
+                "fleet_score": 0.521058636327061
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 111,
+                "sla_miss_count": 109,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9819819819819819,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 511.73269677366625,
+                "latency_max_ms": 522.1666428347526,
+                "fleet_score": 0.5062400240689967
+              }
+            ],
+            "summary": {
+              "requests_total": 679,
+              "sla_miss_count": 643,
+              "hard_miss_count": 1,
+              "sla_miss_rate": 0.946980854197349,
+              "hard_miss_rate": 0.0014727540500736377,
+              "miss_autohorizon_ratio": 0.9602356406480118,
+              "fleet_score": 0.4359122255235337,
+              "min_robot_score": 0.3096931211730394,
+              "latency_p50_ms": 333.41394429293905,
+              "latency_p95_ms": 435.7041716281099,
+              "latency_p99_ms": 511.73269677366625,
+              "latency_max_ms": 522.1666428347526
+            },
+            "method_stats": {
+              "total_h2d_gib": 1805.1253767609596,
+              "swap_count": 212,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "20hz_fractal",
+                "10hz_rel30k"
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 679.3333333333334,
+          "max_requests_total": 689.0,
+          "min_requests_total": 670.0,
+          "mean_sla_miss_count": 626.3333333333334,
+          "max_sla_miss_count": 643.0,
+          "min_sla_miss_count": 615.0,
+          "mean_hard_miss_count": 2.6666666666666665,
+          "max_hard_miss_count": 4.0,
+          "min_hard_miss_count": 1.0,
+          "mean_sla_miss_rate": 0.9221481646362687,
+          "max_sla_miss_rate": 0.946980854197349,
+          "min_sla_miss_rate": 0.8925979680696662,
+          "mean_hard_miss_rate": 0.003932346577804369,
+          "max_hard_miss_rate": 0.005970149253731343,
+          "min_hard_miss_rate": 0.0014727540500736377,
+          "mean_miss_autohorizon_ratio": 0.9436500940813651,
+          "max_miss_autohorizon_ratio": 0.9602356406480118,
+          "min_miss_autohorizon_ratio": 0.9274310595065312,
+          "mean_fleet_score": 0.44456580257810846,
+          "max_fleet_score": 0.4585950628694701,
+          "min_fleet_score": 0.4359122255235337,
+          "mean_min_robot_score": 0.31853176233263364,
+          "max_min_robot_score": 0.3396310406448666,
+          "min_min_robot_score": 0.30627112517999505,
+          "mean_latency_p50_ms": 324.9298715357988,
+          "max_latency_p50_ms": 334.5187524807261,
+          "min_latency_p50_ms": 306.85691783373113,
+          "mean_latency_p95_ms": 437.0074291830501,
+          "max_latency_p95_ms": 439.61394429292704,
+          "min_latency_p95_ms": 435.7041716281099,
+          "mean_latency_p99_ms": 511.73269677366625,
+          "max_latency_p99_ms": 511.73269677366625,
+          "min_latency_p99_ms": 511.73269677366625,
+          "mean_latency_max_ms": 581.8773454606926,
+          "max_latency_max_ms": 611.7326967736662,
+          "min_latency_max_ms": 522.1666428347526
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 20.80462797731161,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 207.66666666666666,
+          "mean_total_h2d_gib": 1762.338172768553
+        }
+      },
+      "paella_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 237,
+                "sla_miss_count": 209,
+                "hard_miss_count": 4,
+                "miss_autohorizon_ratio": 0.9282700421940928,
+                "latency_p50_ms": 333.41394429293723,
+                "latency_p95_ms": 410.54727762627226,
+                "latency_max_ms": 443.8806109596044,
+                "fleet_score": 0.30627112517999505
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 213,
+                "sla_miss_count": 202,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9483568075117371,
+                "latency_p50_ms": 267.8520858140546,
+                "latency_p95_ms": 357.1892009013845,
+                "latency_max_ms": 467.85208581406187,
+                "fleet_score": 0.5375062489195462
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 105,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9545454545454546,
+                "latency_p50_ms": 411.73269677366386,
+                "latency_p95_ms": 511.73269677366363,
+                "latency_max_ms": 611.7326967736662,
+                "fleet_score": 0.5353329859005825
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 105,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9545454545454546,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 511.732696773665,
+                "latency_max_ms": 611.7326967736662,
+                "fleet_score": 0.5297715703562308
+              }
+            ],
+            "summary": {
+              "requests_total": 670,
+              "sla_miss_count": 621,
+              "hard_miss_count": 4,
+              "sla_miss_rate": 0.926865671641791,
+              "hard_miss_rate": 0.005970149253731343,
+              "miss_autohorizon_ratio": 0.9432835820895522,
+              "fleet_score": 0.43919011934132146,
+              "min_robot_score": 0.30627112517999505,
+              "latency_p50_ms": 334.5187524807261,
+              "latency_p95_ms": 435.70417162811316,
+              "latency_p99_ms": 511.73269677366625,
+              "latency_max_ms": 611.7326967736662
+            },
+            "method_stats": {
+              "total_h2d_gib": 1763.5658768489957,
+              "swap_count": 208,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "10hz_rel30k",
+                "10hz_libero"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 252,
+                "sla_miss_count": 210,
+                "hard_miss_count": 3,
+                "miss_autohorizon_ratio": 0.9285714285714286,
+                "latency_p50_ms": 301.1854191473976,
+                "latency_p95_ms": 410.5472776262686,
+                "latency_max_ms": 443.8806109596044,
+                "fleet_score": 0.3396310406448666
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 216,
+                "sla_miss_count": 200,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9259259259259259,
+                "latency_p50_ms": 261.6520858140648,
+                "latency_p95_ms": 393.8806109596044,
+                "latency_max_ms": 466.6084757135941,
+                "fleet_score": 0.5587856006543588
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 111,
+                "sla_miss_count": 104,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9369369369369369,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 511.73269677366625,
+                "latency_max_ms": 611.732696773659,
+                "fleet_score": 0.5198329068672929
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 101,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9181818181818182,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 502.80986045816513,
+                "latency_max_ms": 511.73269677366625,
+                "fleet_score": 0.5454739060164867
+              }
+            ],
+            "summary": {
+              "requests_total": 689,
+              "sla_miss_count": 615,
+              "hard_miss_count": 3,
+              "sla_miss_rate": 0.8925979680696662,
+              "hard_miss_rate": 0.0043541364296081275,
+              "miss_autohorizon_ratio": 0.9274310595065312,
+              "fleet_score": 0.4585950628694701,
+              "min_robot_score": 0.3396310406448666,
+              "latency_p50_ms": 306.85691783373113,
+              "latency_p95_ms": 439.61394429292704,
+              "latency_p99_ms": 511.73269677366625,
+              "latency_max_ms": 611.732696773659
+            },
+            "method_stats": {
+              "total_h2d_gib": 1718.323264695704,
+              "swap_count": 203,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "20hz_fractal",
+                "10hz_rel30k"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 240,
+                "sla_miss_count": 217,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 0.9416666666666667,
+                "latency_p50_ms": 301.1854191473976,
+                "latency_p95_ms": 400.637927616954,
+                "latency_max_ms": 438.28972323287235,
+                "fleet_score": 0.3096931211730394
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 218,
+                "sla_miss_count": 212,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9724770642201835,
+                "latency_p50_ms": 267.8520858140564,
+                "latency_p95_ms": 350.0806109596015,
+                "latency_max_ms": 442.55638989953695,
+                "fleet_score": 0.5378678936738183
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 110,
+                "sla_miss_count": 105,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9545454545454546,
+                "latency_p50_ms": 411.7326967736642,
+                "latency_p95_ms": 511.73269677366096,
+                "latency_max_ms": 511.73269677366625,
+                "fleet_score": 0.521058636327061
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 111,
+                "sla_miss_count": 109,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.9819819819819819,
+                "latency_p50_ms": 411.73269677366443,
+                "latency_p95_ms": 511.73269677366625,
+                "latency_max_ms": 522.1666428347526,
+                "fleet_score": 0.5062400240689967
+              }
+            ],
+            "summary": {
+              "requests_total": 679,
+              "sla_miss_count": 643,
+              "hard_miss_count": 1,
+              "sla_miss_rate": 0.946980854197349,
+              "hard_miss_rate": 0.0014727540500736377,
+              "miss_autohorizon_ratio": 0.9602356406480118,
+              "fleet_score": 0.4359122255235337,
+              "min_robot_score": 0.3096931211730394,
+              "latency_p50_ms": 333.41394429293905,
+              "latency_p95_ms": 435.7041716281099,
+              "latency_p99_ms": 511.73269677366625,
+              "latency_max_ms": 522.1666428347526
+            },
+            "method_stats": {
+              "total_h2d_gib": 1805.1253767609596,
+              "swap_count": 212,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "20hz_fractal",
+                "10hz_rel30k"
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 679.3333333333334,
+          "max_requests_total": 689.0,
+          "min_requests_total": 670.0,
+          "mean_sla_miss_count": 626.3333333333334,
+          "max_sla_miss_count": 643.0,
+          "min_sla_miss_count": 615.0,
+          "mean_hard_miss_count": 2.6666666666666665,
+          "max_hard_miss_count": 4.0,
+          "min_hard_miss_count": 1.0,
+          "mean_sla_miss_rate": 0.9221481646362687,
+          "max_sla_miss_rate": 0.946980854197349,
+          "min_sla_miss_rate": 0.8925979680696662,
+          "mean_hard_miss_rate": 0.003932346577804369,
+          "max_hard_miss_rate": 0.005970149253731343,
+          "min_hard_miss_rate": 0.0014727540500736377,
+          "mean_miss_autohorizon_ratio": 0.9436500940813651,
+          "max_miss_autohorizon_ratio": 0.9602356406480118,
+          "min_miss_autohorizon_ratio": 0.9274310595065312,
+          "mean_fleet_score": 0.44456580257810846,
+          "max_fleet_score": 0.4585950628694701,
+          "min_fleet_score": 0.4359122255235337,
+          "mean_min_robot_score": 0.31853176233263364,
+          "max_min_robot_score": 0.3396310406448666,
+          "min_min_robot_score": 0.30627112517999505,
+          "mean_latency_p50_ms": 324.9298715357988,
+          "max_latency_p50_ms": 334.5187524807261,
+          "min_latency_p50_ms": 306.85691783373113,
+          "mean_latency_p95_ms": 437.0074291830501,
+          "max_latency_p95_ms": 439.61394429292704,
+          "min_latency_p95_ms": 435.7041716281099,
+          "mean_latency_p99_ms": 511.73269677366625,
+          "max_latency_p99_ms": 511.73269677366625,
+          "min_latency_p99_ms": 511.73269677366625,
+          "mean_latency_max_ms": 581.8773454606926,
+          "max_latency_max_ms": 611.7326967736662,
+          "min_latency_max_ms": 522.1666428347526
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 20.80462797731161,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 207.66666666666666,
+          "mean_total_h2d_gib": 1762.338172768553
+        }
+      },
+      "usher_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 470,
+                "sla_miss_count": 470,
+                "hard_miss_count": 2,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 105.88781081577326,
+                "latency_p95_ms": 152.52045868948335,
+                "latency_max_ms": 606.7706727905897,
+                "fleet_score": 0.8059528205985991
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 330,
+                "sla_miss_count": 330,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 105.88781081577145,
+                "latency_p95_ms": 105.88781081577326,
+                "latency_max_ms": 553.8164623831763,
+                "fleet_score": 0.8402270465881829
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 98,
+                "sla_miss_count": 98,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 520.6532481687063,
+                "latency_p95_ms": 545.9540393272998,
+                "latency_max_ms": 620.6532481687082,
+                "fleet_score": 0.47616710058789113
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 99,
+                "sla_miss_count": 99,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 520.6532481687063,
+                "latency_p95_ms": 605.6982854772467,
+                "latency_max_ms": 620.65324816871,
+                "fleet_score": 0.46721238217962685
+              }
+            ],
+            "summary": {
+              "requests_total": 997,
+              "sla_miss_count": 997,
+              "hard_miss_count": 2,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.0020060180541624875,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.7350514033190836,
+              "min_robot_score": 0.46721238217962685,
+              "latency_p50_ms": 105.88781081577326,
+              "latency_p95_ms": 520.65324816871,
+              "latency_p99_ms": 604.1459849493577,
+              "latency_max_ms": 620.65324816871
+            },
+            "method_stats": {
+              "total_h2d_gib": 1616.7887036651373,
+              "swap_count": 190,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "10hz_rel30k",
+                "20hz_fractal",
+                "30hz_bridge"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 503,
+                "sla_miss_count": 503,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 105.88781081577145,
+                "latency_p95_ms": 105.88781081577326,
+                "latency_max_ms": 488.13661623560324,
+                "fleet_score": 0.8464145367603811
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 329,
+                "sla_miss_count": 329,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 105.88781081577145,
+                "latency_p95_ms": 105.88781081577326,
+                "latency_max_ms": 639.2506555316941,
+                "fleet_score": 0.8380442126446385
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 99,
+                "sla_miss_count": 99,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 520.6532481687063,
+                "latency_p95_ms": 620.65324816871,
+                "latency_max_ms": 720.65324816871,
+                "fleet_score": 0.4387286397831399
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 95,
+                "sla_miss_count": 95,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 520.6532481687063,
+                "latency_p95_ms": 588.6494436369009,
+                "latency_max_ms": 620.6532481687063,
+                "fleet_score": 0.44967978253352664
+              }
+            ],
+            "summary": {
+              "requests_total": 1026,
+              "sla_miss_count": 1026,
+              "hard_miss_count": 2,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.001949317738791423,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.7468414437801428,
+              "min_robot_score": 0.4387286397831399,
+              "latency_p50_ms": 105.88781081577145,
+              "latency_p95_ms": 520.65324816871,
+              "latency_p99_ms": 620.6532481687063,
+              "latency_max_ms": 720.65324816871
+            },
+            "method_stats": {
+              "total_h2d_gib": 1571.5460915118456,
+              "swap_count": 185,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "20hz_fractal",
+                "10hz_rel30k"
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 505,
+                "sla_miss_count": 505,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 105.88781081577145,
+                "latency_p95_ms": 105.88781081577326,
+                "latency_max_ms": 470.9967674368818,
+                "fleet_score": 0.8452586151077389
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 317,
+                "sla_miss_count": 317,
+                "hard_miss_count": 1,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 105.88781081577326,
+                "latency_p95_ms": 152.52045868948335,
+                "latency_max_ms": 543.2455712004785,
+                "fleet_score": 0.7894443332447941
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 100,
+                "sla_miss_count": 100,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 520.6532481687054,
+                "latency_p95_ms": 537.311567337417,
+                "latency_max_ms": 704.0366229559681,
+                "fleet_score": 0.4770617878436338
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 100,
+                "sla_miss_count": 100,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 520.6532481687063,
+                "latency_p95_ms": 620.65324816871,
+                "latency_max_ms": 620.65324816871,
+                "fleet_score": 0.45805546621065896
+              }
+            ],
+            "summary": {
+              "requests_total": 1022,
+              "sla_miss_count": 1022,
+              "hard_miss_count": 2,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 0.0019569471624266144,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.7369637489799153,
+              "min_robot_score": 0.45805546621065896,
+              "latency_p50_ms": 105.88781081577326,
+              "latency_p95_ms": 520.6532481687063,
+              "latency_p99_ms": 610.8423690210761,
+              "latency_max_ms": 704.0366229559681
+            },
+            "method_stats": {
+              "total_h2d_gib": 1644.9098000824451,
+              "swap_count": 193,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 20.80462797731161,
+              "resident_models_final": [
+                "30hz_bridge",
+                "10hz_libero",
+                "20hz_fractal"
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 1015.0,
+          "max_requests_total": 1026.0,
+          "min_requests_total": 997.0,
+          "mean_sla_miss_count": 1015.0,
+          "max_sla_miss_count": 1026.0,
+          "min_sla_miss_count": 997.0,
+          "mean_hard_miss_count": 2.0,
+          "max_hard_miss_count": 2.0,
+          "min_hard_miss_count": 2.0,
+          "mean_sla_miss_rate": 1.0,
+          "max_sla_miss_rate": 1.0,
+          "min_sla_miss_rate": 1.0,
+          "mean_hard_miss_rate": 0.0019707609851268414,
+          "max_hard_miss_rate": 0.0020060180541624875,
+          "min_hard_miss_rate": 0.001949317738791423,
+          "mean_miss_autohorizon_ratio": 1.0,
+          "max_miss_autohorizon_ratio": 1.0,
+          "min_miss_autohorizon_ratio": 1.0,
+          "mean_fleet_score": 0.7396188653597139,
+          "max_fleet_score": 0.7468414437801428,
+          "min_fleet_score": 0.7350514033190836,
+          "mean_min_robot_score": 0.45466549605780865,
+          "max_min_robot_score": 0.46721238217962685,
+          "min_min_robot_score": 0.4387286397831399,
+          "mean_latency_p50_ms": 105.88781081577265,
+          "max_latency_p50_ms": 105.88781081577326,
+          "min_latency_p50_ms": 105.88781081577145,
+          "mean_latency_p95_ms": 520.6532481687087,
+          "max_latency_p95_ms": 520.65324816871,
+          "min_latency_p95_ms": 520.6532481687063,
+          "mean_latency_p99_ms": 611.88053404638,
+          "max_latency_p99_ms": 620.6532481687063,
+          "min_latency_p99_ms": 604.1459849493577,
+          "mean_latency_max_ms": 681.7810397644627,
+          "max_latency_max_ms": 720.65324816871,
+          "min_latency_max_ms": 620.65324816871
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 20.80462797731161,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 189.33333333333334,
+          "mean_total_h2d_gib": 1611.0815317531426
+        }
+      },
+      "distserve_like": {
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 35,
+                "sla_miss_count": 35,
+                "hard_miss_count": 35,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2686.0342756060627,
+                "latency_p95_ms": 2719.3676089393966,
+                "latency_max_ms": 2719.3676089393994,
+                "fleet_score": 0.14128553560386214
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 34,
+                "sla_miss_count": 34,
+                "hard_miss_count": 34,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2602.700942272728,
+                "latency_p95_ms": 2602.700942272729,
+                "latency_max_ms": 2652.700942272728,
+                "fleet_score": 0.16823892722550446
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 33,
+                "sla_miss_count": 33,
+                "hard_miss_count": 33,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2352.700942272728,
+                "latency_p95_ms": 2452.700942272728,
+                "latency_max_ms": 2452.700942272728,
+                "fleet_score": 0.1605663647781134
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 33,
+                "sla_miss_count": 33,
+                "hard_miss_count": 33,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2352.700942272728,
+                "latency_p95_ms": 2452.7009422727206,
+                "latency_max_ms": 2452.700942272728,
+                "fleet_score": 0.1624662206401442
+              }
+            ],
+            "summary": {
+              "requests_total": 135,
+              "sla_miss_count": 135,
+              "hard_miss_count": 135,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 1.0,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.15761777986696296,
+              "min_robot_score": 0.14128553560386214,
+              "latency_p50_ms": 2452.700942272728,
+              "latency_p95_ms": 2686.0342756060636,
+              "latency_p99_ms": 2719.367608939398,
+              "latency_max_ms": 2719.3676089393994
+            },
+            "method_stats": {
+              "total_h2d_gib": 1974.8470761179924,
+              "swap_count": 270,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 17.12151573598385,
+              "stage_partitions": [
+                0.5,
+                0.5
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 34,
+                "sla_miss_count": 34,
+                "hard_miss_count": 34,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2686.0342756060563,
+                "latency_p95_ms": 2719.3676089393934,
+                "latency_max_ms": 2719.3676089393994,
+                "fleet_score": 0.14849896369014962
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 34,
+                "sla_miss_count": 34,
+                "hard_miss_count": 34,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2602.700942272728,
+                "latency_p95_ms": 2602.700942272731,
+                "latency_max_ms": 2652.700942272728,
+                "fleet_score": 0.16302273796104627
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 33,
+                "sla_miss_count": 33,
+                "hard_miss_count": 33,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2352.700942272728,
+                "latency_p95_ms": 2352.7009422727297,
+                "latency_max_ms": 2452.700942272728,
+                "fleet_score": 0.1658760439741009
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 33,
+                "sla_miss_count": 33,
+                "hard_miss_count": 33,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2352.700942272728,
+                "latency_p95_ms": 2452.700942272728,
+                "latency_max_ms": 2452.700942272728,
+                "fleet_score": 0.15725945177062733
+              }
+            ],
+            "summary": {
+              "requests_total": 134,
+              "sla_miss_count": 134,
+              "hard_miss_count": 134,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 1.0,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.15847910321629655,
+              "min_robot_score": 0.14849896369014962,
+              "latency_p50_ms": 2452.700942272728,
+              "latency_p95_ms": 2697.700942272727,
+              "latency_p99_ms": 2719.3676089393944,
+              "latency_max_ms": 2719.3676089393994
+            },
+            "method_stats": {
+              "total_h2d_gib": 1962.6032060086727,
+              "swap_count": 268,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 17.12151573598385,
+              "stage_partitions": [
+                0.5,
+                0.5
+              ]
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 34,
+                "sla_miss_count": 34,
+                "hard_miss_count": 34,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2686.0342756060622,
+                "latency_p95_ms": 2719.3676089393925,
+                "latency_max_ms": 2719.3676089393994,
+                "fleet_score": 0.1513206123142151
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 34,
+                "sla_miss_count": 34,
+                "hard_miss_count": 34,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2602.700942272728,
+                "latency_p95_ms": 2620.2009422727324,
+                "latency_max_ms": 2652.700942272728,
+                "fleet_score": 0.15568952352975
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 33,
+                "sla_miss_count": 33,
+                "hard_miss_count": 33,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2352.700942272728,
+                "latency_p95_ms": 2452.700942272728,
+                "latency_max_ms": 2452.7009422727306,
+                "fleet_score": 0.1420422948950421
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 33,
+                "sla_miss_count": 33,
+                "hard_miss_count": 33,
+                "miss_autohorizon_ratio": 1.0,
+                "latency_p50_ms": 2352.700942272728,
+                "latency_p95_ms": 2426.6365342749054,
+                "latency_max_ms": 2452.700942272728,
+                "fleet_score": 0.15870198713315273
+              }
+            ],
+            "summary": {
+              "requests_total": 134,
+              "sla_miss_count": 134,
+              "hard_miss_count": 134,
+              "sla_miss_rate": 1.0,
+              "hard_miss_rate": 1.0,
+              "miss_autohorizon_ratio": 1.0,
+              "fleet_score": 0.1518311439225745,
+              "min_robot_score": 0.1420422948950421,
+              "latency_p50_ms": 2452.700942272728,
+              "latency_p95_ms": 2686.0342756060636,
+              "latency_p99_ms": 2719.3676089393934,
+              "latency_max_ms": 2719.3676089393994
+            },
+            "method_stats": {
+              "total_h2d_gib": 1962.6032060086727,
+              "swap_count": 268,
+              "prefetch_count": 0,
+              "gpu_memory_gib": 17.12151573598385,
+              "stage_partitions": [
+                0.5,
+                0.5
+              ]
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 134.33333333333334,
+          "max_requests_total": 135.0,
+          "min_requests_total": 134.0,
+          "mean_sla_miss_count": 134.33333333333334,
+          "max_sla_miss_count": 135.0,
+          "min_sla_miss_count": 134.0,
+          "mean_hard_miss_count": 134.33333333333334,
+          "max_hard_miss_count": 135.0,
+          "min_hard_miss_count": 134.0,
+          "mean_sla_miss_rate": 1.0,
+          "max_sla_miss_rate": 1.0,
+          "min_sla_miss_rate": 1.0,
+          "mean_hard_miss_rate": 1.0,
+          "max_hard_miss_rate": 1.0,
+          "min_hard_miss_rate": 1.0,
+          "mean_miss_autohorizon_ratio": 1.0,
+          "max_miss_autohorizon_ratio": 1.0,
+          "min_miss_autohorizon_ratio": 1.0,
+          "mean_fleet_score": 0.15597600900194467,
+          "max_fleet_score": 0.15847910321629655,
+          "min_fleet_score": 0.1518311439225745,
+          "mean_min_robot_score": 0.1439422647296846,
+          "max_min_robot_score": 0.14849896369014962,
+          "min_min_robot_score": 0.14128553560386214,
+          "mean_latency_p50_ms": 2452.700942272728,
+          "max_latency_p50_ms": 2452.700942272728,
+          "min_latency_p50_ms": 2452.700942272728,
+          "mean_latency_p95_ms": 2689.9231644949514,
+          "max_latency_p95_ms": 2697.700942272727,
+          "min_latency_p95_ms": 2686.0342756060636,
+          "mean_latency_p99_ms": 2719.3676089393953,
+          "max_latency_p99_ms": 2719.367608939398,
+          "min_latency_p99_ms": 2719.3676089393934,
+          "mean_latency_max_ms": 2719.3676089393994,
+          "max_latency_max_ms": 2719.3676089393994,
+          "min_latency_max_ms": 2719.3676089393994
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 17.12151573598385,
+          "mean_prefetch_count": 0.0,
+          "mean_swap_count": 268.6666666666667,
+          "mean_total_h2d_gib": 1966.6844960451126
+        }
+      },
+      "vla_aware": {
+        "best_shared_fraction": 0.0,
+        "runs": [
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 506,
+                "sla_miss_count": 171,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.6699604743083004,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 137.60000000000446,
+                "latency_max_ms": 177.1333333333314,
+                "fleet_score": 0.8815315654073596
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 330,
+                "sla_miss_count": 145,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.44242424242424244,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 138.65527223737155,
+                "latency_max_ms": 175.3612219192146,
+                "fleet_score": 0.928013614989879
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 172,
+                "sla_miss_count": 69,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.4069767441860465,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 143.79999999999563,
+                "latency_max_ms": 179.62788858587646,
+                "fleet_score": 0.9351167564490301
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 170,
+                "sla_miss_count": 88,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.5176470588235295,
+                "latency_p50_ms": 102.37363881316196,
+                "latency_p95_ms": 143.88061095960438,
+                "latency_max_ms": 179.62788858587646,
+                "fleet_score": 0.9182989455531497
+              }
+            ],
+            "summary": {
+              "requests_total": 1178,
+              "sla_miss_count": 473,
+              "hard_miss_count": 0,
+              "sla_miss_rate": 0.40152801358234297,
+              "hard_miss_rate": 0.0,
+              "miss_autohorizon_ratio": 0.5458404074702886,
+              "fleet_score": 0.9073868005254645,
+              "min_robot_score": 0.8815315654073596,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 139.45272237374084,
+              "latency_p99_ms": 159.05861095960012,
+              "latency_max_ms": 179.62788858587646
+            },
+            "method_stats": {
+              "total_h2d_gib": 2756.5640334933996,
+              "swap_count": 0,
+              "prefetch_count": 322,
+              "gpu_memory_gib": 20.80462797731161,
+              "shared_fraction": 0.0
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 502,
+                "sla_miss_count": 154,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.6354581673306773,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 139.45272237372757,
+                "latency_max_ms": 177.21394429294014,
+                "fleet_score": 0.8858393132263511
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 331,
+                "sla_miss_count": 154,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.46827794561933533,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 139.45272237372592,
+                "latency_max_ms": 169.1612219192175,
+                "fleet_score": 0.9247949642973043
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 173,
+                "sla_miss_count": 85,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.4913294797687861,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 143.79999999999708,
+                "latency_max_ms": 177.1333333333314,
+                "fleet_score": 0.9194984353306946
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 165,
+                "sla_miss_count": 86,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.5272727272727272,
+                "latency_p50_ms": 104.2666666666646,
+                "latency_p95_ms": 143.80000000000237,
+                "latency_max_ms": 164.8139442929387,
+                "fleet_score": 0.9171144901152168
+              }
+            ],
+            "summary": {
+              "requests_total": 1171,
+              "sla_miss_count": 479,
+              "hard_miss_count": 0,
+              "sla_miss_rate": 0.40905209222886424,
+              "hard_miss_rate": 0.0,
+              "miss_autohorizon_ratio": 0.5516652433817251,
+              "fleet_score": 0.9060540172170762,
+              "min_robot_score": 0.8858393132263511,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 139.53333333333285,
+              "latency_p99_ms": 164.81394429293792,
+              "latency_max_ms": 177.21394429294014
+            },
+            "method_stats": {
+              "total_h2d_gib": 2662.3956969454885,
+              "swap_count": 0,
+              "prefetch_count": 311,
+              "gpu_memory_gib": 20.80462797731161,
+              "shared_fraction": 0.0
+            }
+          },
+          {
+            "per_robot": [
+              {
+                "model": "30hz_bridge",
+                "hz": 30.0,
+                "requests": 507,
+                "sla_miss_count": 157,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.6528599605522682,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 137.6000000000131,
+                "latency_max_ms": 177.13333333333867,
+                "fleet_score": 0.8844596155702518
+              },
+              {
+                "model": "20hz_fractal",
+                "hz": 20.0,
+                "requests": 336,
+                "sla_miss_count": 170,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.5059523809523809,
+                "latency_p50_ms": 103.09999999999945,
+                "latency_p95_ms": 142.02788858588065,
+                "latency_max_ms": 171.09455525253725,
+                "fleet_score": 0.9184278307545061
+              },
+              {
+                "model": "10hz_libero",
+                "hz": 10.0,
+                "requests": 171,
+                "sla_miss_count": 79,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.4678362573099415,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 142.9139442929445,
+                "latency_max_ms": 177.1333333333314,
+                "fleet_score": 0.9265905997626082
+              },
+              {
+                "model": "10hz_rel30k",
+                "hz": 10.0,
+                "requests": 168,
+                "sla_miss_count": 81,
+                "hard_miss_count": 0,
+                "miss_autohorizon_ratio": 0.49404761904761907,
+                "latency_p50_ms": 100.0,
+                "latency_p95_ms": 152.5469523762964,
+                "latency_max_ms": 185.827888585889,
+                "fleet_score": 0.9233702287153482
+              }
+            ],
+            "summary": {
+              "requests_total": 1182,
+              "sla_miss_count": 487,
+              "hard_miss_count": 0,
+              "sla_miss_rate": 0.4120135363790186,
+              "hard_miss_rate": 0.0,
+              "miss_autohorizon_ratio": 0.5617597292724196,
+              "fleet_score": 0.9055488689392039,
+              "min_robot_score": 0.8844596155702518,
+              "latency_p50_ms": 100.0,
+              "latency_p95_ms": 142.0278885858861,
+              "latency_p99_ms": 164.82926037527477,
+              "latency_max_ms": 185.827888585889
+            },
+            "method_stats": {
+              "total_h2d_gib": 2765.1247913613915,
+              "swap_count": 0,
+              "prefetch_count": 323,
+              "gpu_memory_gib": 20.80462797731161,
+              "shared_fraction": 0.0
+            }
+          }
+        ],
+        "summary": {
+          "mean_requests_total": 1177.0,
+          "max_requests_total": 1182.0,
+          "min_requests_total": 1171.0,
+          "mean_sla_miss_count": 479.6666666666667,
+          "max_sla_miss_count": 487.0,
+          "min_sla_miss_count": 473.0,
+          "mean_hard_miss_count": 0.0,
+          "max_hard_miss_count": 0.0,
+          "min_hard_miss_count": 0.0,
+          "mean_sla_miss_rate": 0.4075312140634086,
+          "max_sla_miss_rate": 0.4120135363790186,
+          "min_sla_miss_rate": 0.40152801358234297,
+          "mean_hard_miss_rate": 0.0,
+          "max_hard_miss_rate": 0.0,
+          "min_hard_miss_rate": 0.0,
+          "mean_miss_autohorizon_ratio": 0.5530884600414777,
+          "max_miss_autohorizon_ratio": 0.5617597292724196,
+          "min_miss_autohorizon_ratio": 0.5458404074702886,
+          "mean_fleet_score": 0.9063298955605816,
+          "max_fleet_score": 0.9073868005254645,
+          "min_fleet_score": 0.9055488689392039,
+          "mean_min_robot_score": 0.8839434980679876,
+          "max_min_robot_score": 0.8858393132263511,
+          "min_min_robot_score": 0.8815315654073596,
+          "mean_latency_p50_ms": 100.0,
+          "max_latency_p50_ms": 100.0,
+          "min_latency_p50_ms": 100.0,
+          "mean_latency_p95_ms": 140.3379814309866,
+          "max_latency_p95_ms": 142.0278885858861,
+          "min_latency_p95_ms": 139.45272237374084,
+          "mean_latency_p99_ms": 162.90060520927094,
+          "max_latency_p99_ms": 164.82926037527477,
+          "min_latency_p99_ms": 159.05861095960012,
+          "mean_latency_max_ms": 180.88990715490186,
+          "max_latency_max_ms": 185.827888585889,
+          "min_latency_max_ms": 177.21394429294014
+        },
+        "method_summary": {
+          "mean_gpu_memory_gib": 20.80462797731161,
+          "mean_prefetch_count": 318.6666666666667,
+          "mean_shared_fraction": 0.0,
+          "mean_swap_count": 0.0,
+          "mean_total_h2d_gib": 2728.0281739334264
+        }
+      }
+    },
+    "gpulet_like": {
+      "temporal_only": {
+        "feasible_under_100ms": false,
+        "representative_cycle_ms": null,
+        "reason": "queue/cycle plus repeated model switching exceeds 100ms"
+      },
+      "spatial_only": {
+        "feasible_under_100ms": false,
+        "gpu_memory_gib": 6.1219350546598434,
+        "used_partition": 1.0,
+        "schedule": null,
+        "reason": "per-model partitions or shell memory exceed single-GPU budget"
+      },
+      "spatio_temporal": {
+        "feasible_under_100ms": false,
+        "gpu_memory_gib": 0.0,
+        "schedule": null,
+        "reason": "gpulet cycle/duty-window exceeds 100ms once swap-aware shells are included"
+      }
+    }
+  }
+}

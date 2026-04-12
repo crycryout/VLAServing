@@ -1,0 +1,285 @@
+{
+  "system_name": "Unified Chunked VLA Serving System",
+  "scope": "General serving architecture for chunked-action VLA families with predictive request timelines.",
+  "general_interfaces": [
+    {
+      "field": "chunk_size",
+      "meaning": "Number of actions produced by one VLA inference."
+    },
+    {
+      "field": "horizon_process",
+      "meaning": "Distribution or controller that decides how many actions are consumed before the next request."
+    },
+    {
+      "field": "request_period_hz",
+      "meaning": "Robot control/request frequency."
+    },
+    {
+      "field": "request_window",
+      "meaning": "Time-action window in which a new inference may legally happen."
+    },
+    {
+      "field": "latency_model",
+      "meaning": "Per-request inference cost or batch latency curve."
+    },
+    {
+      "field": "memory_relation",
+      "meaning": "How fine-tuned models relate to the base model: full-copy, shared-prefix, or exact-delta."
+    },
+    {
+      "field": "batch_domain",
+      "meaning": "Whether requests may batch across all models, same-model only, or not at all."
+    },
+    {
+      "field": "phase_correction_budget",
+      "meaning": "How aggressively the runtime may pull inference earlier to align future requests."
+    },
+    {
+      "field": "admission_policy",
+      "meaning": "How new robots are admitted while preserving deadline and fairness constraints."
+    }
+  ],
+  "backends": [
+    {
+      "name": "ExactDeltaPrefetch",
+      "when_to_use": "Fine-tunes differ mainly by exact delta pages and the GPU cannot keep all full weights resident.",
+      "control_knobs": [
+        "resident_fraction_per_model",
+        "next_request_prefetch_window_ms",
+        "frequency_aware_residency",
+        "decode_apply_overlap",
+        "shared_shell_count"
+      ],
+      "required_model_properties": [
+        "Exact or lossless delta reconstruction",
+        "Predictable next-request timing from chunked control",
+        "Transfer/decode cost materially larger than compute"
+      ],
+      "disallowed_assumptions": [
+        "Do not assume same-model batching is the dominant win",
+        "Do not assume every fine-tune fits fully resident"
+      ]
+    },
+    {
+      "name": "SharedPrefixPhaseBatch",
+      "when_to_use": "Fine-tunes share a resident prefix or can all remain resident, and same-model batch latency scales well.",
+      "control_knobs": [
+        "phase_correction_budget_actions",
+        "same_model_batch_size_cap",
+        "target_phase_per_model",
+        "fair_quota_per_model"
+      ],
+      "required_model_properties": [
+        "Same architecture across fine-tunes",
+        "Same-model batch curve available",
+        "Legal early replan window inside the chunk"
+      ],
+      "disallowed_assumptions": [
+        "Do not assume MPS always increases stable capacity",
+        "Do not assume greedy batch-first admission is fair"
+      ]
+    },
+    {
+      "name": "HybridChunkedRuntime",
+      "when_to_use": "A new chunked-action model family only partially satisfies the assumptions of the two specialized backends.",
+      "control_knobs": [
+        "backend_selection_rule",
+        "per-model residency tier",
+        "phase_correction_budget_actions",
+        "quota_fairness"
+      ],
+      "required_model_properties": [
+        "Chunked action outputs",
+        "Predictable re-request semantics",
+        "At least one measurable latency model"
+      ],
+      "disallowed_assumptions": [
+        "Do not hardcode Pi05 or GR00T specific names",
+        "Do not require a particular backbone architecture"
+      ]
+    }
+  ],
+  "selection_rule": {
+    "goal": "Choose a serving backend for any chunked-action VLA family without hardcoding Pi05 or GR00T specific assumptions.",
+    "decision_tree": [
+      {
+        "if": "all fine-tunes can remain resident or share a fully resident prefix, and same-model batch latency is known",
+        "then": "use SharedPrefixPhaseBatch"
+      },
+      {
+        "if": "fine-tunes are reconstructable by exact/lossless deltas and whole-model residency is too expensive",
+        "then": "use ExactDeltaPrefetch"
+      },
+      {
+        "if": "neither assumption fully holds",
+        "then": "use HybridChunkedRuntime and learn the backend choice per model family from measured latency + memory artifacts"
+      }
+    ],
+    "required_measurements_for_a_new_family": [
+      "single-request p50/p95 latency",
+      "same-model batch curve, if batching is supported",
+      "full-shell memory footprint",
+      "exact-delta or shared-prefix memory footprint, if available",
+      "AutoHorizon or fixed execution-horizon process",
+      "legal early-replan window inside a chunk"
+    ]
+  },
+  "runtime_components": {
+    "timeline_predictor": {
+      "role": "Maintain the next-request timeline for every robot from its chunk horizon process.",
+      "general_to_chunked_models": true
+    },
+    "memory_state_manager": {
+      "role": "Own resident shells/prefixes/delta pages and issue prefetch/decode/apply commands.",
+      "backends": [
+        "ExactDeltaPrefetch",
+        "SharedPrefixPhaseBatch",
+        "HybridChunkedRuntime"
+      ]
+    },
+    "compute_scheduler": {
+      "role": "Schedule inference work so that request-to-result latency stays under the target deadline.",
+      "submodes": [
+        "single-queue shell reuse",
+        "same-model batch waves",
+        "optional MPS waves only when they do not reduce stable capacity"
+      ]
+    },
+    "phase_controller": {
+      "role": "Use legal early replan inside the chunk to lock future requests into better cohorts.",
+      "note": "Mandatory for SharedPrefixPhaseBatch; optional/weak for ExactDeltaPrefetch families such as Pi05."
+    },
+    "admission_controller": {
+      "role": "Admit robots only when the predicted steady-state remains stable, deadline-safe, and fair.",
+      "policy_defaults": {
+        "gr00t_n1d6": "quota_fair",
+        "pi05": "frequency_aware_prefetch"
+      }
+    }
+  },
+  "families": {
+    "pi05": {
+      "family": "pi05",
+      "chunk_size": 50,
+      "default_backend": "ExactDeltaPrefetch",
+      "scheduler": "single active shell + predictive prefetch + decode/apply overlap",
+      "admission": "frequency-aware residency with predictive windows; fairness can be layered on top",
+      "memory_strategy": "three active shells resident; low-frequency models keep compressed/exact-delta pages resident by fraction",
+      "phase_control": "use AutoHorizon future request times; phase shifting is weak compared with memory scheduling and not the primary lever",
+      "batching": "not the primary optimization path for Pi05 fine-tuned families in this workspace",
+      "mps_policy": "disabled by default; not part of the validated Pi05 fast path",
+      "validated_reference": {
+        "reference_file": "/root/autodl-tmp/VLAServing/results/pi05_four_model_residency_prefetch_system_20260406.json",
+        "validated_models": 4,
+        "robot_period_ms": 500.0,
+        "deadline_passes_ms": [
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          80,
+          100
+        ],
+        "effective_swap_ms": 289.47464376688004,
+        "gpu_memory_total_gb": 22.455,
+        "fits_under_24gb": true,
+        "service_backlog_p95_ms": 0.0,
+        "per_model_e2e_p95_ms": {
+          "10hz_a_logits": 43.21331214904785,
+          "10hz_b_autoh": 43.06164741516113,
+          "20hz_quantiles": 43.18052673339844,
+          "30hz_official_ft": 43.198463439941406
+        },
+        "autohorizon_admission_reference": {
+          "reference_file": "/root/autodl-tmp/VLAServing/results/pi05_frequency_aware_page_prefetch_autohorizon_20260406.json",
+          "mean_admitted_total": 4.0,
+          "admitted_histogram": {
+            "10Hz::10hz_a_logits": 3,
+            "10Hz::10hz_b_autoh": 3,
+            "20Hz::20hz_quantiles": 3,
+            "30Hz::30hz_official_ft": 3
+          }
+        }
+      }
+    },
+    "gr00t_n1d6": {
+      "family": "gr00t_n1d6",
+      "chunk_size": 16,
+      "default_backend": "SharedPrefixPhaseBatch",
+      "scheduler": "same-model phase-lock batching with predictive correction inside the legal chunk window",
+      "admission": "quota-fair admission with per-model target lanes; do not use greedy batch-first as the production default",
+      "memory_strategy": "shared-prefix resident copies; all fine-tunes remain resident instead of swapping whole models",
+      "phase_control": "enabled by default; budget 4 actions is the knee point, budget >4 adds no value in current evidence",
+      "batching": "same-model only; target full batch cohorts per model",
+      "mps_policy": "optional only; disabled by default because validated stable capacity does not improve over batch-only",
+      "validated_reference": {
+        "reference_file": "/root/autodl-tmp/VLAServing/results/gr00t_shared_prefix_phase_lock_batch_mps_20260412.json",
+        "validated_models": 4,
+        "stable_robot_count_batch_only": 16,
+        "stable_robot_count_batch_plus_mps": 16,
+        "batch_only_p95_ms_at_16": 58.429246535524726,
+        "batch_plus_mps_p95_ms_at_16": 58.429246535524726,
+        "batch_only_mean_batch_size_at_16": 4.0,
+        "batch_plus_mps_mean_batch_size_at_16": 4.0,
+        "fair_admission_reference": {
+          "reference_file": "/root/autodl-tmp/VLAServing/results/gr00t_batch_only_fair_admission_20260412.json",
+          "mean_final_robot_count": 15.666666666666666,
+          "final_count_gap": 2.0,
+          "jain_final_count": 0.9986437613019892,
+          "mean_p95_ms": 58.429246535524726
+        },
+        "phase_budget_frontier": [
+          {
+            "budget": 4,
+            "copies_per_model": 4,
+            "robot_count": 16,
+            "phases": {
+              "20hz_fractal": 12.5,
+              "10hz_libero": 25.0,
+              "10hz_rel30k": 87.5
+            },
+            "stable": true,
+            "reply_over": 0,
+            "p95_ms": 58.429246535524726,
+            "mean_batch_size": 4.0,
+            "mean_phase_correction_abs_actions": 0.06589147286821705,
+            "mean_chunk_count": 2408.0,
+            "extra_chunk_ratio_vs_strict": 1.4588155207624234
+          },
+          {
+            "budget": 8,
+            "copies_per_model": 4,
+            "robot_count": 16,
+            "phases": {
+              "20hz_fractal": 12.5,
+              "10hz_libero": 25.0,
+              "10hz_rel30k": 87.5
+            },
+            "stable": true,
+            "reply_over": 0,
+            "p95_ms": 58.429246535524726,
+            "mean_batch_size": 4.0,
+            "mean_phase_correction_abs_actions": 0.06589147286821705,
+            "mean_chunk_count": 2408.0,
+            "extra_chunk_ratio_vs_strict": 1.4588155207624234
+          }
+        ]
+      }
+    }
+  },
+  "unification_summary": {
+    "common_primitives": [
+      "future request timeline from chunk horizons",
+      "deadline-aware admission",
+      "family-specific memory backend behind a shared coordinator",
+      "phase-aware scheduling when early replan is legal"
+    ],
+    "family_specific_specialization": {
+      "pi05": "memory-bound exact-delta residency/prefetch backend",
+      "gr00t_n1d6": "shared-prefix same-model phase-lock batch backend"
+    },
+    "general_claim": "The system generalizes to chunked-action VLA models by abstracting over horizon process, latency model, and fine-tune memory relation rather than hardcoding one model architecture."
+  }
+}

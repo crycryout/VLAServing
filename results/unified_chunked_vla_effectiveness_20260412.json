@@ -1,0 +1,263 @@
+{
+  "findings": [
+    "Pi05 predictive prefetch removes hard misses in the admission-level run (3.0 -> 0.0) without increasing p95 latency.",
+    "GR00T phase-lock batching is the decisive enabler for stable serving: at 8 robots reply-over drops 7 -> 0, and at 16 robots 15 -> 0.",
+    "GR00T quota-fair admission materially reduces admission bias: accept-rate gap 0.2921 -> 0.0994, final-count gap 18.0 -> 2.0.",
+    "For the validated GR00T runtime, MPS does not improve stable capacity over batch-only: at 16 robots both are stable, and at 24 robots both are unstable with reply-over 18 vs 18."
+  ],
+  "gr00t_batch_mps_effectiveness": {
+    "cases": [
+      {
+        "batch_only": {
+          "mean_batch_size": 4.0,
+          "mean_request_to_result_p95_ms": 58.429246535524726,
+          "reply_over_chunk_actions_count": 0,
+          "stable_under_100ms": true
+        },
+        "batch_plus_mps": {
+          "mean_batch_size": 4.0,
+          "mean_request_to_result_p95_ms": 58.429246535524726,
+          "reply_over_chunk_actions_count": 0,
+          "stable_under_100ms": true
+        },
+        "delta": {
+          "mean_batch_size_delta": 0.0,
+          "mean_p95_ms_delta": 0.0,
+          "reply_over_change": 0
+        },
+        "robots": 16,
+        "scenario": "4x_per_model_16_robots"
+      },
+      {
+        "batch_only": {
+          "mean_batch_size": 6.0,
+          "mean_request_to_result_p95_ms": 79.44235485047102,
+          "reply_over_chunk_actions_count": 18,
+          "stable_under_100ms": false
+        },
+        "batch_plus_mps": {
+          "mean_batch_size": 6.0,
+          "mean_request_to_result_p95_ms": 79.44235485047102,
+          "reply_over_chunk_actions_count": 18,
+          "stable_under_100ms": false
+        },
+        "delta": {
+          "mean_batch_size_delta": 0.0,
+          "mean_p95_ms_delta": 0.0,
+          "reply_over_change": 0
+        },
+        "robots": 24,
+        "scenario": "6x_per_model_24_robots"
+      }
+    ],
+    "method": "GR00T batch-only vs batch+MPS"
+  },
+  "gr00t_fair_admission_effectiveness": {
+    "baseline_greedy": {
+      "accept_rate_by_type": {
+        "10Hz::10hz_libero": 0.4883720930232558,
+        "10Hz::10hz_rel30k": 0.7358490566037735,
+        "20Hz::20hz_fractal": 0.4883720930232558,
+        "30Hz::30hz_bridge": 0.7804878048780488
+      },
+      "accept_rate_gap": 0.292115711854793,
+      "accepted_count_gap": 18.0,
+      "accepted_total": {
+        "10Hz::10hz_libero": 21,
+        "10Hz::10hz_rel30k": 39,
+        "20Hz::20hz_fractal": 21,
+        "30Hz::30hz_bridge": 32
+      },
+      "final_count_gap": 18.0,
+      "final_total": {
+        "10Hz::10hz_libero": 27,
+        "10Hz::10hz_rel30k": 45,
+        "20Hz::20hz_fractal": 27,
+        "30Hz::30hz_bridge": 38
+      },
+      "jain_accept_rate": 0.9546669194058189,
+      "jain_accepted_count": 0.9314998540997957,
+      "jain_final_count": 0.9523543738583317,
+      "mean_final_robot_count": 22.833333333333332,
+      "mean_p95_ms": 90.01332183834165,
+      "mean_reply_over": 0.0,
+      "offered_total": {
+        "10Hz::10hz_libero": 43,
+        "10Hz::10hz_rel30k": 53,
+        "20Hz::20hz_fractal": 43,
+        "30Hz::30hz_bridge": 41
+      },
+      "stable_group_ratio": 1.0
+    },
+    "delta": {
+      "accept_rate_gap_reduction": 0.19271396312032452,
+      "final_count_gap_reduction": 16.0,
+      "jain_final_count_gain": 0.046289387443657515,
+      "mean_final_robot_count_delta": -7.166666666666666,
+      "mean_p95_ms_delta": -31.584075302816927
+    },
+    "method": "GR00T quota-fair admission over greedy batch-first admission",
+    "quota_fair": {
+      "accept_rate_by_type": {
+        "10Hz::10hz_libero": 0.4186046511627907,
+        "10Hz::10hz_rel30k": 0.33962264150943394,
+        "20Hz::20hz_fractal": 0.37209302325581395,
+        "30Hz::30hz_bridge": 0.43902439024390244
+      },
+      "accept_rate_gap": 0.0994017487344685,
+      "accepted_count_gap": 2.0,
+      "accepted_total": {
+        "10Hz::10hz_libero": 18,
+        "10Hz::10hz_rel30k": 18,
+        "20Hz::20hz_fractal": 16,
+        "30Hz::30hz_bridge": 18
+      },
+      "final_count_gap": 2.0,
+      "final_total": {
+        "10Hz::10hz_libero": 24,
+        "10Hz::10hz_rel30k": 24,
+        "20Hz::20hz_fractal": 22,
+        "30Hz::30hz_bridge": 24
+      },
+      "jain_accept_rate": 0.99025631088567,
+      "jain_accepted_count": 0.997557003257329,
+      "jain_final_count": 0.9986437613019892,
+      "mean_final_robot_count": 15.666666666666666,
+      "mean_p95_ms": 58.429246535524726,
+      "mean_reply_over": 0.0,
+      "offered_total": {
+        "10Hz::10hz_libero": 43,
+        "10Hz::10hz_rel30k": 53,
+        "20Hz::20hz_fractal": 43,
+        "30Hz::30hz_bridge": 41
+      },
+      "stable_group_ratio": 1.0
+    }
+  },
+  "gr00t_phase_lock_effectiveness": {
+    "cases": [
+      {
+        "delta": {
+          "mean_batch_gain": 0.6154621249609944,
+          "mean_fleet_score_gain": 0.0,
+          "mean_min_robot_score_gain": 0.0,
+          "reply_over_removed": 7
+        },
+        "phase_lock_batch": {
+          "mean_batch_size": 2.0,
+          "mean_fleet_score": 1.0,
+          "mean_min_robot_score": 1.0,
+          "mean_request_to_result_p95_ms": 47.61115345172584,
+          "reply_over_chunk_actions_count": 0,
+          "stable_under_100ms": true
+        },
+        "robots": 8,
+        "scenario": "2x_per_model_8_robots",
+        "strict_horizon": {
+          "mean_batch_size": 1.3845378750390056,
+          "mean_fleet_score": 1.0,
+          "mean_min_robot_score": 1.0,
+          "mean_request_to_result_p95_ms": 47.61115345172584,
+          "reply_over_chunk_actions_count": 7,
+          "stable_under_100ms": false
+        }
+      },
+      {
+        "delta": {
+          "mean_batch_gain": 1.8033799292481771,
+          "mean_fleet_score_gain": 0.0,
+          "mean_min_robot_score_gain": 0.0,
+          "reply_over_removed": 15
+        },
+        "phase_lock_batch": {
+          "mean_batch_size": 4.0,
+          "mean_fleet_score": 1.0,
+          "mean_min_robot_score": 1.0,
+          "mean_request_to_result_p95_ms": 58.429246535524726,
+          "reply_over_chunk_actions_count": 0,
+          "stable_under_100ms": true
+        },
+        "robots": 16,
+        "scenario": "4x_per_model_16_robots",
+        "strict_horizon": {
+          "mean_batch_size": 2.196620070751823,
+          "mean_fleet_score": 1.0,
+          "mean_min_robot_score": 1.0,
+          "mean_request_to_result_p95_ms": 58.429246535524726,
+          "reply_over_chunk_actions_count": 15,
+          "stable_under_100ms": false
+        }
+      }
+    ],
+    "method": "GR00T shared-prefix phase-lock batching"
+  },
+  "meta": {
+    "date": "2026-04-12",
+    "goal": "Run fresh, method-level experiments that separately validate the core Pi05 and GR00T serving techniques used in the unified chunked-VLA serving design.",
+    "result_file": "/root/autodl-tmp/VLAServing/results/unified_chunked_vla_effectiveness_20260412.json"
+  },
+  "pi05_prefetch_effectiveness": {
+    "admission_level": {
+      "delta": {
+        "hard_miss_count_removed": 3.0,
+        "mean_min_robot_score_delta": 0.00196941437108078,
+        "mean_service_p95_ms_delta": -0.00655817985593643
+      },
+      "with_prefetch": {
+        "admitted_histogram": {
+          "10Hz::10hz_a_logits": 3,
+          "10Hz::10hz_b_autoh": 3,
+          "20Hz::20hz_quantiles": 3,
+          "30Hz::30hz_official_ft": 3
+        },
+        "hard_miss_count": 0.0,
+        "mean_admitted_total": 4.0,
+        "mean_fleet_score": 0.5537390050192684,
+        "mean_min_robot_score": 0.2787901178163183,
+        "mean_miss_autohorizon_ratio": 0.9596794992583026,
+        "mean_service_p95_ms": 43.198463439941406,
+        "total_admitted_robots": 12
+      },
+      "without_prefetch": {
+        "admitted_histogram": {
+          "10Hz::10hz_a_logits": 3,
+          "10Hz::10hz_b_autoh": 3,
+          "20Hz::20hz_quantiles": 3,
+          "30Hz::30hz_official_ft": 3
+        },
+        "hard_miss_count": 3.0,
+        "mean_admitted_total": 4.0,
+        "mean_fleet_score": 0.5533943711180963,
+        "mean_min_robot_score": 0.2768207034452375,
+        "mean_miss_autohorizon_ratio": 0.9601251320568767,
+        "mean_service_p95_ms": 43.20502161979734,
+        "total_admitted_robots": 12
+      }
+    },
+    "fixed_four_robot_level": {
+      "delta": {
+        "mean_hard_miss_count_removed": 1.0,
+        "mean_sla_miss_count_removed": 1.0
+      },
+      "with_prefetch": {
+        "mean_hard_miss_count": 0.0,
+        "mean_latency_p95_ms": 43.19846343994141,
+        "mean_min_robot_score": 0.3389972044672385,
+        "mean_sla_miss_count": 0.0
+      },
+      "without_prefetch": {
+        "mean_hard_miss_count": 1.0,
+        "mean_latency_p95_ms": 43.20440292358399,
+        "mean_min_robot_score": 0.33844276786506394,
+        "mean_sla_miss_count": 1.0
+      }
+    },
+    "method": "Pi05 predictive prefetch on shared 10Hz shell",
+    "policy": {
+      "phase10": 1.0,
+      "phase20": 0.0,
+      "r10a": 0.0,
+      "r10b": 0.1
+    }
+  }
+}

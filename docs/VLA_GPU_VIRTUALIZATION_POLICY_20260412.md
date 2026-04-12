@@ -7,6 +7,7 @@ This note documents a new workload-aware GPU resource partitioning policy implem
 Results are written to:
 
 - [vla_gpu_virtualization_policy_20260412.json](../results/vla_gpu_virtualization_policy_20260412.json)
+- [pi05_vla_serving_autoh25_50_phase_shift_20260413.json](../results/pi05_vla_serving_autoh25_50_phase_shift_20260413.json)
 
 ## Goal
 
@@ -45,12 +46,28 @@ Two modes are evaluated.
 
 - the system may serve a chunk anywhere in a safe action-consumption window
 - the lower bound of that window is:
-  - `min(horizon, 20)` for `Pi0.5`
+  - `25` for `Pi0.5` under the current `{25, 50}` control semantics
   - `min(horizon, 6)` for `GR00T N1.6`
 
 This is the workload-aware extension:
 
 - for long-horizon chunks, the scheduler may shift the next request phase to align with shell availability and prefetch completion
+
+## Pi0.5 25/50 Semantic Variant
+
+We also reran the Pi0.5 serving policy under a stricter control-side interpretation:
+
+- any sampled AutoHorizon below `25` is treated as `25`
+- any sampled AutoHorizon above `25` is treated as `50`
+- the legal early-replan window is therefore `[25, 50]`
+
+This variant is implemented in:
+
+- [bench_pi05_vla_serving_autoh25_50_phase_shift.py](../src/bench_pi05_vla_serving_autoh25_50_phase_shift.py)
+
+and writes:
+
+- [pi05_vla_serving_autoh25_50_phase_shift_20260413.json](../results/pi05_vla_serving_autoh25_50_phase_shift_20260413.json)
 
 ## Key Metric Definitions
 
@@ -72,22 +89,25 @@ For VLA real-time claims, `request_to_result_ms` is the relevant metric.
 
 ### Pi0.5
 
-Under the current `30/20/10/10` four-robot setup:
+Under the current `{25, 50}` semantic variant:
 
-- `strict_horizon` and `phase_shift` both achieve:
+- fixed-4 still stays at:
   - zero hard misses
   - zero action exhaustion
-  - `request_to_result p95 ≈ 43.21ms`
+  - `request-to-result p95 ≈ 43.21ms`
   - perfect fixed-4 fleet/min scores
-
-Admission result:
-
-- both modes admit about `22.33` robots on average under the configured quality thresholds
+- admission improves materially:
+  - `mean_admitted_total: 22.33 -> 32.67`
+  - `mean_fleet_score: 0.9862 -> 0.9934`
+  - `mean_min_robot_score: 0.9483 -> 0.9644`
+  - `mean_miss_autohorizon_ratio: 0.0947 -> 0.0420`
 
 Interpretation:
 
-- with the current three-shell predictive-prefetch design, the `Pi0.5` four-robot case is already not bottlenecked by phase alignment
-- the additional phase-shift flexibility does not improve the fixed four-robot setup
+- for Pi0.5, the main gain here is not aggressive phase movement itself
+- the real gain comes from changing the control semantics so the legal request window becomes `[25, 50]`
+- once that wider window exists, the same predictive-residency and prefetch runtime can admit substantially more robots without hurting request latency
+- even under this new setting, `phase_shift` still does not outperform `strict_horizon` on admission count; the gain comes from the wider legal window, not from extra phase motion
 
 ### GR00T N1.6
 
@@ -108,6 +128,7 @@ Interpretation:
 The policy is implemented and validated, but the experiments show a workload-dependent result:
 
 - `Pi0.5`: predictive residency + prefetch already captures most of the benefit; phase shifting adds little in the current fixed four-robot setting
+- `Pi0.5 (25/50 semantic variant)`: widening the legal replan window to `[25, 50]` significantly improves admission capacity while keeping `request-to-result p95` unchanged
 - `GR00T N1.6`: phase shifting can hurt because the horizon slack is much tighter
 
 So the main system contribution that survives both workloads is:
@@ -115,5 +136,6 @@ So the main system contribution that survives both workloads is:
 - predictive model-state residency
 - predictive prefetch
 - shell-aware resource partitioning
+- control-semantic window design
 
 while phase shifting should remain an optional optimization rather than a universal default.

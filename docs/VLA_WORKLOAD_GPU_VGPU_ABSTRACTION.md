@@ -44,6 +44,8 @@ VLA 有 4 个额外特征：
 
 4. `Horizon is controllable`
    - 像 AutoHorizon 这类机制使得请求相位不是完全固定的，系统可以在合法窗口内主动平移请求。
+   - 对 `Pi05` 来说，这个“合法窗口”还可以由控制语义定义。
+   - 我们已经验证过一个更强的语义：把 horizon 压成 `{25, 50}`，并允许在 `[25, 50]` 内任意时刻提前触发下一次 VLA 推理。
 
 所以 VLA 里需要虚拟化的不只是 compute。
 还要虚拟化：
@@ -75,20 +77,21 @@ VLA 有 4 个额外特征：
   - 可能是：
     - full shell
     - shared prefix
-    - delta pages
-    - hot pages
+    - resident task state
+    - warm resident state
+    - activated task state
 
 - `X`: state transfer / decode budget
   - 为这个机器人未来请求预留的：
     - CPU->GPU 带宽
-    - GPU decode/apply 带宽
-    - page activation buffer
+    - GPU 侧状态激活 / apply 带宽
+    - activation buffer
 
 - `W`: legal request window
   - 这个机器人下一次推理可以被触发的合法 action window
   - 例如：
     - `Pi05`: 在 `[25, 50]` 内可重规划
-    - `GR00T`: 在 `[8, 16]` 内可提前重规划
+    - `GR00T`: 在自身合法 chunk window 内可提前重规划
 
 - `B`: batch affinity
   - 这个机器人与哪些其它机器人有 batch 亲和性
@@ -142,21 +145,21 @@ VLA 有 4 个额外特征：
 VLA 中最重要的不是“谁占了多少显存”，而是：
 
 - 哪些模型状态常驻
-- 哪些只以压缩 / delta 形式常驻
-- 哪些页需要在未来多久内被激活
+- 哪些模型只保留部分常驻状态
+- 哪些状态需要在未来多久内被激活
 
 所以显存要被拆成 3 类：
 
 1. `Resident Shell Memory`
    - 当前可直接运行推理的 active shell
 
-2. `Compressed / Shared State Memory`
+2. `Resident Warm State Memory`
    - shared prefix
-   - exact delta
-   - hot pages
+   - resident task state
+   - warm state buffers
 
 3. `Transient Activation Memory`
-   - decode/apply buffer
+   - activation/apply buffer
    - staging buffer
    - in-flight swap buffer
 
@@ -167,13 +170,13 @@ VLA 中最重要的不是“谁占了多少显存”，而是：
 因为对多微调模型 serving 而言，很多时候瓶颈不是 infer kernel，而是：
 
 - H2D copy
-- delta decode
-- page apply/revert
+- GPU 侧状态激活
+- state apply/revert
 
 因此带宽也要虚拟化成 lease：
 
 - `copy slot`
-- `decode slot`
+- `activation slot`
 - `apply slot`
 
 ### 4.5 控制窗口虚拟化
@@ -191,6 +194,25 @@ VLA 特有的一类资源是：
 - `phase correction budget`
 
 也必须进入 vGPU 抽象。
+
+这里要强调一点：
+
+- `W` 不只是一个被动观测到的随机变量
+- 它也可以是系统和 VLA 控制语义联合设计后的结果
+
+例如在我们最新的 `Pi05` 实验里：
+
+- 原始 AutoHorizon 中所有 `<25` 的值都被视为 `25`
+- 所有 `>25` 的值都被视为 `50`
+- 因而系统拿到的是一个更规整的 `{25, 50}` horizon 过程
+- 对应的 `legal replan window` 也稳定为 `[25, 50]`
+
+这个变化直接提升了 admission 容量，而没有增加 `request-to-result` 延迟。
+
+同时要区分两类思路：
+
+- `shared prefix`
+  - 是 `GR00T N1.6` 中已经验证有效的结构共享
 
 ---
 
@@ -243,13 +265,13 @@ VLA 里更合理的抽象单位是：
 
 - 决定：
   - 哪些模型全量常驻
-  - 哪些模型共享 prefix
-  - 哪些模型只保留 hot pages / delta pages
+  - 哪些模型保留额外常驻状态
+  - 哪些模型主要依赖预测式预取
 
 它维护的是：
 
 - `resident set`
-- `compressed resident set`
+- `warm resident set`
 - `active shells`
 
 ### 6.3 Transfer Scheduler
@@ -299,10 +321,10 @@ VLA 里更合理的抽象单位是：
    - 执行当前 block / batch 的推理
 
 2. `prefetch stream`
-   - 做 H2D / page fetch
+   - 做 H2D / state fetch
 
 3. `decode/apply stream`
-   - 在 GPU 内完成 delta decode、page activation、state apply
+   - 在 GPU 内完成状态激活与 state apply
 
 因此一个标准的数据面流水线是：
 
@@ -325,9 +347,9 @@ Pi05 更偏向：
 对应关系：
 
 - `T`: 为未来 chunk 预留推理时间
-- `M`: three-shell + exact-delta / hot-page residency
+- `M`: three-shell + frequency-aware resident state
 - `X`: H2D + decode/apply overlap
-- `W`: AutoHorizon 给出的下一次合法触发窗口
+- `W`: AutoHorizon 给出的下一次合法触发窗口；在最新验证版本里，`Pi05` 使用 `{25, 50}` horizon 语义，并允许在 `[25, 50]` 内提前重规划
 - `B`: batching 很弱，不是主要优化点
 
 因此 Pi05 的优化重点是：
@@ -335,6 +357,14 @@ Pi05 更偏向：
 - `resident shell design`
 - `predictive prefetch`
 - `bandwidth scheduling`
+
+这组实验已经验证：
+
+- fixed-4 `request-to-result p95` 仍然约为 `43.21ms`
+- `hard miss = 0`
+- admission 容量从旧设定下的 `22.33` 提升到 `32.67`
+
+这说明对 `Pi05` 而言，`W` 不是边缘参数，而是会直接改变 vGPU lease 可行域的一等资源。
 
 ### 8.2 GR00T N1.6 映射
 
@@ -346,12 +376,13 @@ GR00T 更偏向：
 
 - `T`: 未来请求的相位布局
 - `S`: batch lane / optional MPS share
-- `M`: shared-prefix resident state
-- `W`: 8~16 action 之间可提前重规划
+- `M`: shared-prefix resident state + task-specific resident state
+- `W`: GR00T 自身合法 chunk window
 - `B`: same-model batch affinity 非常强
 
 因此 GR00T 的优化重点是：
 
+- `shared-prefix residency`
 - `phase lock`
 - `same-model batching`
 - `quota-fair admission`
@@ -372,9 +403,9 @@ Lease(robot_i) =
   request_window = [t_open, t_close],
   deadline = t_exhaust,
   resident_state_bytes,
-  compressed_state_bytes,
+  warm_state_bytes,
   future_copy_bytes,
-  future_decode_bytes,
+  future_activation_bytes,
   compute_service_ms,
   batch_affinity_group,
   fairness_weight
@@ -387,6 +418,11 @@ Lease(robot_i) =
 - 哪个模型该多常驻
 - 哪个模型该提前预取
 - 哪些机器人应被相位对齐
+
+对 `Pi05 25/50` 设定来说，这个 `lease descriptor` 里最关键的变化就是：
+
+- `request_window = [t_open, t_close]` 变宽了
+- 于是同样的 `resident_state_bytes` 和 `future_copy_bytes` 可以服务更多 admitted robots
 
 ---
 
@@ -444,3 +480,18 @@ Lease(robot_i) =
 **一个 VLA-vGPU = 未来 compute 时间片 + 显存驻留份额 + 状态搬运带宽 + 合法重规划窗口 + batch 亲和性。**
 
 这才是把 GPU 虚拟化思想真正带入 VLA workload 之后，合理的系统抽象边界。
+
+---
+
+## 13. 对应实验结果
+
+和这页抽象直接对应的结果文件主要是：
+
+- [vla_gpu_virtualization_policy_20260412.json](../results/vla_gpu_virtualization_policy_20260412.json)
+  - 原始 `Pi05 / GR00T` workload-aware GPU virtualization policy
+- [pi05_vla_serving_autoh25_50_phase_shift_20260413.json](../results/pi05_vla_serving_autoh25_50_phase_shift_20260413.json)
+  - `Pi05` 的 `{25, 50}` horizon 语义 + `[25, 50]` legal replan window
+- [unified_chunked_vla_effectiveness_20260412.json](../results/unified_chunked_vla_effectiveness_20260412.json)
+  - `Pi05 predictive prefetch`、`GR00T phase-lock batching`、`quota-fair admission` 的方法级有效性
+- [unified_chunked_vla_vs_baselines_20260412.json](../results/unified_chunked_vla_vs_baselines_20260412.json)
+  - 和 `Clockwork / GPUlet / REEF / Paella / USHER / DistServe-like` 的统一对照

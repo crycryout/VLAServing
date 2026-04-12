@@ -7,7 +7,7 @@ This note summarizes a paper-faithful reproduction of representative single-GPU 
 Test whether mainstream single-GPU serving abstractions remain suitable when all of the following are true at once:
 
 - multiple fine-tuned models share one GPU
-- requests follow chunk-level AutoHorizon dynamics
+- requests follow workload-specific chunk control semantics
 - request-to-result latency must be within `100ms`
 - action chunks must never be exhausted before the next reply arrives
 
@@ -34,7 +34,7 @@ Test whether mainstream single-GPU serving abstractions remain suitable when all
 - `VLA-aware`
   - frequency-aware shell residency
   - next-request-aware prefetch
-  - AutoHorizon-driven request timing
+  - control-semantic request timing
 
 ## Workloads
 
@@ -51,6 +51,9 @@ Constants:
 - full pinned H2D whole-model copy about `289ms`
 - shell memory about `7.485 GiB`
 - chunk size `50`
+- control semantics:
+  - horizon target in `{25, 50}`
+  - legal replan window `[25, 50]`
 
 ### GR00T N1.6
 
@@ -69,12 +72,9 @@ Constants:
 
 ## Request model
 
-- Each chunk draws a new AutoHorizon.
-- A request is issued at:
-
-  `request_time = chunk_start + horizon * action_period - 100ms`
-
-- So a method must both:
+- `Pi0.5` uses the current `{25, 50}` control semantics with legal replan window `[25, 50]`.
+- `GR00T N1.6` keeps its own chunk-level dynamic horizon process.
+- A method must both:
   - return within `100ms`
   - and keep the chunk alive until the next reply arrives
 
@@ -82,66 +82,19 @@ Constants:
 
 ### Pi0.5
 
-`oracle_full_resident`
+旧版 `Pi0.5` baseline 数字基于更早的非 `25/50` 语义，当前文档不再保留。
 
-- all 4 models resident
-- mean SLA miss rate `0.0497`
-- mean hard miss rate `0.0082`
-- mean fleet score `0.9920`
-- mean min robot score `0.9847`
-- mean latency p95 `104.92ms`
-- memory `29.94 GiB`
+当前 `Pi0.5` 主线结论应以这两份结果为准：
 
-`reef_like_temporal`
+- [`vla_gpu_virtualization_policy_20260412.json`](../results/vla_gpu_virtualization_policy_20260412.json)
+- [`pi05_vla_serving_autoh25_50_phase_shift_20260413.json`](../results/pi05_vla_serving_autoh25_50_phase_shift_20260413.json)
 
-- mean SLA miss rate `0.9132`
-- mean hard miss rate `0.3799`
-- mean latency p95 `752.67ms`
+当前有效结论是：
 
-`clockwork_like`
-
-- mean SLA miss rate `0.2425`
-- mean hard miss rate `0.1538`
-- mean latency p95 `364.84ms`
-- memory `22.46 GiB`
-
-`paella_like`
-
-- mean SLA miss rate `0.2425`
-- mean hard miss rate `0.1538`
-- mean latency p95 `364.84ms`
-- memory `22.46 GiB`
-
-`usher_like`
-
-- mean SLA miss rate `1.0`
-- mean hard miss rate `0.3850`
-- mean latency p95 `471.71ms`
-- memory `22.46 GiB`
-
-`distserve_like`
-
-- mean SLA miss rate `0.9667`
-- mean hard miss rate `0.5151`
-- mean latency p95 `1980.08ms`
-- memory `14.97 GiB`
-
-`vla_aware`
-
-- mean SLA miss rate `0.0497`
-- mean hard miss rate `0.0082`
-- mean fleet score `0.9920`
-- mean min robot score `0.9847`
-- mean latency p95 `104.92ms`
-- memory `22.46 GiB`
-
-Interpretation:
-
-- The VLA-aware system matches the no-swap upper bound behavior while using only `22.46 GiB`, not `29.94 GiB`.
-- Clockwork-like and Paella-like reactive systems still fail because one model remains cold and pays reactive swap on the critical path.
-- REEF-like temporal preemption fails worst because preemption cannot remove model-switch cost.
-- USHER-like spatial partitioning still fails because fixed resident partitions do not solve predictive model-state placement.
-- DistServe-like stage disaggregation performs worst among non-REEF baselines because VLA inference is not naturally prefill/decode separable, so the extra stage queues and duplicated cold-model swaps dominate latency.
+- `Pi0.5` 使用 `{25, 50}` 控制语义和 `[25, 50]` legal replan window
+- fixed-4 场景稳定在约 `43.21ms p95`
+- admission 容量约为 `32.67`
+- 主导收益来自 `legal replan window` 变宽，而不是更激进的 phase shift
 
 ### GR00T N1.6
 
@@ -231,7 +184,7 @@ Traditional single-GPU serving methods are not directly suitable for VLA workloa
 
 - predictive model-state residency and prefetch before the request
 - control-semantic hard deadlines
-- AutoHorizon-aware soft scheduling targets
+- workload-aware legal replan windows
 - multi-model memory virtualization as a first-class resource
 
 ## Files
