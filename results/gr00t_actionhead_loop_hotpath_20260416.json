@@ -1,0 +1,62 @@
+{
+  "config": {
+    "device": "cuda:0",
+    "dtype": "bfloat16",
+    "seq_len": 256,
+    "batch_sizes": [
+      4,
+      8
+    ],
+    "warmup": 2,
+    "iterations": 6,
+    "output_json": "/root/autodl-tmp/VLAServing/results/gr00t_actionhead_loop_hotpath_20260416.json"
+  },
+  "results": [
+    {
+      "batch_size": 4,
+      "baseline": {
+        "mean_ms": 67.60059390217066,
+        "std_ms": 0.7802094898601764,
+        "p50_ms": 67.33430828899145,
+        "p95_ms": 68.85322136804461,
+        "min_ms": 67.07435846328735,
+        "max_ms": 69.31408494710922,
+        "num_samples": 6
+      },
+      "candidate_reuse_buffers": {
+        "mean_ms": 67.09335496028264,
+        "std_ms": 1.0600812089176344,
+        "p50_ms": 66.64846558123827,
+        "p95_ms": 68.79298528656363,
+        "min_ms": 66.48331508040428,
+        "max_ms": 69.44915652275085,
+        "num_samples": 6
+      },
+      "candidate_delta_p50_ms": -0.6858427077531815,
+      "candidate_speedup_p50": 1.0102904500767118
+    },
+    {
+      "batch_size": 8,
+      "baseline": {
+        "mean_ms": 65.4429942369461,
+        "std_ms": 0.09675504723471683,
+        "p50_ms": 65.41036069393158,
+        "p95_ms": 65.59903779998422,
+        "min_ms": 65.35051017999649,
+        "max_ms": 65.63891470432281,
+        "num_samples": 6
+      },
+      "candidate_reuse_buffers": {
+        "mean_ms": 65.61609047154586,
+        "std_ms": 0.07597813181869291,
+        "p50_ms": 65.60937408357859,
+        "p95_ms": 65.71666244417429,
+        "min_ms": 65.50314091145992,
+        "max_ms": 65.72525762021542,
+        "num_samples": 6
+      },
+      "candidate_delta_p50_ms": 0.199013389647007,
+      "candidate_speedup_p50": 0.9969666927565337
+    }
+  ]
+}

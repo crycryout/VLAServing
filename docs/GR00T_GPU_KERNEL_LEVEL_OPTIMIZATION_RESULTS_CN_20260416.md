@@ -220,6 +220,40 @@
 - backbone/action-head 之间的 execution boundary
 - same-model super-batch 的真实 runtime 接入
 
+### 6.3 Action-head hot loop 的小型内存复用优化，没有形成稳定收益
+
+代码：
+
+- `src/gr00t/eval/bench_gr00t_actionhead_loop_hotpath.py`
+
+结果：
+
+- `results/gr00t_actionhead_loop_hotpath_20260416.json`
+
+这轮尝试优化的内容是：
+
+- 复用 `timesteps_tensor`
+- 复用 `state + action` 拼接缓冲区
+- 预取 position embedding
+- 尽量减少 diffusion loop 内的临时张量分配
+
+关键结果：
+
+| batch | baseline p50 | candidate p50 | 结果 |
+| --- | --- | --- | --- |
+| 4 | 67.334 ms | 66.648 ms | 约 1.0% 提升 |
+| 8 | 65.410 ms | 65.609 ms | 约 0.3% 回退 |
+
+结论：
+
+1. 这个方向没有形成稳定、可复现、可扩展的收益
+2. loop 内的小型分配和拼接不是当前主矛盾
+3. 当前真正的主矛盾仍然是 DiT / attention 主体计算
+4. 因此后续 kernel-level 深挖，不应把主要精力继续放在这种 buffer 复用类微优化上
+5. 更值得继续做的方向是 DiT / attention 主路径的 kernel specialization。
+6. 更值得继续做的方向是 fixed-shape same-model batch 的 graph capture / persistent execution。
+7. 更值得继续做的方向是与 phase-locked super-batch runtime 的联合设计。
+
 ---
 
 ## 7. 当前能稳妥声称什么
