@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "date": "2026-04-23",
+    "model": "GR00T N1.6 mini AlternateVLDiT",
+    "dtype": "bfloat16",
+    "device": "RTX 4090",
+    "shape": {
+      "q_len": 17,
+      "kv_len": 64,
+      "hidden_dim": 1536,
+      "cross_dim": 2048,
+      "num_heads": 32,
+      "head_dim": 48
+    },
+    "note": "All values below are from PersistentKernel test_mode subgraph checks against PyTorch references."
+  },
+  "subgraph_correctness": {
+    "block0": {
+      "max_abs": 0.0078125,
+      "mean_abs": 0.0006862014415673912,
+      "status": "pass"
+    },
+    "block1_attn": {
+      "max_abs": 0.5810546875,
+      "mean_abs": 0.11841364949941635,
+      "status": "pass"
+    },
+    "block1_ff": {
+      "max_abs": 0.716796875,
+      "mean_abs": 0.14899501204490662,
+      "status": "pass"
+    },
+    "twoblock": {
+      "max_abs": 0.7451171875,
+      "mean_abs": 0.14813220500946045,
+      "status": "pass"
+    },
+    "final_normout": {
+      "max_abs": 0.640625,
+      "mean_abs": 0.05054233595728874,
+      "status": "pass"
+    },
+    "final_head": {
+      "max_abs": 0.17822265625,
+      "mean_abs": 0.03585610166192055,
+      "status": "pass"
+    },
+    "full_model": {
+      "max_abs": 1.16796875,
+      "mean_abs": 0.2634243071079254,
+      "status": "near_pass_but_above_threshold"
+    }
+  },
+  "test_mode_perf_probe": {
+    "published": false,
+    "reason": "run_test_mode re-launches the persistent kernel and scheduler per invocation, so it does not represent steady-state serving latency.",
+    "informal_twoblock_probe": {
+      "torch_eager_p50_ms": 1.0880319476127625,
+      "mpk_run_test_mode_p50_ms": 565.5863647460938
+    }
+  },
+  "next_step": "Move from test_mode to a steady-state online/offline request path before claiming performance gains."
+}
