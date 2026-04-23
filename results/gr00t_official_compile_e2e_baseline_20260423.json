@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "date": "2026-04-23",
+    "benchmark_source": "Isaac-GR00T/scripts/deployment/benchmark_inference.py",
+    "dataset_path": "demo_data/gr1.PickNPlace",
+    "num_iterations": 8,
+    "warmup": 3,
+    "inference_steps": 4
+  },
+  "raw_stdout_path": "/tmp/gr00t_official_compile_bench_stdout_20260423.txt",
+  "pytorch_eager": {
+    "e2e": {
+      "p50_ms": 209.7,
+      "mean_ms": 210.9,
+      "std_ms": 1.8,
+      "min_ms": 209.5,
+      "max_ms": 214.1
+    },
+    "data_processing": {
+      "p50_ms": 4.55
+    },
+    "backbone": {
+      "p50_ms": 139.26
+    },
+    "action_head": {
+      "p50_ms": 65.7
+    }
+  },
+  "torch_compile": {
+    "e2e": {
+      "p50_ms": 176.2,
+      "mean_ms": 176.7,
+      "std_ms": 0.9,
+      "min_ms": 176.0,
+      "max_ms": 178.5
+    },
+    "data_processing": {
+      "p50_ms": 4.55
+    },
+    "backbone": {
+      "p50_ms": 139.26
+    },
+    "action_head": {
+      "p50_ms": 32.4
+    }
+  }
+}
