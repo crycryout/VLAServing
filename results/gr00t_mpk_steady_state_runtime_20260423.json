@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "date": "2026-04-23",
+    "device": "RTX 4090",
+    "dtype": "bfloat16",
+    "graph": "GR00T N1.6 mini AlternateVLDiT two-block core",
+    "shape": {
+      "q_len": 17,
+      "kv_len": 64,
+      "hidden_dim": 1536,
+      "cross_dim": 2048,
+      "num_heads": 32,
+      "head_dim": 48
+    },
+    "notes": [
+      "This benchmark uses non-test-mode PersistentKernel request paths.",
+      "online_notoken is used for single-request latency.",
+      "offline(total_num_requests=N, max_num_batched_requests=1) is used for steady-state throughput."
+    ]
+  },
+  "torch_eager_twoblock": {
+    "mean_ms": 1.5487462377548218,
+    "std_ms": 0.6602893957515756,
+    "p50_ms": 1.3982720375061035,
+    "p95_ms": 1.947596830129621,
+    "min_ms": 1.3514560461044312,
+    "max_ms": 5.334015846252441,
+    "num_samples": 50
+  },
+  "mpk_online_notoken_conservative": {
+    "latency_ms": {
+      "mean_ms": 567.8888427734375,
+      "std_ms": 7.250963798270246,
+      "p50_ms": 564.1213989257812,
+      "p95_ms": 578.8774536132812,
+      "min_ms": 563.962890625,
+      "max_ms": 582.37646484375,
+      "num_samples": 5
+    },
+    "correctness": {
+      "max_abs": 1.88671875,
+      "mean_abs": 0.3931973874568939,
+      "out_sum": 65.96903228759766
+    }
+  },
+  "mpk_online_notoken_auto": {
+    "latency_ms": {
+      "mean_ms": 568.1883056640625,
+      "std_ms": 6.4012041341935175,
+      "p50_ms": 565.032958984375,
+      "p95_ms": 577.8407348632812,
+      "min_ms": 564.8148193359375,
+      "max_ms": 580.9868774414062,
+      "num_samples": 5
+    },
+    "correctness": {
+      "max_abs": 2.03125,
+      "mean_abs": 0.3776549696922302,
+      "out_sum": 297.0539245605469
+    }
+  },
+  "mpk_offline_conservative_r8": {
+    "elapsed_ms": {
+      "mean_ms": 4517.051513671875,
+      "std_ms": 5.444580078125,
+      "p50_ms": 4517.051513671875,
+      "p95_ms": 4521.951635742187,
+      "min_ms": 4511.60693359375,
+      "max_ms": 4522.49609375,
+      "num_samples": 2
+    },
+    "per_request_ms": {
+      "mean_ms": 564.6314392089844,
+      "std_ms": 0.680572509765625,
+      "p50_ms": 564.6314392089844,
+      "p95_ms": 565.2439544677734,
+      "min_ms": 563.9508666992188,
+      "max_ms": 565.31201171875,
+      "num_samples": 2
+    },
+    "throughput_rps": {
+      "mean_ms": 1.7710693797817547,
+      "std_ms": 0.0021347396709890942,
+      "p50_ms": 1.7710693797817547,
+      "p95_ms": 1.772990645485645,
+      "min_ms": 1.7689346401107657,
+      "max_ms": 1.773204119452744,
+      "num_samples": 2
+    },
+    "correctness": {
+      "max_abs": 1.88671875,
+      "mean_abs": 0.3931973874568939,
+      "out_sum": 65.96903228759766
+    }
+  },
+  "mpk_offline_conservative_r64": {
+    "elapsed_ms": {
+      "mean_ms": 36221.80078125,
+      "std_ms": 92.51953125,
+      "p50_ms": 36221.80078125,
+      "p95_ms": 36305.068359375,
+      "min_ms": 36129.28125,
+      "max_ms": 36314.3203125,
+      "num_samples": 2
+    },
+    "per_request_ms": {
+      "mean_ms": 565.9656372070312,
+      "std_ms": 1.44561767578125,
+      "p50_ms": 565.9656372070312,
+      "p95_ms": 567.2666931152344,
+      "min_ms": 564.52001953125,
+      "max_ms": 567.4112548828125,
+      "num_samples": 2
+    },
+    "throughput_rps": {
+      "mean_ms": 1.7669032508228848,
+      "std_ms": 0.004513112462781077,
+      "p50_ms": 1.7669032508228848,
+      "p95_ms": 1.7709650520393878,
+      "min_ms": 1.7623901383601037,
+      "max_ms": 1.7714163632856659,
+      "num_samples": 2
+    },
+    "correctness": {
+      "max_abs": 1.88671875,
+      "mean_abs": 0.3931973874568939,
+      "out_sum": 65.96903228759766
+    }
+  }
+}

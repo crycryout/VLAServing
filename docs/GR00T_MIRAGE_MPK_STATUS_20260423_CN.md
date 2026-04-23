@@ -115,30 +115,108 @@
 
 ---
 
-## 5. 为什么现在还不能发布 Mirage 的“性能提升结果”
+## 5. steady-state request path benchmark：已经做了，但结果目前很差
 
-我已经做过一轮最小 perf probe，但当前不能把它当正式结果。
+前一版结论里说过，`test_mode` 不能直接拿来做性能判断。
 
-原因很直接：
+这次已经补做了真正的非 `test_mode` benchmark，对应脚本和结果是：
 
-1. 当前主要可用的是 `PersistentKernel test_mode`
-2. `test_mode` 每次调用都会重新发起 persistent kernel/scheduler 的 launch
-3. 因此它测到的是：
-   - `launch + single-pass execution`
-   - 而不是 steady-state serving
+- 脚本：`src/gr00t/eval/bench_gr00t_mpk_steady_state_runtime.py`
+- 结果：`results/gr00t_mpk_steady_state_runtime_20260423.json`
 
-这会带来一个误导性的现象：
+运行这份 benchmark 时，本地 Mirage Python wrapper 额外做了一个很小的接口修复：
 
-- PyTorch eager twoblock `p50` 大约只有 `1.09 ms`
-- MPK `run_test_mode()` 的 `p50` 却在 `565 ms` 左右
+1. 在 `compile()` 之后，把 `.so` 里已有的 `init_request_func` 也绑定到 `PersistentKernel`
 
-这个数字**不能**解释成“MPK 比 PyTorch 慢 500 倍”。
+这不是新的 runtime 机制，只是把原本已经存在的 C 接口从 Python 层接出来。
 
-更准确的解释是：
+这份 benchmark 走的是两条真正的 request path：
 
-**当前测到的是 test harness 的固定 launch 成本，不是 kernel steady-state throughput/latency。**
+1. `online_notoken`
+   - 用来测单 request latency
+2. `offline(total_num_requests=N, max_num_batched_requests=1)`
+   - 用来测 steady-state throughput
 
-所以现在不能发布“Mirage 对 GR00T N1.6 已经拿到多少倍加速”这种说法。
+这里测的是已经闭合的 `two-block mini-DiT core`，而不是 full model。
+
+### 5.1 PyTorch eager baseline
+
+| 指标 | 数值 |
+| --- | --- |
+| eager twoblock `p50` | `1.40 ms` |
+| eager twoblock `p95` | `1.95 ms` |
+
+### 5.2 `online_notoken` 单请求 latency
+
+保守配置：`num_workers=1, num_local_schedulers=1`
+
+| 指标 | 数值 |
+| --- | --- |
+| `p50` | `564.12 ms` |
+| `p95` | `578.88 ms` |
+| first-run correctness `max_abs` | `1.8867` |
+
+自动配置：`96 workers / 128 schedulers`
+
+| 指标 | 数值 |
+| --- | --- |
+| `p50` | `565.03 ms` |
+| `p95` | `577.84 ms` |
+| first-run correctness `max_abs` | `2.0313` |
+
+结论：
+
+1. 自动配置并没有明显优于保守配置
+2. 当前问题不是“worker/scheduler 参数还没调好”
+3. steady-state path 的数值误差也比 `test_mode` 更大，说明 runtime path 本身也在引入额外问题
+
+### 5.3 `offline` steady-state throughput
+
+`total_num_requests=8`
+
+| 指标 | 数值 |
+| --- | --- |
+| total elapsed | `4517.05 ms` |
+| per-request `p50` | `564.63 ms` |
+| throughput | `1.77 req/s` |
+
+`total_num_requests=64`
+
+| 指标 | 数值 |
+| --- | --- |
+| total elapsed | `36221.80 ms` |
+| per-request `p50` | `565.97 ms` |
+| throughput | `1.77 req/s` |
+
+这里最关键的观察是：
+
+1. `8 requests` 和 `64 requests` 的 `per-request latency` 几乎一样
+2. `throughput` 也几乎不变
+3. 说明当前 steady-state path **没有把 launch/scheduler 成本 amortize 掉**
+
+换句话说：
+
+**offline request loop 已经能跑，但它并没有形成有效的 steady-state 加速。**
+
+### 5.4 当前的正确结论
+
+所以这条 Mirage 线现在不能写成：
+
+- “steady-state 路径已经能显著加速 GR00T DiT”
+
+而应该写成：
+
+- “steady-state request path 已经打通，但当前 runtime 对这种小而规则的 VLA DiT 图仍然有巨大的固定开销”
+
+这也解释了为什么：
+
+1. `test_mode` 看起来慢
+2. 换成真正的 `online/offline` request path 以后，还是慢
+3. 并且 `offline` 的多 request 处理也没有显著 amortization
+
+因此现在性能瓶颈的主因已经很明确：
+
+**不是 graph 没编出来，而是 Mirage 当前 runtime/scheduler 结构本身还不适合这种 GR00T 小图 workload。**
 
 ---
 
@@ -148,19 +226,19 @@
 
 1. `Mirage MPK` 已经把 `GR00T N1.6 mini-DiT core` 的主要子图跑通了。
 2. 大部分子图已经在容差内闭合，full path 只剩少量累计误差没有完全压下去。
-3. 当前 `test_mode` 只能做 correctness，不适合直接做正式 latency 结论；下一步必须转向 steady-state request path。
+3. steady-state request path 现在也已经测过，但结果表明当前 Mirage runtime 对这类 GR00T 小图仍然有约 `565 ms/request` 的巨大固定成本，没有形成有效吞吐增益。
 
 ---
 
 ## 7. 下一步
 
-真正可行的下一步不是继续在 `test_mode` 上抠毫秒，而是：
+真正可行的下一步不是继续在 `test_mode` 上抠毫秒，而是直接针对 runtime 结构动刀：
 
-1. 找到 Mirage 的 `offline/online` steady-state request path
-2. 在那个路径上测：
-   - 单次 request latency
-   - steady-state throughput
-   - launch amortization 后的真实收益
-3. 再决定是否值得继续把这条 MPK 路线扩到更完整的 GR00T action head
+1. 减少 `online/offline` 路径里的 scheduler / worker 固定开销
+2. 研究为什么这类单图 workload 没有得到 amortization
+3. 如果 runtime 级问题解决不了，再考虑：
+   - 是否需要更 coarse-grained 的 megakernel
+   - 是否需要把多个 denoising steps 进一步合并
+   - 是否需要完全绕开当前 MPK request runtime，直接做 VLA 专用 persistent execution
 
 这才是后面能够写成论文或系统结果的性能实验入口。
