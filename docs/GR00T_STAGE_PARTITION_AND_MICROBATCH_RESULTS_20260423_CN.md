@@ -49,7 +49,7 @@
 这个方向的问题是：
 
 1. 粒度太粗
-2. 一个 request 本身已经接近 `100ms`
+2. 在 `eager-only baseline` 下，一个 request 本身已经接近 `100ms`
 3. 一旦开始攒 batch，就几乎必然把端到端 latency 推过 deadline
 
 ---
@@ -125,26 +125,43 @@
 - 脚本：`src/gr00t/eval/bench_gr00t_batch_only_fair_admission.py`
 - 结果：`results/gr00t_batch_only_fair_admission_20260412.json`
 
+### 3.7 compile reference
+
+- 脚本：`src/gr00t/eval/bench_n1d6_same_model_batch.py`
+- 结果：`results/groot_n1d6_bridge_dit_batch1_compile_20260423.json`
+
+### 3.8 VLM partial-compile reference
+
+- 脚本：`src/gr00t/eval/bench_gr00t_vlm_partial_compile.py`
+- 结果：`results/gr00t_vlm_partial_compile_20260423.json`
+
 ---
 
 ## 4. 核心实验结果
 
-### 4.1 request-level batch 太粗
+### 4.1 request-level batch 太粗，但 `95.5 ms` 只是 eager-only baseline
 
-来自 `gr00t_request_batch_vs_microbatch_admission_20260419.json` 和组件曲线：
+来自 `groot_n1d6_bridge_gr1_component_batch_curves_20260412.json` 与 `groot_n1d6_bridge_dit_batch1_compile_20260423.json`：
 
 | 指标 | 数值 |
 | --- | --- |
-| whole-request batch=1 | `95.50 ms` |
-| whole-request batch=2 | `125.36 ms` |
-| whole-request batch=4 | `111.31 ms` |
-| whole-request batch=8 | `147.73 ms` |
+| eager whole-request batch=1 | `95.50 ms` |
+| eager whole-request batch=2 | `125.36 ms` |
+| eager whole-request batch=4 | `111.31 ms` |
+| eager whole-request batch=8 | `147.73 ms` |
+| eager `VLM(batch=1)` | `27.62 ms` |
+| eager `DiT(batch=1)` | `62.91 ms` |
+| full `get_action(batch=1)` with only diffusion compiled | `39.05 ms` |
+| pure `DiT(batch=1, denoising_step=4)` compiled | `18.23 ms` |
+| component-wise `eager VLM + compiled pure DiT` | `45.85 ms` |
 
 结论：
 
-1. 整次 request 在 `batch=1` 时就已经接近 `100ms`
-2. 从 `batch=2` 开始，单次服务时间本身就超过 `100ms`
-3. 因此 `whole-request batching` 不适合作为 `GR00T VLA` 的主 serving primitive
+1. 之前文档里引用的 `95.50 ms` 应被理解为 `eager-only whole-request baseline`，不是 compile 后的最终数字。
+2. 之前单独引用的 `39.05 ms` 不是 pure `DiT`，而是完整 `get_action()` 路径上“只编译 diffusion 子模块”的测量。
+3. pure `DiT` 在 `denoising_step=4` 下做 `torch.compile` 后，`batch=1 p50` 已经压到 `18.23 ms`。
+4. 从 `batch=2` 开始，`eager` 路径下单次服务时间本身就超过 `100ms`。
+5. 因此 `whole-request batching` 仍然不适合作为 `GR00T VLA` 的主 serving primitive。
 
 ---
 
@@ -209,10 +226,11 @@
 1. 只改执行时间模型，不改请求相位与 cohort 形成机制
 2. admission 层面并不会自然得到更高容量
 3. `MicroBatch` 不是 `phase control` 的替代品
+4. 这里的 `whole_request_greedy mean_p95 = 95.50 ms` 同样应理解为 `eager-only baseline`，不是 compile 后的最终 request latency
 
 ---
 
-### 4.5 VLM 的 stage split 在顺序执行下成立，但 MPS stage pipeline 不成立
+### 4.5 VLM 的 stage split 在顺序执行下成立，但 `compile` 与 `MPS` 要分开看
 
 #### 4.5.1 operator-level four-stage
 
@@ -252,7 +270,44 @@
 1. `operator-level MPS pipeline` 在单卡上没有形成可用的低延迟 serving 路径
 2. 根因不是“不能拆”，而是“拆完以后同卡并发导致资源争用与 queueing 放大”
 
-#### 4.5.2 coarse two-stage
+#### 4.5.2 partial compile：`vision eager + llm compiled`
+
+来自 `gr00t_vlm_partial_compile_20260423.json`。
+
+这次不再尝试直接 compile 整个 `VLM backbone`，而是只做：
+
+- `vision/projector/fuse` 保持 eager
+- `llm body` 单独 `torch.compile`
+- 再用 staged runtime 重新测整次 request
+
+结果如下：
+
+| 指标 | 数值 |
+| --- | --- |
+| eager monolithic `p50` | `33.00 ms` |
+| eager staged `p50` | `32.34 ms` |
+| partial compile full-request `p50` | `25.64 ms` |
+| eager staged `llm p50` | `16.14 ms` |
+| partial compile `llm p50` | `11.94 ms` |
+
+从 `p50` 看，当前软件栈下：
+
+- `32.34 ms -> 25.64 ms`
+- 约下降 `6.70 ms`
+- 相对下降约 `20.7%`
+
+但要注意，当前只验证了“能跑”和“更快”，还没有把数值一致性完全做实：
+
+- hidden-state `mean_abs diff = 0.0508`
+- hidden-state `max_abs diff = 71.5`
+
+因此更准确的结论是：
+
+1. `partial compile` 是当前 `VLM` 路径里真正可跑的 compile 方向
+2. 它已经能带来正的端到端收益
+3. 但还需要补 action-level 或最终输出级别的一致性验证，才能把它当成 production-safe 路径
+
+#### 4.5.3 coarse two-stage
 
 来自 `gr00t_vlm_coarse_pipeline_mps_stream_20260419.json`：
 
@@ -347,6 +402,93 @@
 
 ---
 
+### 4.8 真实 unified runtime：`VLM multi-stage + compiled DiT step-microbatch`
+
+前面的 `stage-aware microbatch pipeline` 结果，主要是基于组件实测曲线做的系统级仿真。
+
+为了确认这些结论在真实 runtime 里是否仍然成立，这次又补做了一版真正的统一执行路径：
+
+1. `VLM` 按 `vision / projector / fuse / llm` 四段顺序执行
+2. `DiT` 按 `4` 个 denoising steps 执行
+3. 每个 denoising step 做 same-model microbatch
+4. 当前只打开 `DiT torch.compile`
+5. `llm body compile` 暂时不并进这条 runtime，避免和数值一致性问题混在一起
+
+对应脚本与结果：
+
+- 脚本：`src/gr00t/eval/bench_gr00t_unified_multistage_microbatch_runtime.py`
+- 结果 1：`results/gr00t_unified_multistage_microbatch_runtime_c2_20260423.json`
+- 结果 2：`results/gr00t_unified_multistage_microbatch_runtime_20260423.json`
+
+先看 correctness：
+
+| 指标 | 数值 |
+| --- | --- |
+| `step_microbatch_vs_reference max_abs` | `0.0` |
+
+这说明当前 runtime 至少在 `DiT step-level microbatch` 这一层，和 reference loop 是数值一致的。
+
+#### 4.8.1 小规模真实 replay：`1 cohort x 2 requests`
+
+来自 `gr00t_unified_multistage_microbatch_runtime_c2_20260423.json`：
+
+burst 场景：
+
+| burst size | eager whole-request `p50` | unified `request_to_result p50` | unified `VLM p50` | unified `DiT-step p50` | mean step batch |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `1` | `95.51 ms` | `56.26 ms` | `32.65 ms` | `5.65 ms` | `1.0` |
+| `2` | `106.82 ms` | `88.51 ms` | `31.16 ms` | `6.49 ms` | `2.0` |
+
+phase-locked replay：
+
+| 路径 | `request_to_result p50` | `deadline_miss_ratio` |
+| --- | ---: | ---: |
+| eager whole-request | `97.87 ms` | `0.5` |
+| unified runtime | `86.51 ms` | `0.0` |
+
+结论：
+
+1. 在 `2 slots / 1 cohort x 2 requests` 这一规模下，真实 unified runtime 是有效的
+2. 它不仅比 eager baseline 更快，而且已经能把 replay 从“有 deadline miss”拉到“无 miss”
+3. 此时 `DiT step batch` 的平均大小已经达到 `2.0`
+
+#### 4.8.2 更大真实 replay：`2 cohorts x 2 requests`
+
+来自 `gr00t_unified_multistage_microbatch_runtime_20260423.json`：
+
+burst 场景：
+
+| burst size | eager whole-request `p50` | unified `request_to_result p50` | unified `VLM p50` | unified `DiT-step p50` | mean step batch |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `1` | `120.62 ms` | `64.59 ms` | `41.63 ms` | `5.63 ms` | `1.0` |
+| `2` | `174.45 ms` | `106.77 ms` | `40.07 ms` | `6.59 ms` | `2.0` |
+| `4` | `118.24 ms` | `154.03 ms` | `38.48 ms` | `6.20 ms` | `2.0` |
+
+phase-locked replay：
+
+| 路径 | `request_to_result p50` | `deadline_miss_ratio` |
+| --- | ---: | ---: |
+| eager whole-request | `159.67 ms` | `1.0` |
+| unified runtime | `434.12 ms` | `1.0` |
+
+结论：
+
+1. 一旦扩到 `4 slots / 2 cohorts x 2 requests`，真实 unified runtime 反而失稳
+2. 根因不是 `DiT step microbatch` 无效
+3. 真正拖垮系统的是：
+   - `VLM staged runtime` 的固定开销
+   - step-level 调度与同步开销
+   - 当两个 cohort 同时推进时，`VLM` 和 `DiT` 的交错执行并没有形成足够强的 overlap
+4. 这和 earlier simulation 的差异很关键：曲线级仿真低估了真实 runtime 开销
+
+因此更准确的结论是：
+
+1. `stage-aware microbatch` 作为执行优化方向是成立的
+2. 但它必须以“真实 runtime 的固定开销”来重新评估
+3. 当前这版统一实现只在小规模 cohort 下成立，还不能直接外推到更大的闭环 serving 场景
+
+---
+
 ## 5. 总结：哪些结论已经被验证
 
 ### 5.1 已经被验证成立的结论
@@ -356,12 +498,15 @@
 3. `DiT` 的正确 batch 粒度是 `denoising step`
 4. `stage-aware microbatch` 的确能显著降低 backlog 和 chunk elapsed time
 5. `batch-first greedy` 的确会引入明显的 admission bias
+6. pure `DiT torch.compile` 会把 `batch=1, denoising_step=4` 从 `63.83 ms` 压到 `18.23 ms`，因此旧文档里的 `95.5 ms` 不应再被当成“当前最优单请求时延”
+7. 真实 unified runtime 已经证明：`VLM multi-stage + compiled DiT step-microbatch` 在小规模 `1 cohort x 2 requests` 下可以做到 `86.51 ms p50 / 0 miss`
 
 ### 5.2 目前被明确验证为“不行”的路线
 
 1. 单卡上的 `VLM operator-level MPS pipeline`
 2. 单卡上的 `VLM coarse two-stage MPS pipeline`
 3. 仅靠 `stage split` 或 `microbatch` 而不做 phase control，就想稳定守住 `100ms deadline`
+4. 把 curve-driven stage-aware microbatch 仿真结果，直接当成更大规模 unified runtime 的真实上界
 
 ### 5.3 当前最准确的系统判断
 
