@@ -198,7 +198,74 @@
 
 **offline request loop 已经能跑，但它并没有形成有效的 steady-state 加速。**
 
-### 5.4 当前的正确结论
+### 5.4 runtime breakdown profiling：固定开销到底在哪里
+
+在 steady-state benchmark 之后，又补做了一轮 runtime breakdown profiling：
+
+- 脚本：`src/gr00t/eval/profile_gr00t_mpk_runtime_breakdown.py`
+- 结果：`results/gr00t_mpk_runtime_breakdown_20260423.json`
+- Perfetto trace：
+  - `results/gr00t_mpk_online_notoken_conservative_20260423.perfetto-trace`
+  - `results/gr00t_mpk_online_notoken_auto_20260423.perfetto-trace`
+  - `results/gr00t_mpk_offline_r8_conservative_20260423.perfetto-trace`
+
+这轮 profiling 的目标只有一个：
+
+**把之前“是不是 host launch / scheduler 本身太重”这个问题直接拆开。**
+
+核心结果如下。
+
+`online_notoken` 保守配置：
+
+| 指标 | 数值 |
+| --- | --- |
+| `init_request_func_wall_ms` | `0.0109 ms` |
+| `launch_enqueue_wall_ms` | `0.0674 ms` |
+| `gpu_elapsed_ms` | `564.54 ms` |
+| `scheduler_total_us` | `8.19 us` |
+| `worker_total_us` | `564373.50 us` |
+| `TASK_LINEAR_GENERIC` 占 worker 时间 | `93.32%` |
+
+`online_notoken` 自动配置：
+
+| 指标 | 数值 |
+| --- | --- |
+| `init_request_func_wall_ms` | `0.0111 ms` |
+| `launch_enqueue_wall_ms` | `0.1223 ms` |
+| `gpu_elapsed_ms` | `565.46 ms` |
+| `scheduler_total_us` | `16.38 us` |
+| `worker_total_us` | `565175.30 us` |
+| `TASK_LINEAR_GENERIC` 占 worker 时间 | `93.42%` |
+
+`offline_r8` 保守配置：
+
+| 指标 | 数值 |
+| --- | --- |
+| `init_request_func_wall_ms` | `0.0168 ms` |
+| `launch_enqueue_wall_ms` | `0.0844 ms` |
+| `gpu_elapsed_ms` | `4512.02 ms` |
+| `scheduler_total_us` | `109.57 us` |
+| `worker_total_us` | `4431478.78 us` |
+| `TASK_LINEAR_GENERIC` 占 worker 时间 | `93.21%` |
+
+这轮 profiling 把结论收窄成了很明确的三点：
+
+1. `init_request_func` 和 host enqueue 的 wall time 都是 `0.01~0.12 ms` 量级，几乎可以忽略。
+2. scheduler 自身时间只有 `8~110 us`，占总时间不到 `0.003%`，不是主瓶颈。
+3. 绝大部分时间都烧在 GPU worker 侧，而其中约 `93%` 又都集中在 `TASK_LINEAR_GENERIC`。
+
+所以，这一轮之后必须把之前的粗结论改掉：
+
+- 之前的粗结论：`Mirage runtime/scheduler 结构本身是主瓶颈`
+- 现在的精确结论：**当前主瓶颈是 correctness-first 的 `generic linear` fallback kernel，而不是 host launch 或 scheduler**
+
+也就是说：
+
+1. steady-state request path 确实没有形成有效 amortization
+2. 但“没有 amortize 掉”的主要原因，不是 Python/host/scheduler 太慢
+3. 而是当前图里的 GEMM 路径仍然落在一个极慢的 `TASK_LINEAR_GENERIC` 实现上
+
+### 5.5 当前的正确结论
 
 所以这条 Mirage 线现在不能写成：
 
@@ -216,7 +283,7 @@
 
 因此现在性能瓶颈的主因已经很明确：
 
-**不是 graph 没编出来，而是 Mirage 当前 runtime/scheduler 结构本身还不适合这种 GR00T 小图 workload。**
+**不是 graph 没编出来，也不是 host/scheduler 太重，而是图里的 `TASK_LINEAR_GENERIC` fallback 过慢。**
 
 ---
 
@@ -226,17 +293,17 @@
 
 1. `Mirage MPK` 已经把 `GR00T N1.6 mini-DiT core` 的主要子图跑通了。
 2. 大部分子图已经在容差内闭合，full path 只剩少量累计误差没有完全压下去。
-3. steady-state request path 现在也已经测过，但结果表明当前 Mirage runtime 对这类 GR00T 小图仍然有约 `565 ms/request` 的巨大固定成本，没有形成有效吞吐增益。
+3. steady-state request path 现在也已经测过，但结果表明当前实现对这类 GR00T 小图仍然有约 `565 ms/request` 的巨大成本，而且主耗时集中在 GPU 侧 `TASK_LINEAR_GENERIC`，没有形成有效吞吐增益。
 
 ---
 
 ## 7. 下一步
 
-真正可行的下一步不是继续在 `test_mode` 上抠毫秒，而是直接针对 runtime 结构动刀：
+真正可行的下一步不是继续在 `test_mode` 上抠毫秒，而是直接针对 `linear` 路径动刀：
 
-1. 减少 `online/offline` 路径里的 scheduler / worker 固定开销
-2. 研究为什么这类单图 workload 没有得到 amortization
-3. 如果 runtime 级问题解决不了，再考虑：
+1. 先替换 `TASK_LINEAR_GENERIC`，给当前 GR00T 维度接一个真正可用的优化 GEMM path
+2. 再重新测 `online/offline`，验证 steady-state path 是否开始出现真实 amortization
+3. 如果替换掉 `linear` 以后仍然慢，再进一步检查：
    - 是否需要更 coarse-grained 的 megakernel
    - 是否需要把多个 denoising steps 进一步合并
    - 是否需要完全绕开当前 MPK request runtime，直接做 VLA 专用 persistent execution

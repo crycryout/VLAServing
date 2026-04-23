@@ -320,6 +320,9 @@ def build_gr00t_minidit_pk(
     max_num_pages: int,
     num_workers: int,
     num_local_schedulers: int,
+    profiler_tensor: torch.Tensor | None = None,
+    trace_name: str | None = None,
+    output_dir: str = COMPILE_COPY_DIR,
 ):
     model, hidden_states, encoder_hidden_states, backbone_attention_mask, _, temb = (
         make_model_and_inputs(ctx)
@@ -349,6 +352,8 @@ def build_gr00t_minidit_pk(
             meta_tensors=meta_tensors,
             test_mode=False,
             use_cutlass_kernel=False,
+            profiler_tensor=profiler_tensor,
+            trace_name=trace_name,
         )
     )
     pk = PersistentKernel(**params)
@@ -645,7 +650,7 @@ def build_gr00t_minidit_pk(
         "block1_hidden_out",
     )
 
-    pk.compile(output_dir=COMPILE_COPY_DIR)
+    pk.compile(output_dir=output_dir)
     return pk, out_buf, model, hidden_states, encoder_hidden_states, backbone_attention_mask, temb
 
 
