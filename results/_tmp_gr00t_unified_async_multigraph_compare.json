@@ -1,0 +1,513 @@
+{
+  "meta": {
+    "model_path": "nvidia/GR00T-N1.6-bridge",
+    "device": "cuda:0",
+    "dtype": "bfloat16",
+    "num_slots": 8,
+    "inference_steps": 4,
+    "seed": 20260425,
+    "phase": {
+      "cohort_size": 2,
+      "num_cohorts": 2,
+      "waves": 8,
+      "period_ms": 80.0,
+      "phase_stride_ms": 20.0
+    }
+  },
+  "baseline": {
+    "vlm_service_ms": {
+      "mean_ms": 99.92019629478455,
+      "std_ms": 18.161131055453883,
+      "p50_ms": 99.65923309326172,
+      "p95_ms": 122.63546905517578,
+      "min_ms": 75.19315338134766,
+      "max_ms": 126.65225219726562,
+      "num_samples": 32
+    },
+    "dit_step_service_ms": {
+      "mean_ms": 19.073613554239273,
+      "std_ms": 2.1272995372429353,
+      "p50_ms": 19.907119750976562,
+      "p95_ms": 22.533785247802733,
+      "min_ms": 15.976448059082031,
+      "max_ms": 23.831552505493164,
+      "num_samples": 64
+    },
+    "dit_step_batch_size": {
+      "mean_ms": 2.0,
+      "std_ms": 0.0,
+      "p50_ms": 2.0,
+      "p95_ms": 2.0,
+      "min_ms": 2.0,
+      "max_ms": 2.0,
+      "num_samples": 64
+    },
+    "vlm_stage_breakdown_ms": {
+      "prefill_ms": {
+        "mean_ms": 50.59980118274689,
+        "std_ms": 1.9512149411909878,
+        "p50_ms": 50.249216079711914,
+        "p95_ms": 54.91730365753174,
+        "min_ms": 48.235328674316406,
+        "max_ms": 55.140289306640625,
+        "num_samples": 32
+      },
+      "prefill_to_llm_wait_ms": {
+        "mean_ms": 33.541852086782455,
+        "std_ms": 17.40713519035699,
+        "p50_ms": 33.65926456451416,
+        "p95_ms": 54.44044818878174,
+        "min_ms": 13.75436782836914,
+        "max_ms": 55.388160705566406,
+        "num_samples": 32
+      },
+      "llm_ms": {
+        "mean_ms": 15.19408804178238,
+        "std_ms": 1.6421597828421226,
+        "p50_ms": 15.753072261810303,
+        "p95_ms": 17.013428306579588,
+        "min_ms": 12.740703582763672,
+        "max_ms": 19.564544677734375,
+        "num_samples": 32
+      },
+      "encode_ms": {
+        "mean_ms": 0.4594760024920106,
+        "std_ms": 0.10459544124993822,
+        "p50_ms": 0.45260800421237946,
+        "p95_ms": 0.5256704092025757,
+        "min_ms": 0.347135990858078,
+        "max_ms": 0.9523199796676636,
+        "num_samples": 32
+      },
+      "total_ms": {
+        "mean_ms": 99.92019629478455,
+        "std_ms": 18.161131055453883,
+        "p50_ms": 99.65923309326172,
+        "p95_ms": 122.63546905517578,
+        "min_ms": 75.19315338134766,
+        "max_ms": 126.65225219726562,
+        "num_samples": 32
+      },
+      "host_overhead_ms": {
+        "mean_ms": 7.634721220005304,
+        "std_ms": 7.623666935507685,
+        "p50_ms": 6.518168352544308,
+        "p95_ms": 16.177338878810406,
+        "min_ms": 0.09707951545715332,
+        "max_ms": 19.762581378221512,
+        "num_samples": 32
+      }
+    },
+    "request_to_result_ms": {
+      "mean_ms": 1544.036099142395,
+      "std_ms": 785.9139737838633,
+      "p50_ms": 1577.5799081102014,
+      "p95_ms": 2682.024421863258,
+      "min_ms": 226.79824009537697,
+      "max_ms": 2779.76698808372,
+      "num_samples": 32
+    },
+    "queue_wait_ms": {
+      "mean_ms": 1367.8214486306533,
+      "std_ms": 795.4918095811034,
+      "p50_ms": 1390.9978921189904,
+      "p95_ms": 2522.372494773567,
+      "min_ms": 17.10166683793068,
+      "max_ms": 2631.3166859596968,
+      "num_samples": 32
+    },
+    "deadline_miss_count": 32,
+    "deadline_miss_ratio": 1.0,
+    "num_requests": 32,
+    "makespan_ms": 3362.1069211512804,
+    "executor_config": {
+      "vlm_slot_count": 2,
+      "vlm_max_prefill_ready": 1,
+      "vlm_max_llm_queue_depth": 1,
+      "prefill_priority": 0,
+      "llm_priority": 0,
+      "step_priority": 0,
+      "pause_prefill_when_steps_ready": true,
+      "pause_llm_when_steps_ready": false
+    },
+    "executor_peaks": {
+      "prefill_pending": 2,
+      "ready_for_llm": 1,
+      "llm_pending": 1,
+      "encode_pending": 1,
+      "ready_tasks": 1
+    }
+  },
+  "step_only": {
+    "vlm_service_ms": {
+      "mean_ms": 103.24307298660278,
+      "std_ms": 17.66673544095176,
+      "p50_ms": 104.59443283081055,
+      "p95_ms": 123.84885711669922,
+      "min_ms": 82.93478393554688,
+      "max_ms": 125.60684967041016,
+      "num_samples": 32
+    },
+    "dit_step_service_ms": {
+      "mean_ms": 5.58595348149538,
+      "std_ms": 0.12318265444439257,
+      "p50_ms": 5.552095890045166,
+      "p95_ms": 5.861287856101989,
+      "min_ms": 5.493760108947754,
+      "max_ms": 6.07539176940918,
+      "num_samples": 64
+    },
+    "dit_step_batch_size": {
+      "mean_ms": 2.0,
+      "std_ms": 0.0,
+      "p50_ms": 2.0,
+      "p95_ms": 2.0,
+      "min_ms": 2.0,
+      "max_ms": 2.0,
+      "num_samples": 64
+    },
+    "vlm_stage_breakdown_ms": {
+      "prefill_ms": {
+        "mean_ms": 51.38435232639313,
+        "std_ms": 1.2447510704081046,
+        "p50_ms": 50.8676815032959,
+        "p95_ms": 54.047860336303714,
+        "min_ms": 50.06438446044922,
+        "max_ms": 54.3713264465332,
+        "num_samples": 32
+      },
+      "prefill_to_llm_wait_ms": {
+        "mean_ms": 34.59154796600342,
+        "std_ms": 16.664002088705125,
+        "p50_ms": 35.20000076293945,
+        "p95_ms": 52.48943653106689,
+        "min_ms": 16.74553680419922,
+        "max_ms": 52.776737213134766,
+        "num_samples": 32
+      },
+      "llm_ms": {
+        "mean_ms": 16.59862792491913,
+        "std_ms": 1.0654439291848177,
+        "p50_ms": 16.17414379119873,
+        "p95_ms": 18.676991558074953,
+        "min_ms": 15.428607940673828,
+        "max_ms": 18.93177604675293,
+        "num_samples": 32
+      },
+      "encode_ms": {
+        "mean_ms": 0.5236399983987212,
+        "std_ms": 0.13186206530932018,
+        "p50_ms": 0.4890719950199127,
+        "p95_ms": 0.830620789527893,
+        "min_ms": 0.4198080003261566,
+        "max_ms": 1.0535680055618286,
+        "num_samples": 32
+      },
+      "total_ms": {
+        "mean_ms": 103.24307298660278,
+        "std_ms": 17.66673544095176,
+        "p50_ms": 104.59443283081055,
+        "p95_ms": 123.84885711669922,
+        "min_ms": 82.93478393554688,
+        "max_ms": 125.60684967041016,
+        "num_samples": 32
+      },
+      "host_overhead_ms": {
+        "mean_ms": 8.252468480262905,
+        "std_ms": 8.146414151770713,
+        "p50_ms": 7.876545488834381,
+        "p95_ms": 17.555398753285406,
+        "min_ms": 0.11149562895298004,
+        "max_ms": 18.666359275579453,
+        "num_samples": 32
+      }
+    },
+    "request_to_result_ms": {
+      "mean_ms": 1076.6165630565956,
+      "std_ms": 554.3140189673173,
+      "p50_ms": 1074.7260060533881,
+      "p95_ms": 1915.41113056615,
+      "min_ms": 164.0018317848444,
+      "max_ms": 1994.934858828783,
+      "num_samples": 32
+    },
+    "queue_wait_ms": {
+      "mean_ms": 951.0296761440113,
+      "std_ms": 554.4920344498026,
+      "p50_ms": 952.1477201208472,
+      "p95_ms": 1789.9482310958206,
+      "min_ms": 18.00503470003605,
+      "max_ms": 1886.054955035448,
+      "num_samples": 32
+    },
+    "deadline_miss_count": 32,
+    "deadline_miss_ratio": 1.0,
+    "num_requests": 32,
+    "makespan_ms": 2579.2180132120848,
+    "executor_config": {
+      "vlm_slot_count": 2,
+      "vlm_max_prefill_ready": 1,
+      "vlm_max_llm_queue_depth": 1,
+      "prefill_priority": 0,
+      "llm_priority": 0,
+      "step_priority": 0,
+      "pause_prefill_when_steps_ready": true,
+      "pause_llm_when_steps_ready": false
+    },
+    "executor_peaks": {
+      "prefill_pending": 2,
+      "ready_for_llm": 1,
+      "llm_pending": 1,
+      "encode_pending": 1,
+      "ready_tasks": 1
+    }
+  },
+  "vlm_only": {
+    "vlm_service_ms": {
+      "mean_ms": 88.61375737190247,
+      "std_ms": 24.314500643181177,
+      "p50_ms": 88.30310440063477,
+      "p95_ms": 115.98330459594726,
+      "min_ms": 61.5731201171875,
+      "max_ms": 117.39949035644531,
+      "num_samples": 32
+    },
+    "dit_step_service_ms": {
+      "mean_ms": 23.830401927232742,
+      "std_ms": 3.0063346923026377,
+      "p50_ms": 23.154175758361816,
+      "p95_ms": 29.934941196441642,
+      "min_ms": 17.770496368408203,
+      "max_ms": 32.18329620361328,
+      "num_samples": 64
+    },
+    "dit_step_batch_size": {
+      "mean_ms": 2.0,
+      "std_ms": 0.0,
+      "p50_ms": 2.0,
+      "p95_ms": 2.0,
+      "min_ms": 2.0,
+      "max_ms": 2.0,
+      "num_samples": 64
+    },
+    "vlm_stage_breakdown_ms": {
+      "prefill_ms": {
+        "mean_ms": 53.654995918273926,
+        "std_ms": 2.1383157221431595,
+        "p50_ms": 53.11787223815918,
+        "p95_ms": 57.42770309448242,
+        "min_ms": 49.498111724853516,
+        "max_ms": 58.178558349609375,
+        "num_samples": 32
+      },
+      "prefill_to_llm_wait_ms": {
+        "mean_ms": 29.89433090388775,
+        "std_ms": 23.923932400532156,
+        "p50_ms": 28.846591472625732,
+        "p95_ms": 56.1542236328125,
+        "min_ms": 5.7292799949646,
+        "max_ms": 58.46323013305664,
+        "num_samples": 32
+      },
+      "llm_ms": {
+        "mean_ms": 5.064429983496666,
+        "std_ms": 0.10211067165088389,
+        "p50_ms": 5.049855947494507,
+        "p95_ms": 5.231923007965088,
+        "min_ms": 4.953824043273926,
+        "max_ms": 5.425151824951172,
+        "num_samples": 32
+      },
+      "encode_ms": {
+        "mean_ms": 0.0,
+        "std_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.0,
+        "num_samples": 32
+      },
+      "total_ms": {
+        "mean_ms": 88.61375737190247,
+        "std_ms": 24.314500643181177,
+        "p50_ms": 88.30310440063477,
+        "p95_ms": 115.98330459594726,
+        "min_ms": 61.5731201171875,
+        "max_ms": 117.39949035644531,
+        "num_samples": 32
+      },
+      "host_overhead_ms": {
+        "mean_ms": 0.6152456304989755,
+        "std_ms": 0.14037303762957334,
+        "p50_ms": 0.583107478916645,
+        "p95_ms": 0.9178560629487037,
+        "min_ms": 0.43118782341480255,
+        "max_ms": 1.006486564874649,
+        "num_samples": 32
+      }
+    },
+    "request_to_result_ms": {
+      "mean_ms": 1535.8735297131352,
+      "std_ms": 819.5621321589382,
+      "p50_ms": 1535.5421295762062,
+      "p95_ms": 2760.570425581187,
+      "min_ms": 208.1089075654745,
+      "max_ms": 2862.2366339713335,
+      "num_samples": 32
+    },
+    "queue_wait_ms": {
+      "mean_ms": 1351.9381646323018,
+      "std_ms": 819.726981778824,
+      "p50_ms": 1345.7785950303078,
+      "p95_ms": 2588.316136812419,
+      "min_ms": 7.324010714888573,
+      "max_ms": 2711.1642806082964,
+      "num_samples": 32
+    },
+    "deadline_miss_count": 32,
+    "deadline_miss_ratio": 1.0,
+    "num_requests": 32,
+    "makespan_ms": 3447.2374357283115,
+    "executor_config": {
+      "vlm_slot_count": 2,
+      "vlm_max_prefill_ready": 1,
+      "vlm_max_llm_queue_depth": 1,
+      "prefill_priority": 0,
+      "llm_priority": 0,
+      "step_priority": 0,
+      "pause_prefill_when_steps_ready": true,
+      "pause_llm_when_steps_ready": false
+    },
+    "executor_peaks": {
+      "prefill_pending": 2,
+      "ready_for_llm": 1,
+      "llm_pending": 1,
+      "encode_pending": 0,
+      "ready_tasks": 1
+    }
+  },
+  "step_and_vlm": {
+    "vlm_service_ms": {
+      "mean_ms": 85.77268207073212,
+      "std_ms": 23.50214804299051,
+      "p50_ms": 85.32172775268555,
+      "p95_ms": 113.64582099914551,
+      "min_ms": 59.6611213684082,
+      "max_ms": 114.9491195678711,
+      "num_samples": 32
+    },
+    "dit_step_service_ms": {
+      "mean_ms": 5.5743470042943954,
+      "std_ms": 0.10497493143405592,
+      "p50_ms": 5.549968004226685,
+      "p95_ms": 5.736131310462952,
+      "min_ms": 5.46940803527832,
+      "max_ms": 6.111231803894043,
+      "num_samples": 64
+    },
+    "dit_step_batch_size": {
+      "mean_ms": 2.0,
+      "std_ms": 0.0,
+      "p50_ms": 2.0,
+      "p95_ms": 2.0,
+      "min_ms": 2.0,
+      "max_ms": 2.0,
+      "num_samples": 64
+    },
+    "vlm_stage_breakdown_ms": {
+      "prefill_ms": {
+        "mean_ms": 51.86239182949066,
+        "std_ms": 1.9351416109607862,
+        "p50_ms": 51.91883087158203,
+        "p95_ms": 54.63281898498535,
+        "min_ms": 49.017696380615234,
+        "max_ms": 55.77113723754883,
+        "num_samples": 32
+      },
+      "prefill_to_llm_wait_ms": {
+        "mean_ms": 28.874588817358017,
+        "std_ms": 23.14472537086869,
+        "p50_ms": 27.68628764152527,
+        "p95_ms": 54.73551254272461,
+        "min_ms": 5.642176151275635,
+        "max_ms": 56.10095977783203,
+        "num_samples": 32
+      },
+      "llm_ms": {
+        "mean_ms": 5.035700976848602,
+        "std_ms": 0.053799016489868845,
+        "p50_ms": 5.046720027923584,
+        "p95_ms": 5.11324143409729,
+        "min_ms": 4.923391819000244,
+        "max_ms": 5.1484479904174805,
+        "num_samples": 32
+      },
+      "encode_ms": {
+        "mean_ms": 0.0,
+        "std_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.0,
+        "num_samples": 32
+      },
+      "total_ms": {
+        "mean_ms": 85.77268207073212,
+        "std_ms": 23.50214804299051,
+        "p50_ms": 85.32172775268555,
+        "p95_ms": 113.64582099914551,
+        "min_ms": 59.6611213684082,
+        "max_ms": 114.9491195678711,
+        "num_samples": 32
+      },
+      "host_overhead_ms": {
+        "mean_ms": 0.48937511537224054,
+        "std_ms": 0.10252106789635373,
+        "p50_ms": 0.45228980481624603,
+        "p95_ms": 0.6862456671893596,
+        "min_ms": 0.360772043466568,
+        "max_ms": 0.7902792543172836,
+        "num_samples": 32
+      }
+    },
+    "request_to_result_ms": {
+      "mean_ms": 873.1662885192782,
+      "std_ms": 455.0953649386,
+      "p50_ms": 868.6867161095142,
+      "p95_ms": 1564.288052584976,
+      "min_ms": 135.84467954933643,
+      "max_ms": 1631.4680279046297,
+      "num_samples": 32
+    },
+    "queue_wait_ms": {
+      "mean_ms": 765.0962184313685,
+      "std_ms": 453.7402829899484,
+      "p50_ms": 759.3172741234303,
+      "p95_ms": 1455.3308801911771,
+      "min_ms": 6.282757475972176,
+      "max_ms": 1543.9053700715303,
+      "num_samples": 32
+    },
+    "deadline_miss_count": 32,
+    "deadline_miss_ratio": 1.0,
+    "num_requests": 32,
+    "makespan_ms": 2214.3663316965103,
+    "executor_config": {
+      "vlm_slot_count": 2,
+      "vlm_max_prefill_ready": 1,
+      "vlm_max_llm_queue_depth": 1,
+      "prefill_priority": 0,
+      "llm_priority": 0,
+      "step_priority": 0,
+      "pause_prefill_when_steps_ready": true,
+      "pause_llm_when_steps_ready": false
+    },
+    "executor_peaks": {
+      "prefill_pending": 2,
+      "ready_for_llm": 1,
+      "llm_pending": 1,
+      "encode_pending": 0,
+      "ready_tasks": 1
+    }
+  }
+}

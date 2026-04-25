@@ -1,0 +1,146 @@
+{
+  "config": {
+    "step_batch_trigger": 2,
+    "vlm_slot_count": 1,
+    "vlm_max_prefill_ready": 1,
+    "vlm_max_llm_queue_depth": 1,
+    "prefill_priority": 0,
+    "llm_priority": 0,
+    "step_priority": 0,
+    "pause_prefill_when_steps_ready": false,
+    "pause_llm_when_steps_ready": false
+  },
+  "result": {
+    "vlm_service_ms": {
+      "mean_ms": 47.613243103027344,
+      "std_ms": 1.2994511564582758,
+      "p50_ms": 47.847856521606445,
+      "p95_ms": 48.440883255004884,
+      "min_ms": 43.5230712890625,
+      "max_ms": 49.72441482543945,
+      "num_samples": 32
+    },
+    "dit_step_service_ms": {
+      "mean_ms": 38.100947229067486,
+      "std_ms": 67.64991663811634,
+      "p50_ms": 25.42182445526123,
+      "p95_ms": 44.453170776367074,
+      "min_ms": 4.445184230804443,
+      "max_ms": 432.3973083496094,
+      "num_samples": 60
+    },
+    "dit_step_batch_size": {
+      "mean_ms": 2.1333333333333333,
+      "std_ms": 0.7180219742846005,
+      "p50_ms": 2.0,
+      "p95_ms": 3.049999999999997,
+      "min_ms": 1.0,
+      "max_ms": 6.0,
+      "num_samples": 60
+    },
+    "vlm_stage_breakdown_ms": {
+      "prefill_ms": {
+        "mean_ms": 47.613243103027344,
+        "std_ms": 1.2994511564582758,
+        "p50_ms": 47.847856521606445,
+        "p95_ms": 48.440883255004884,
+        "min_ms": 43.5230712890625,
+        "max_ms": 49.72441482543945,
+        "num_samples": 32
+      },
+      "prefill_to_llm_wait_ms": {
+        "mean_ms": 0.0,
+        "std_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.0,
+        "num_samples": 32
+      },
+      "llm_ms": {
+        "mean_ms": 0.0,
+        "std_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.0,
+        "num_samples": 32
+      },
+      "encode_ms": {
+        "mean_ms": 0.0,
+        "std_ms": 0.0,
+        "p50_ms": 0.0,
+        "p95_ms": 0.0,
+        "min_ms": 0.0,
+        "max_ms": 0.0,
+        "num_samples": 32
+      },
+      "total_ms": {
+        "mean_ms": 47.613243103027344,
+        "std_ms": 1.2994511564582758,
+        "p50_ms": 47.847856521606445,
+        "p95_ms": 48.440883255004884,
+        "min_ms": 43.5230712890625,
+        "max_ms": 49.72441482543945,
+        "num_samples": 32
+      },
+      "host_overhead_ms": {
+        "mean_ms": 14.086938874330372,
+        "std_ms": 68.20787154215428,
+        "p50_ms": 0.6218378841876984,
+        "p95_ms": 19.26121470108628,
+        "min_ms": 0.34224092960357666,
+        "max_ms": 393.0095163434744,
+        "num_samples": 32
+      },
+      "full_graph_ms": {
+        "mean_ms": 47.613243103027344,
+        "std_ms": 1.2994511564582758,
+        "p50_ms": 47.847856521606445,
+        "p95_ms": 48.440883255004884,
+        "min_ms": 43.5230712890625,
+        "max_ms": 49.72441482543945,
+        "num_samples": 32
+      }
+    },
+    "request_to_result_ms": {
+      "mean_ms": 1027.3346346593462,
+      "std_ms": 448.33795600974196,
+      "p50_ms": 1140.0073993206024,
+      "p95_ms": 1518.4374076463282,
+      "min_ms": 206.24712482094765,
+      "max_ms": 1814.7737514972687,
+      "num_samples": 32
+    },
+    "queue_wait_ms": {
+      "mean_ms": 806.3707495457493,
+      "std_ms": 458.74654608399527,
+      "p50_ms": 950.3526001945138,
+      "p95_ms": 1392.835957685858,
+      "min_ms": 46.60777039825916,
+      "max_ms": 1420.0206182301044,
+      "num_samples": 32
+    },
+    "deadline_miss_count": 32,
+    "deadline_miss_ratio": 1.0,
+    "num_requests": 32,
+    "makespan_ms": 2398.7670727074146,
+    "executor_config": {
+      "vlm_slot_count": 1,
+      "vlm_max_prefill_ready": 1,
+      "vlm_max_llm_queue_depth": 1,
+      "prefill_priority": 0,
+      "llm_priority": 0,
+      "step_priority": 0,
+      "pause_prefill_when_steps_ready": false,
+      "pause_llm_when_steps_ready": false
+    },
+    "executor_peaks": {
+      "prefill_pending": 1,
+      "ready_for_llm": 0,
+      "llm_pending": 0,
+      "encode_pending": 0,
+      "ready_tasks": 5
+    }
+  }
+}

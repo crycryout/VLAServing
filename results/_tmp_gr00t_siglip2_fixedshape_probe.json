@@ -1,0 +1,19 @@
+{
+  "baseline": {
+    "eager_ms": 54.911112412810326,
+    "capture_ok": false,
+    "capture_error": "RuntimeError: CUDA error: operation failed due to a previous error during capture\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n",
+    "capture_replay_ms": null
+  },
+  "fixedshape": {
+    "eager_ms": 43.14906522631645,
+    "capture_ok": false,
+    "capture_error": "RuntimeError: captures_underway.empty() INTERNAL ASSERT FAILED at \"/pytorch/c10/cuda/CUDACachingAllocator.cpp\":3089, please report a bug to PyTorch. ",
+    "capture_replay_ms": null,
+    "last_hidden_state_max_abs": 0.0,
+    "last_hidden_state_mean_abs": 0.0,
+    "spatial_shapes_max_abs": 0.0,
+    "reverse_mapping_numel": 5184,
+    "window_tokens_numel": 5184
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "baseline_prepare_ms": {
+    "mean_ms": 68.40282073244452,
+    "p50_ms": 67.89273023605347
+  },
+  "full_graph_prepare_ms": {
+    "mean_ms": 44.50948373414576,
+    "p50_ms": 44.099923223257065
+  },
+  "backbone_max_abs": 0.625,
+  "backbone_mean_abs": 0.0166015625,
+  "state_max_abs": 0.0,
+  "state_mean_abs": 0.0
+}
