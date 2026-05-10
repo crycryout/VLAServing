@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "date": "2026-05-10",
+    "benchmark_source": "/root/autodl-tmp/Isaac-GR00T/scripts/deployment/benchmark_inference.py",
+    "model_path": "nvidia/GR00T-N1.6-bridge",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T/demo_data/gr1.PickNPlace",
+    "embodiment_tag": "gr1",
+    "device": "NVIDIA GeForce RTX 4090",
+    "num_iterations": 4,
+    "warmup": 3,
+    "inference_steps": 4,
+    "note": "Recorded from the successful benchmark_inference.py run in this session. The script prints stdout only and does not write JSON."
+  },
+  "pytorch_eager": {
+    "e2e": {
+      "p50_ms": 104.1,
+      "mean_ms": 104.2,
+      "std_ms": 0.3,
+      "min_ms": 104.0,
+      "max_ms": 104.7
+    },
+    "data_processing": {
+      "p50_ms": 5.60
+    },
+    "backbone": {
+      "p50_ms": 29.73
+    },
+    "action_head": {
+      "p50_ms": 68.19
+    }
+  },
+  "torch_compile": {
+    "e2e": {
+      "p50_ms": 55.1,
+      "mean_ms": 55.0,
+      "std_ms": 3.3,
+      "min_ms": 50.4,
+      "max_ms": 59.5
+    },
+    "data_processing": {
+      "p50_ms": 5.60
+    },
+    "backbone": {
+      "p50_ms": 32.26
+    },
+    "action_head": {
+      "p50_ms": 16.69
+    }
+  }
+}

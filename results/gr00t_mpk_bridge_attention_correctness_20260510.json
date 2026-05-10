@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "date": "2026-05-10",
+    "device": "NVIDIA GeForce RTX 4090",
+    "purpose": "Directly test the MPK-callable GR00T Mirage padded attention helper against a PyTorch scaled masked softmax reference."
+  },
+  "cases": [
+    {
+      "shape": {
+        "heads": 32,
+        "q_pad": 64,
+        "kv_pad": 64,
+        "valid_kv_len": 51,
+        "head_dim": 48,
+        "dtype": "bf16"
+      },
+      "run_ms": {
+        "min": 0.4933643341064453,
+        "mean": 0.49409008026123047,
+        "max": 0.49761009216308594
+      },
+      "correctness": {
+        "max_abs_all_qpad": 0.003875136375427246,
+        "mean_abs_all_qpad": 0.00026186415925621986,
+        "max_abs_first_51_q": 0.003765583038330078,
+        "mean_abs_first_51_q": 0.0002615830453578383
+      }
+    },
+    {
+      "shape": {
+        "heads": 32,
+        "q_pad": 64,
+        "kv_pad": 256,
+        "valid_kv_len": 203,
+        "head_dim": 48,
+        "dtype": "bf16"
+      },
+      "run_ms": {
+        "min": 1.9155006408691406,
+        "mean": 1.9166767120361328,
+        "max": 1.9195365905761719
+      },
+      "correctness": {
+        "max_abs_all_qpad": 0.0019278526306152344,
+        "mean_abs_all_qpad": 0.00013854572898708284,
+        "max_abs_first_51_q": 0.0019278526306152344,
+        "mean_abs_first_51_q": 0.00013867909729015082
+      }
+    }
+  ]
+}

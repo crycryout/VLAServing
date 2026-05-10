@@ -1,0 +1,801 @@
+{
+  "meta": {
+    "date": "2026-05-10",
+    "scope": "Serving-stage scheduler MVP for the MPK data-plane plan. This is a discrete-event control-plane simulator using measured Prefill/LLM and DiT CUDA Graph latencies; it does not implement the later VLM postprefill hand-MPK kernel.",
+    "duration_ms": 1000.0,
+    "replan_actions": 8,
+    "horizon_actions": 8,
+    "phase_locked": false,
+    "max_dit_batch": 8,
+    "target_dit_batch": 4,
+    "dit_deadline_guard_ms": 20.0,
+    "credit_cap": 8,
+    "fairness_cap_per_group": 4,
+    "input_files": {
+      "dit_curve_json": "/root/autodl-tmp/VLAServing/results/_tmp_gr00t_dit_step_cudagraph_executor.json",
+      "mps_triplet_json": "/root/autodl-tmp/VLAServing/results/_tmp_gr00t_mps_prefill_llm_dit_mixedstep_triplet.json",
+      "vlm_mpk_json": "/root/autodl-tmp/VLAServing/results/gr00t_vlm_mpk_dataplane_proxy_20260510.json"
+    },
+    "stage_ms": {
+      "prefill": 12.720339931547642,
+      "llm": 12.811786495149136
+    },
+    "stage_input_reference": {
+      "prefill_solo_p50_ms": 12.720339931547642,
+      "llm_solo_p50_ms": 12.811786495149136,
+      "prefill_concurrent_p50_ms": 15.80725982785225,
+      "llm_concurrent_p50_ms": 15.460705384612083,
+      "dit_batch2_concurrent_p50_ms": 8.039990440011024,
+      "vlm_prepare_baseline_p50_ms": 34.30393600463867,
+      "vlm_postprefill_proxy_p50_ms": 10.850303649902344
+    },
+    "dit_step_curve_p50_ms": {
+      "1": 4.6094972640275955,
+      "2": 5.711760371923447,
+      "3": 6.609938107430935,
+      "4": 7.571709342300892,
+      "5": 8.425730280578136,
+      "6": 8.938879705965519,
+      "7": 11.241967789828777,
+      "8": 12.393653392791748
+    },
+    "vlm_postprefill_next_step_hook": {
+      "available_proxy_p50_ms": 10.850303649902344,
+      "baseline_prepare_task_p50_ms": 34.30393600463867,
+      "note": "Kept as a measured input for the next VLM postprefill phase, but not used by this first DiT+scheduler MVP."
+    }
+  },
+  "results": {
+    "stable_31": {
+      "mix": {
+        "10": 16,
+        "20": 8,
+        "30": 7
+      },
+      "num_requests": 67,
+      "policies": {
+        "prefill_first_naive": {
+          "completed": 67,
+          "total_requests": 67,
+          "misses": 67,
+          "miss_rate": 1.0,
+          "latency_ms": {
+            "mean_ms": 1459.5356067090531,
+            "std_ms": 194.5941485044052,
+            "p50_ms": 1459.6303315389723,
+            "p95_ms": 1730.1674088977632,
+            "min_ms": 1107.674765586853,
+            "max_ms": 1760.227084159851,
+            "num_samples": 67
+          },
+          "lateness_ms": {
+            "mean_ms": 993.8639649180078,
+            "std_ms": 318.78225734452076,
+            "p50_ms": 1002.4874743961152,
+            "p95_ms": 1436.8848796117873,
+            "min_ms": 307.674765586853,
+            "max_ms": 1493.5604174931843,
+            "num_samples": 67
+          },
+          "stage_dispatch_counts": {
+            "prefill": 67,
+            "llm": 67,
+            "dit": 36
+          },
+          "mean_dit_batch": 7.444444444444445,
+          "by_group_hz": {
+            "10": {
+              "completed": 20,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 1426.514732837677,
+                "std_ms": 193.98414948401444,
+                "p50_ms": 1433.950924873352,
+                "p95_ms": 1712.727084159851,
+                "min_ms": 1107.674765586853,
+                "max_ms": 1760.227084159851,
+                "num_samples": 20
+              }
+            },
+            "20": {
+              "completed": 20,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 1426.514732837677,
+                "std_ms": 193.98414948401444,
+                "p50_ms": 1433.950924873352,
+                "p95_ms": 1712.727084159851,
+                "min_ms": 1107.674765586853,
+                "max_ms": 1760.227084159851,
+                "num_samples": 20
+              }
+            },
+            "30": {
+              "completed": 27,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 1508.4554198518317,
+                "std_ms": 184.95815369366395,
+                "p50_ms": 1562.4366703487576,
+                "p95_ms": 1730.1674088977632,
+                "min_ms": 1143.2129411115532,
+                "max_ms": 1760.227084159851,
+                "num_samples": 27
+              }
+            }
+          },
+          "timeline_tail": [
+            {
+              "stage": "dit",
+              "start_ms": 2057.674765586853,
+              "end_ms": 2070.068418979645,
+              "batch_size": 8,
+              "request_ids": [
+                50,
+                54,
+                58,
+                62,
+                66,
+                43,
+                47,
+                51
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2070.068418979645,
+              "end_ms": 2082.4620723724365,
+              "batch_size": 8,
+              "request_ids": [
+                50,
+                54,
+                58,
+                62,
+                66,
+                43,
+                47,
+                51
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2082.4620723724365,
+              "end_ms": 2094.8557257652283,
+              "batch_size": 8,
+              "request_ids": [
+                50,
+                54,
+                58,
+                62,
+                66,
+                43,
+                47,
+                51
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2094.8557257652283,
+              "end_ms": 2107.24937915802,
+              "batch_size": 8,
+              "request_ids": [
+                50,
+                54,
+                58,
+                62,
+                66,
+                43,
+                47,
+                51
+              ],
+              "completed_request_ids": [
+                50,
+                54,
+                58,
+                62,
+                66,
+                43,
+                47,
+                51
+              ]
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2107.24937915802,
+              "end_ms": 2113.859317265451,
+              "batch_size": 3,
+              "request_ids": [
+                55,
+                59,
+                63
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2113.859317265451,
+              "end_ms": 2120.469255372882,
+              "batch_size": 3,
+              "request_ids": [
+                55,
+                59,
+                63
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2120.469255372882,
+              "end_ms": 2127.079193480313,
+              "batch_size": 3,
+              "request_ids": [
+                55,
+                59,
+                63
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2127.079193480313,
+              "end_ms": 2133.6891315877438,
+              "batch_size": 3,
+              "request_ids": [
+                55,
+                59,
+                63
+              ],
+              "completed_request_ids": [
+                55,
+                59,
+                63
+              ]
+            }
+          ]
+        },
+        "stage_credit_edf": {
+          "completed": 67,
+          "total_requests": 67,
+          "misses": 53,
+          "miss_rate": 0.7910447761194029,
+          "latency_ms": {
+            "mean_ms": 869.153108728974,
+            "std_ms": 491.298043925624,
+            "p50_ms": 814.2379060387611,
+            "p95_ms": 1719.0674296952784,
+            "min_ms": 138.26426275606667,
+            "max_ms": 1762.1929459273815,
+            "num_samples": 67
+          },
+          "lateness_ms": {
+            "mean_ms": 403.48146693792927,
+            "std_ms": 406.39610934439077,
+            "p50_ms": 331.25050123780966,
+            "p95_ms": 1040.9961619041858,
+            "min_ms": -197.45002295821905,
+            "max_ms": 1135.8600822676503,
+            "num_samples": 67
+          },
+          "stage_dispatch_counts": {
+            "prefill": 67,
+            "llm": 67,
+            "dit": 184
+          },
+          "mean_dit_batch": 1.4565217391304348,
+          "by_group_hz": {
+            "10": {
+              "completed": 20,
+              "miss_rate": 0.85,
+              "latency_ms": {
+                "mean_ms": 1290.9617211669683,
+                "std_ms": 397.49145286966115,
+                "p50_ms": 1349.8470602557063,
+                "p95_ms": 1744.380232701078,
+                "min_ms": 628.3024875447154,
+                "max_ms": 1762.1929459273815,
+                "num_samples": 20
+              }
+            },
+            "20": {
+              "completed": 20,
+              "miss_rate": 0.75,
+              "latency_ms": {
+                "mean_ms": 775.2026810776442,
+                "std_ms": 422.5196355459541,
+                "p50_ms": 675.3247385844588,
+                "p95_ms": 1464.5766471885145,
+                "min_ms": 202.54997704178095,
+                "max_ms": 1518.2228304445744,
+                "num_samples": 20
+              }
+            },
+            "30": {
+              "completed": 27,
+              "miss_rate": 0.7777777777777778,
+              "latency_ms": {
+                "mean_ms": 626.2951940721856,
+                "std_ms": 390.353763307963,
+                "p50_ms": 500.24958635192536,
+                "p95_ms": 1306.0077879382739,
+                "min_ms": 138.26426275606667,
+                "max_ms": 1402.526748934317,
+                "num_samples": 27
+              }
+            }
+          },
+          "timeline_tail": [
+            {
+              "stage": "dit",
+              "start_ms": 2592.1137807890773,
+              "end_ms": 2596.723278053105,
+              "batch_size": 1,
+              "request_ids": [
+                5
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2596.723278053105,
+              "end_ms": 2601.3327753171325,
+              "batch_size": 1,
+              "request_ids": [
+                5
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2601.3327753171325,
+              "end_ms": 2605.94227258116,
+              "batch_size": 1,
+              "request_ids": [
+                5
+              ],
+              "completed_request_ids": [
+                5
+              ]
+            },
+            {
+              "stage": "llm",
+              "start_ms": 2605.94227258116,
+              "end_ms": 2618.754059076309,
+              "batch_size": 1,
+              "request_ids": [
+                7
+              ]
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2618.754059076309,
+              "end_ms": 2623.363556340337,
+              "batch_size": 1,
+              "request_ids": [
+                7
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2623.363556340337,
+              "end_ms": 2627.9730536043644,
+              "batch_size": 1,
+              "request_ids": [
+                7
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2627.9730536043644,
+              "end_ms": 2632.582550868392,
+              "batch_size": 1,
+              "request_ids": [
+                7
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 2632.582550868392,
+              "end_ms": 2637.1920481324196,
+              "batch_size": 1,
+              "request_ids": [
+                7
+              ],
+              "completed_request_ids": [
+                7
+              ]
+            }
+          ]
+        }
+      },
+      "delta_stage_credit_minus_naive": {
+        "p95_latency_ms": -11.099979202484747,
+        "miss_rate": -0.20895522388059706,
+        "mean_dit_batch": -5.98792270531401
+      }
+    },
+    "stress": {
+      "mix": {
+        "10": 24,
+        "20": 12,
+        "30": 10
+      },
+      "num_requests": 98,
+      "policies": {
+        "prefill_first_naive": {
+          "completed": 98,
+          "total_requests": 98,
+          "misses": 98,
+          "miss_rate": 1.0,
+          "latency_ms": {
+            "mean_ms": 2343.2032572696003,
+            "std_ms": 154.85778762779367,
+            "p50_ms": 2352.2564458847046,
+            "p95_ms": 2541.010652065277,
+            "min_ms": 2031.2278588612874,
+            "max_ms": 2551.723003387451,
+            "num_samples": 98
+          },
+          "lateness_ms": {
+            "mean_ms": 1872.4549579498719,
+            "std_ms": 309.7773826992242,
+            "p50_ms": 1908.1420977910361,
+            "p95_ms": 2266.8265458742776,
+            "min_ms": 1231.2278588612874,
+            "max_ms": 2285.0563367207847,
+            "num_samples": 98
+          },
+          "stage_dispatch_counts": {
+            "prefill": 98,
+            "llm": 98,
+            "dit": 52
+          },
+          "mean_dit_batch": 7.538461538461538,
+          "by_group_hz": {
+            "10": {
+              "completed": 30,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 2291.475431124369,
+                "std_ms": 147.3708838673437,
+                "p50_ms": 2291.4754311243696,
+                "p95_ms": 2510.698246161143,
+                "min_ms": 2031.2278588612874,
+                "max_ms": 2551.723003387451,
+                "num_samples": 30
+              }
+            },
+            "20": {
+              "completed": 30,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 2291.475431124369,
+                "std_ms": 147.3708838673437,
+                "p50_ms": 2291.4754311243696,
+                "p95_ms": 2510.698246161143,
+                "min_ms": 2031.2278588612874,
+                "max_ms": 2551.723003387451,
+                "num_samples": 30
+              }
+            },
+            "30": {
+              "completed": 38,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 2424.8787722357533,
+                "std_ms": 129.06557240378734,
+                "p50_ms": 2496.8659385045366,
+                "p95_ms": 2544.7693718274436,
+                "min_ms": 2133.224127491315,
+                "max_ms": 2551.723003387451,
+                "num_samples": 38
+              }
+            }
+          },
+          "timeline_tail": [
+            {
+              "stage": "dit",
+              "start_ms": 3047.469139099121,
+              "end_ms": 3059.862792491913,
+              "batch_size": 8,
+              "request_ids": [
+                94,
+                97,
+                63,
+                67,
+                71,
+                75,
+                79,
+                83
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3059.862792491913,
+              "end_ms": 3072.2564458847046,
+              "batch_size": 8,
+              "request_ids": [
+                94,
+                97,
+                63,
+                67,
+                71,
+                75,
+                79,
+                83
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3072.2564458847046,
+              "end_ms": 3084.6500992774963,
+              "batch_size": 8,
+              "request_ids": [
+                94,
+                97,
+                63,
+                67,
+                71,
+                75,
+                79,
+                83
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3084.6500992774963,
+              "end_ms": 3097.043752670288,
+              "batch_size": 8,
+              "request_ids": [
+                94,
+                97,
+                63,
+                67,
+                71,
+                75,
+                79,
+                83
+              ],
+              "completed_request_ids": [
+                94,
+                97,
+                63,
+                67,
+                71,
+                75,
+                79,
+                83
+              ]
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3097.043752670288,
+              "end_ms": 3102.7555130422115,
+              "batch_size": 2,
+              "request_ids": [
+                87,
+                91
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3102.7555130422115,
+              "end_ms": 3108.467273414135,
+              "batch_size": 2,
+              "request_ids": [
+                87,
+                91
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3108.467273414135,
+              "end_ms": 3114.1790337860584,
+              "batch_size": 2,
+              "request_ids": [
+                87,
+                91
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 3114.1790337860584,
+              "end_ms": 3119.890794157982,
+              "batch_size": 2,
+              "request_ids": [
+                87,
+                91
+              ],
+              "completed_request_ids": [
+                87,
+                91
+              ]
+            }
+          ]
+        },
+        "stage_credit_edf": {
+          "completed": 98,
+          "total_requests": 98,
+          "misses": 91,
+          "miss_rate": 0.9285714285714286,
+          "latency_ms": {
+            "mean_ms": 1592.5041516065653,
+            "std_ms": 936.9008066245854,
+            "p50_ms": 1549.3951550250254,
+            "p95_ms": 3131.254641093935,
+            "min_ms": 167.90744920571643,
+            "max_ms": 3141.3598963369923,
+            "num_samples": 98
+          },
+          "lateness_ms": {
+            "mean_ms": 1121.755852286837,
+            "std_ms": 847.6407115492353,
+            "p50_ms": 1106.6238925481834,
+            "p95_ms": 2339.58887222223,
+            "min_ms": -158.7592174609502,
+            "max_ms": 2466.1400053029256,
+            "num_samples": 98
+          },
+          "stage_dispatch_counts": {
+            "prefill": 98,
+            "llm": 98,
+            "dit": 332
+          },
+          "mean_dit_batch": 1.180722891566265,
+          "by_group_hz": {
+            "10": {
+              "completed": 30,
+              "miss_rate": 1.0,
+              "latency_ms": {
+                "mean_ms": 2279.430528637022,
+                "std_ms": 781.1630007089308,
+                "p50_ms": 2404.1158557559056,
+                "p95_ms": 3138.3387375529855,
+                "min_ms": 856.8677557632327,
+                "max_ms": 3141.3598963369923,
+                "num_samples": 30
+              }
+            },
+            "20": {
+              "completed": 30,
+              "miss_rate": 0.9,
+              "latency_ms": {
+                "mean_ms": 1419.2101285172005,
+                "std_ms": 845.9538153501658,
+                "p50_ms": 1348.8330841685336,
+                "p95_ms": 2767.173451768855,
+                "min_ms": 241.2407825390498,
+                "max_ms": 2866.1400053029256,
+                "num_samples": 30
+              }
+            },
+            "30": {
+              "completed": 38,
+              "miss_rate": 0.8947368421052632,
+              "latency_ms": {
+                "mean_ms": 1187.0049248109653,
+                "std_ms": 810.1633284428983,
+                "p50_ms": 1053.0273335302868,
+                "p95_ms": 2519.528851258258,
+                "min_ms": 167.90744920571643,
+                "max_ms": 2714.229658854504,
+                "num_samples": 38
+              }
+            }
+          },
+          "timeline_tail": [
+            {
+              "stage": "dit",
+              "start_ms": 4050.446948967874,
+              "end_ms": 4055.0564462319016,
+              "batch_size": 1,
+              "request_ids": [
+                9
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 4055.0564462319016,
+              "end_ms": 4059.6659434959292,
+              "batch_size": 1,
+              "request_ids": [
+                9
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 4059.6659434959292,
+              "end_ms": 4064.275440759957,
+              "batch_size": 1,
+              "request_ids": [
+                9
+              ],
+              "completed_request_ids": [
+                9
+              ]
+            },
+            {
+              "stage": "llm",
+              "start_ms": 4064.275440759957,
+              "end_ms": 4077.087227255106,
+              "batch_size": 1,
+              "request_ids": [
+                11
+              ]
+            },
+            {
+              "stage": "dit",
+              "start_ms": 4077.087227255106,
+              "end_ms": 4081.6967245191336,
+              "batch_size": 1,
+              "request_ids": [
+                11
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 4081.6967245191336,
+              "end_ms": 4086.306221783161,
+              "batch_size": 1,
+              "request_ids": [
+                11
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 4086.306221783161,
+              "end_ms": 4090.9157190471888,
+              "batch_size": 1,
+              "request_ids": [
+                11
+              ],
+              "completed_request_ids": []
+            },
+            {
+              "stage": "dit",
+              "start_ms": 4090.9157190471888,
+              "end_ms": 4095.5252163112164,
+              "batch_size": 1,
+              "request_ids": [
+                11
+              ],
+              "completed_request_ids": [
+                11
+              ]
+            }
+          ]
+        }
+      },
+      "delta_stage_credit_minus_naive": {
+        "p95_latency_ms": 590.2439890286578,
+        "miss_rate": -0.0714285714285714,
+        "mean_dit_batch": -6.357738646895273
+      }
+    }
+  },
+  "interpretation": {
+    "mvp_status": "The scheduler separates control-plane policy from the MPK data plane: DiT steps are batched by denoising-step readiness, while stage credit prevents Prefill from outrunning LLM/DiT.",
+    "policy_features": [
+      "request-path service curve",
+      "phase-local deadline",
+      "stage credit",
+      "fairness-capacity tradeoff via per-group DiT batch cap"
+    ],
+    "next_runtime_step": "Replace simulated stage dispatch with the DiT hand-MPK executor once the q_len=17 small-M linear task is faster than generic TASK_LINEAR_GENERIC."
+  }
+}

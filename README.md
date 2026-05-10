@@ -88,6 +88,15 @@ Representative result:
 
 - `results/groot_n1d6_global_reservation_final_cfg040_bins16_fast_20260329.json`
 
+Recent Mirage / MPK VLA runtime status:
+
+- `docs/GR00T_MIRAGE_MPK_VLA_RESULTS_20260510.md`
+  - official `torch.compile` baseline
+  - VLM data-plane / graph replay proxy
+  - DiT hand-MPK single-step MVP
+  - Mirage/MPK attention task bridge
+  - serving-stage scheduler MVP
+
 ## Notes
 
 - This repo is a curated experiment repo, not a full standalone LeRobot distribution.

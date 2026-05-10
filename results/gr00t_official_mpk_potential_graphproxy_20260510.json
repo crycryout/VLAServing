@@ -1,0 +1,279 @@
+{
+  "meta": {
+    "date": "2026-05-10",
+    "device": "NVIDIA GeForce RTX 4090",
+    "model_path": "nvidia/GR00T-N1.6-bridge",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T/demo_data/gr1.PickNPlace",
+    "observation_source": "synthetic",
+    "embodiment_tag": "gr1",
+    "inference_steps": 4,
+    "official_scope": "NVIDIA benchmark_inference.py style: data processing + backbone + action_head, torch.compile on action_head.model.forward",
+    "mpk_proxy_scope": "profile-derived ideal lower bound if a mega/persistent kernel removes launch/operator timeline gaps but does not reduce math kernel time",
+    "iterations": 2,
+    "warmup": 1
+  },
+  "official_torch_compile": {
+    "data_processing_ms": {
+      "mean_ms": 6.27280306071043,
+      "std_ms": 0.3320882096886635,
+      "p50_ms": 6.27280306071043,
+      "p95_ms": 6.571682449430227,
+      "min_ms": 5.940714851021767,
+      "max_ms": 6.604891270399094,
+      "num_samples": 2
+    },
+    "backbone": {
+      "cpu_wall_ms": {
+        "mean_ms": 32.28477481752634,
+        "std_ms": 3.7381956353783607,
+        "p50_ms": 32.28477481752634,
+        "p95_ms": 35.649150889366865,
+        "min_ms": 28.54657918214798,
+        "max_ms": 36.0229704529047,
+        "num_samples": 2
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 32.24971103668213,
+        "std_ms": 3.727503776550293,
+        "p50_ms": 32.24971103668213,
+        "p95_ms": 35.60446443557739,
+        "min_ms": 28.522207260131836,
+        "max_ms": 35.97721481323242,
+        "num_samples": 2
+      }
+    },
+    "action_head": {
+      "cpu_wall_ms": {
+        "mean_ms": 17.107254825532436,
+        "std_ms": 0.43515581637620926,
+        "p50_ms": 17.107254825532436,
+        "p95_ms": 17.498895060271025,
+        "min_ms": 16.672099009156227,
+        "max_ms": 17.542410641908646,
+        "num_samples": 2
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 17.076224327087402,
+        "std_ms": 0.4331521987915039,
+        "p50_ms": 17.076224327087402,
+        "p95_ms": 17.466061305999755,
+        "min_ms": 16.6430721282959,
+        "max_ms": 17.509376525878906,
+        "num_samples": 2
+      }
+    },
+    "model_gpu_only": {
+      "cpu_wall_ms": {
+        "mean_ms": 47.38757759332657,
+        "std_ms": 2.4801772087812424,
+        "p50_ms": 47.38757759332657,
+        "p95_ms": 49.61973708122969,
+        "min_ms": 44.907400384545326,
+        "max_ms": 49.86775480210781,
+        "num_samples": 2
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 47.35840034484863,
+        "std_ms": 2.4827518463134766,
+        "p50_ms": 47.35840034484863,
+        "p95_ms": 49.59287700653076,
+        "min_ms": 44.875648498535156,
+        "max_ms": 49.84115219116211,
+        "num_samples": 2
+      }
+    },
+    "estimated_e2e_p50_ms": 53.63120340555906
+  },
+  "profile": {
+    "backbone": {
+      "cpu_wall_ms": 48.818884417414665,
+      "cuda_event_elapsed_ms": 46.13942337036133,
+      "cuda_kernel_sum_ms": 9.087453000000057,
+      "kernel_count": 1665,
+      "timeline_gap_ms": 37.051970370361275,
+      "cpu_extra_over_cuda_event_ms": 2.679461047053337,
+      "top_cuda_kernels": [
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.7361179999999949
+        },
+        {
+          "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+          "self_cuda_ms": 0.06278600000000006
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.03977700000000186
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.039776999999998224
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.0397129999999961
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.03964899999999762
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.03958499999999913
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.03955299999999989
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.039394000000000234
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.03916900000000169
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.03913700000000245
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.039136999999998805
+        }
+      ]
+    },
+    "action_head": {
+      "cpu_wall_ms": 20.607763901352882,
+      "cuda_event_elapsed_ms": 18.519840240478516,
+      "cuda_kernel_sum_ms": 14.53460299999997,
+      "kernel_count": 1451,
+      "timeline_gap_ms": 3.985237240478545,
+      "cpu_extra_over_cuda_event_ms": 2.0879236608743668,
+      "top_cuda_kernels": [
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04313800000000083
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04307400000000052
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042944999999999706
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04288199999999961
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042881000000001224
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04285000000000037
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042849000000001976
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04284900000000016
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04281800000000112
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.0428169999999991
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.0428169999999991
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04278499999999986
+        }
+      ]
+    },
+    "model_gpu_only": {
+      "cpu_wall_ms": 71.68643549084663,
+      "cuda_event_elapsed_ms": 69.6283187866211,
+      "cuda_kernel_sum_ms": 23.635605000000094,
+      "kernel_count": 3116,
+      "timeline_gap_ms": 45.992713786620996,
+      "cpu_extra_over_cuda_event_ms": 2.05811670422554,
+      "top_cuda_kernels": [
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "self_cuda_ms": 0.7359899999999979
+        },
+        {
+          "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+          "self_cuda_ms": 0.06262600000000021
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.043073000000003955
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04304200000000128
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042944999999999706
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042913000000000465
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042881000000008496
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042881000000008496
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042880999999993945
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.04284999999999854
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.042849000000001976
+        },
+        {
+          "name": "triton_red_fused_addmm_13",
+          "self_cuda_ms": 0.0428179999999993
+        }
+      ]
+    }
+  },
+  "action_head_cudagraph_proxy": {
+    "status": "failed",
+    "error_type": "RuntimeError",
+    "error": "Cannot prepare for replay during capturing stage. during CUDA graph capture. If you need this call to be captured, please file an issue. Current cudaStreamCaptureStatus: cudaStreamCaptureStatusActive",
+    "traceback": "Traceback (most recent call last):\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_gr00t_official_mpk_potential.py\", line 491, in main\n    graph_proxy = ActionHeadCudaGraphProxy(\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_gr00t_official_mpk_potential.py\", line 254, in __init__\n    self._capture()\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_gr00t_official_mpk_potential.py\", line 308, in _capture\n    self._body()\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py\", line 116, in decorate_context\n    return func(*args, **kwargs)\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_gr00t_official_mpk_potential.py\", line 286, in _body\n    model_output = self.action_head.model(\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py\", line 655, in _fn\n    return fn(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/gr00t/model/modules/dit.py\", line 299, in forward\n    def forward(\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py\", line 838, in _fn\n    return fn(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_functorch/aot_autograd.py\", line 1209, in forward\n    return compiled_fn(full_args)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py\", line 328, in runtime_wrapper\n    all_outs = call_func_at_runtime_with_args(\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_functorch/_aot_autograd/utils.py\", line 126, in call_func_at_runtime_with_args\n    out = normalize_as_list(f(args))\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py\", line 495, in wrapper\n    return compiled_fn(runtime_args)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/output_code.py\", line 460, in __call__\n    return self.current_callable(inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/compile_fx.py\", line 1372, in run\n    return compiled_fn(new_inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 371, in deferred_cudagraphify\n    return fn(inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/utils.py\", line 2404, in run\n    return model(new_inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 1997, in run\n    out = self._run(new_inputs, function_id)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 2139, in _run\n    return self.run(new_inputs, function_id)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 1997, in run\n    out = self._run(new_inputs, function_id)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 2121, in _run\n    return self.execute_node(child, new_inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 2239, in execute_node\n    return node.run(new_inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 1095, in run\n    self.run_graph()\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/_inductor/cudagraph_trees.py\", line 1206, in run_graph\n    self.graph.replay()\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/cuda/graphs.py\", line 88, in replay\n    super().replay()\nRuntimeError: Cannot prepare for replay during capturing stage. during CUDA graph capture. If you need this call to be captured, please file an issue. Current cudaStreamCaptureStatus: cudaStreamCaptureStatusActive\n",
+    "interpretation": "The proxy could not capture this exact action-head path. That is a negative implementation signal for a full MPK-style data plane."
+  },
+  "mpk_idealized_bound": {
+    "data_processing_p50_ms": 6.27280306071043,
+    "model_cuda_kernel_sum_ms": 23.635605000000094,
+    "ideal_e2e_lower_bound_ms": 29.908408060710524,
+    "official_estimated_e2e_p50_ms": 53.63120340555906,
+    "potential_e2e_delta_ms": 23.72279534484854,
+    "potential_e2e_speedup": 1.7931814791577698,
+    "interpretation": "This is an upper-bound/proxy experiment, not an implemented MPK result. It proves removable GPU timeline gap exists only if the ideal bound is below the official p50; a real MPK must recover enough of that gap while preserving correctness."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "date": "2026-05-10",
+    "device": "NVIDIA GeForce RTX 4090",
+    "purpose": "Probe the official MPK persistent-kernel task-graph compiler on a GR00T DiT-shaped attention task.",
+    "scope": "This uses the current MPK TASK_FULL_ATTENTION registration path, not the standalone Mirage-generated attention .cu bridge."
+  },
+  "shape": {
+    "q_len": 64,
+    "kv_len": 64,
+    "num_heads": 32,
+    "head_dim": 48,
+    "hidden_dim": 1536,
+    "dtype": "bf16",
+    "task": "gr00t_mirage_padded_attention",
+    "q_tile": 16,
+    "valid_kv_len": 51,
+    "use_mask": true
+  },
+  "generate_task_graph_ms": 9.472789764404297,
+  "task_graph_json_bytes": 208814,
+  "task_graph_cuda_bytes": 6148,
+  "task_graph_contains_full_attention": false,
+  "mpk_compile_ok": true,
+  "mpk_compile_ms": 16034.278619766235,
+  "output_dir": "/root/autodl-tmp/VLAServing/results/mpk_bridge_attention_self_padded64_launch",
+  "launch_ok": true,
+  "launch_iters": 1,
+  "launch_ms": {
+    "min": 48.95231819152832,
+    "mean": 48.95231819152832,
+    "max": 48.95231819152832
+  },
+  "ok": true
+}

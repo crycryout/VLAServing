@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "date": "2026-05-10",
+    "device": "NVIDIA GeForce RTX 4090",
+    "model_path": "nvidia/GR00T-N1.6-bridge",
+    "dtype": "bfloat16",
+    "num_slots": 8,
+    "slot_id": 0,
+    "inference_steps": 4,
+    "warmup": 3,
+    "iterations": 5,
+    "llm_attn_impl": "sdpa",
+    "vision_attn_impl": "flash_attention_2",
+    "scope": "VLM full-graph CUDA Graph replay as a conservative MPK-style resident data-plane proxy. The same-math scope compares uncaptured fixed-shape VLM forward against replay using the same resident buffers and attention implementations."
+  },
+  "correctness_same_math_graph_vs_uncaptured": {
+    "backbone": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0
+    },
+    "state": {
+      "max_abs": 0.0,
+      "mean_abs": 0.0
+    }
+  },
+  "same_math_vlm_forward": {
+    "uncaptured_fixedshape": {
+      "cpu_wall_ms": {
+        "mean_ms": 28.955700621008873,
+        "std_ms": 3.090385404766608,
+        "p50_ms": 26.83928981423378,
+        "p95_ms": 33.70048180222511,
+        "min_ms": 26.72993205487728,
+        "max_ms": 34.68128852546215,
+        "num_samples": 5
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 28.890291213989258,
+        "std_ms": 3.0806145271193888,
+        "p50_ms": 26.77555274963379,
+        "p95_ms": 33.61902008056641,
+        "min_ms": 26.670080184936523,
+        "max_ms": 34.59388732910156,
+        "num_samples": 5
+      }
+    },
+    "uncaptured_fixedshape_profile": {
+      "cpu_wall_ms": 37.751151248812675,
+      "cuda_event_elapsed_ms": 37.2053108215332,
+      "cuda_kernel_sum_ms": 11.076547000000023,
+      "kernel_count": 1380,
+      "timeline_gap_ms": 26.12876382153318,
+      "cpu_extra_over_cuda_event_ms": 0.5458404272794724,
+      "top_cuda_kernels": [
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.060769999999999984
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.06019400000000132
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.0600659999999998
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.059873999999999795
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05980999999999949
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05961700000000019
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05936200000000099
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05932900000000154
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05932900000000063
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05923400000000038
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.058945999999999915
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05875300000000016
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.058721999999999754
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.058658000000001265
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.0585619999999999
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.0585619999999999
+        }
+      ]
+    },
+    "full_graph_replay": {
+      "cpu_wall_ms": {
+        "mean_ms": 10.875823721289635,
+        "std_ms": 0.03646759415496364,
+        "p50_ms": 10.849032551050186,
+        "p95_ms": 10.920676589012146,
+        "min_ms": 10.841939598321915,
+        "max_ms": 10.920865461230278,
+        "num_samples": 5
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 10.846822547912598,
+        "std_ms": 0.033842155292215695,
+        "p50_ms": 10.82470417022705,
+        "p95_ms": 10.888601875305175,
+        "min_ms": 10.809344291687012,
+        "max_ms": 10.889216423034668,
+        "num_samples": 5
+      }
+    },
+    "full_graph_replay_profile": {
+      "cpu_wall_ms": 11.816909536719322,
+      "cuda_event_elapsed_ms": 11.37065601348877,
+      "cuda_kernel_sum_ms": 10.709849000000043,
+      "kernel_count": 1382,
+      "timeline_gap_ms": 0.6608070134887267,
+      "cpu_extra_over_cuda_event_ms": 0.4462535232305527,
+      "top_cuda_kernels": [
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.0596810000000005
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05945799999999963
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05939399999999978
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05900900000000001
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05897700000000077
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05891400000000067
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05884999999999991
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.058721999999999754
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05852999999999997
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05852999999999997
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05852999999999974
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.0584970000000003
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05846600000000012
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05843299999999999
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.05840099999999984
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_128x64_sliced1x2_ldg8_relu_f2f_tn",
+          "self_cuda_ms": 0.058338000000000646
+        }
+      ]
+    },
+    "p50_speedup": 2.473559769261774,
+    "p50_delta_ms": 15.950848579406738,
+    "math_kernel_sum_ratio_graph_over_uncaptured": 0.9668941954564018,
+    "timeline_gap_delta_ms": 25.467956808044455,
+    "interpretation": "This is the clean MPK-style data-plane proof: same VLM math path, same fixed-shape resident buffers, graph replay removes host/operator launch boundaries while preserving kernel work."
+  },
+  "serving_prepare_task_scope": {
+    "baseline_prepare_task": {
+      "cpu_wall_ms": {
+        "mean_ms": 35.94926409423351,
+        "std_ms": 2.6269336161324723,
+        "p50_ms": 34.37912277877331,
+        "p95_ms": 39.81437161564827,
+        "min_ms": 33.72775577008724,
+        "max_ms": 40.387047454714775,
+        "num_samples": 5
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 35.89993591308594,
+        "std_ms": 2.630234147084563,
+        "p50_ms": 34.30393600463867,
+        "p95_ms": 39.77118682861328,
+        "min_ms": 33.686431884765625,
+        "max_ms": 40.344383239746094,
+        "num_samples": 5
+      }
+    },
+    "full_graph_launch_plus_materialize": {
+      "cpu_wall_ms": {
+        "mean_ms": 10.865319892764091,
+        "std_ms": 0.02116996220261981,
+        "p50_ms": 10.880595073103905,
+        "p95_ms": 10.884812474250793,
+        "min_ms": 10.835513472557068,
+        "max_ms": 10.885817930102348,
+        "num_samples": 5
+      },
+      "cuda_event_elapsed_ms": {
+        "mean_ms": 10.836985397338868,
+        "std_ms": 0.017823080163053673,
+        "p50_ms": 10.850303649902344,
+        "p95_ms": 10.852159690856933,
+        "min_ms": 10.811391830444336,
+        "max_ms": 10.852319717407227,
+        "num_samples": 5
+      }
+    },
+    "p50_speedup": 3.161564607912832,
+    "p50_delta_ms": 23.453632354736328,
+    "interpretation": "This includes the runtime materialization path used by serving. It is not a pure same-math comparison because the full graph uses the fixed-shape VLM path, but it shows the practical stage latency impact for a batch=1 VLM prepare."
+  }
+}
