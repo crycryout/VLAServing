@@ -914,7 +914,333 @@ artifacts:
 Only after these profiling gates pass should the implementation move toward a
 full real-compute five-phase VLA runtime.
 
-## 13. Implementation Roadmap
+## 13. Official Clean GR00T N1.6 Profiling Update
+
+To avoid comparing against a polluted local stack, a fresh official GR00T N1.6
+checkout was used for the latest profiling:
+
+| Item | Value |
+|---|---|
+| official checkout | `/root/autodl-tmp/Isaac-GR00T-official-clean-20260520` |
+| branch | `n1.6-release` |
+| commit | `ead52833afbbf4243f8cd5e7664f48a94de03b19` |
+| model | `nvidia/GR00T-N1.6-3B` |
+| dataset | `demo_data/gr1.PickNPlace` |
+| embodiment | `gr1` |
+| GPU | RTX 4090 |
+| torch | `2.7.1+cu126` |
+| compile mode | official action-head `torch.compile(..., mode="max-autotune")` |
+
+Result artifacts:
+
+- `results/official_clean_groot_n16_3b_torchcompile_launch_sync_20260520.json`
+- `results/official_clean_groot_n16_noncompute_overhead_breakdown_20260520.json`
+- `results/official_clean_groot_n16_operator_inventory_20260520.json`
+
+Scope note:
+
+- Public GR00T N1.6 README-style timing has reported RTX 4090
+  `torch.compile` around data `2 ms`, backbone `25 ms`, action head `17 ms`,
+  E2E `44 ms` for 4 denoising steps and single view.
+- The local fresh-stack measurement here is a dataset-backed profiling harness
+  on this machine, so its `~54-56 ms` E2E numbers should not be presented as
+  NVIDIA's universal official latency.
+- Comparisons must always use same model, same input shape, same dtype, same
+  inference path, and same measurement boundary.
+
+### 13.1 Launch / Sync / CUDA Event Breakdown
+
+The fresh official-stack timing shows that `sync wait` is not pure
+synchronization overhead. It is mostly the CPU waiting for remaining GPU work at
+the measurement boundary. CPU enqueue/runtime work can overlap with GPU
+execution.
+
+| target | host enqueue | sync wait | wall sync | CUDA event | CPU CUDA launch/runtime |
+|---|---:|---:|---:|---:|---:|
+| VLM/backbone | `31.46 ms` | `0.64 ms` | `32.10 ms` | `31.94 ms` | `7.07 ms` |
+| DiT action head | `7.13 ms` | `9.92 ms` | `17.05 ms` | `16.09 ms` | `3.64 ms` |
+| full model GPU-only | `47.05 ms` | `8.84 ms` | `56.08 ms` | `55.47 ms` | `10.30 ms` |
+
+Interpretation:
+
+- Without CUDA Graph, the request path does expose about `10 ms` of CPU CUDA
+  runtime/launch activity in the full model measurement.
+- That `10 ms` is not directly subtractable from E2E because some host work
+  overlaps with GPU computation.
+- A CUDA Graph-only path should be expected to remove a launch/runtime portion,
+  roughly `5-10 ms` in this local harness, not the whole model latency.
+- MPK/Mega Kernel is motivated by the additional gaps CUDA Graph alone does not
+  remove: kernel boundary bubbles, graph boundaries, intermediate tensor
+  materialization, and small-kernel fragmentation.
+
+### 13.2 Non-Compute Overhead Breakdown
+
+The corrected non-profiled CUDA event timing was used as the timing anchor, with
+torch profiler kernel/copy/memset union as a category proxy.
+
+| target | CUDA event | profiler kernel union | memcpy union | memset union | estimated non-kernel gap |
+|---|---:|---:|---:|---:|---:|
+| backbone prepared | `26.653 ms` | `8.886 ms` | `0.155 ms` | `0.029 ms` | `~17.58 ms` |
+| action head prepared | `16.931 ms` | `14.835 ms` | `0.045 ms` | `0.000 ms` | `~2.05 ms` |
+| full model prepared | `49.836 ms` | `23.303 ms` | `0.214 ms` | `0.029 ms` | `~26.29 ms` |
+
+Caveat:
+
+- This is not Nsight Compute roofline evidence.
+- The gap estimate is a practical torch-profiler proxy for timeline/boundary
+  overhead in this harness.
+- Intermediate tensor materialization inside kernels and HBM traffic cannot be
+  fully measured without Nsight Compute or CUPTI memory counters.
+
+Single-inference implication:
+
+| Scope | Conservative expectation |
+|---|---|
+| current local E2E | data processing `~4.45 ms` + model `~49.84 ms` = `~54.3 ms` |
+| CUDA Graph-only likely range | remove about `5-10 ms` from request-path launch/runtime exposure |
+| MPK-style conservative target | `~35-42 ms` E2E if it removes substantial boundary/gap while preserving math efficiency |
+| aggressive ideal bound | `~30-33 ms`, not claimable until high-performance VLM+DiT MPK exists |
+
+This should be framed carefully:
+
+```text
+CUDA Graph can reduce launch/runtime overhead.
+MPK can potentially go further by fusing task boundaries, eliminating some HBM
+round trips, and scheduling work inside a persistent GPU data plane.
+Neither CUDA Graph nor MPK removes the dense VLM/DiT math itself.
+```
+
+## 14. Official Operator Inventory and Bottleneck Classification
+
+The standard official GR00T N1.6 E2E path contains these high-level stages:
+
+| Stage | Main work |
+|---|---|
+| data processing | video/image/state/language preprocessing, tokenization, collation, dtype/device preparation |
+| prepare input | `backbone.prepare_input` and `action_head.prepare_input` |
+| VLM/backbone | Eagle3 VLM, SigLIP2 vision encoder, Qwen3 language backbone |
+| DiT action head | state/action encoder, 4-step denoising, 32-layer DiT transformer, action decoder |
+| postprocess | action decode, CPU copy, unnormalization, controller handoff |
+
+### 14.1 Module Inventory
+
+VLM/backbone module counts:
+
+| module | count |
+|---|---:|
+| `Linear` | 280 |
+| `Qwen3RMSNorm` | 65 |
+| `LayerNorm` | 57 |
+| `Siglip2Attention` | 27 |
+| `Siglip2MLP` | 28 |
+| `Siglip2EncoderLayer` | 27 |
+| `Qwen3Attention` | 16 |
+| `Qwen3MLP` | 16 |
+| `Qwen3DecoderLayer` | 16 |
+| `SiLU` | 16 |
+| `Embedding` | 2 |
+
+DiT action-head module counts:
+
+| module | count |
+|---|---:|
+| `BasicTransformerBlock` | 32 |
+| `Attention` | 32 |
+| `FeedForward` | 32 |
+| `AdaLayerNorm` | 32 |
+| `LayerNorm` | 66 |
+| `Linear` | 228 |
+| `Dropout` | 128 |
+| `SiLU` | 33 |
+| `GELU` | 32 |
+| `CategorySpecificLinear` | 7 |
+| `CategorySpecificMLP` | 2 |
+
+Runtime note:
+
+```text
+The DiT action head has 4 denoising steps. The 32 DiT blocks are executed once
+per denoising step, so the runtime transformer path is effectively 4 x 32
+blocks per action-head inference.
+```
+
+### 14.2 CUDA Kernel Class Counts
+
+| kernel class | VLM/backbone count | DiT count | full model count | full model time |
+|---|---:|---:|---:|---:|
+| GEMM/MM | 322 | 964 | 1286 | `20.191 ms` |
+| attention | 0 | 32 | 32 | `0.043 ms` |
+| norm | 56 | 262 | 318 | `0.722 ms` |
+| copy/cast | 478 | 32 | 510 | `0.920 ms` |
+| elementwise | 351 | 47 | 398 | `0.483 ms` |
+| activation | 44 | 4 | 48 | `0.118 ms` |
+| shape/index | 41 | 72 | 113 | `0.387 ms` |
+| memcpy | 76 | 20 | 108 | `0.113 ms` |
+| memset | 61 | 0 | 61 | `0.029 ms` |
+| other | 224 | 18 | 242 | `0.560 ms` |
+
+Interpretation:
+
+- The dominant math work is GEMM/MM, especially VLM and DiT linear/FFN paths.
+- The largest number of non-math kernels comes from copy/cast, elementwise,
+  norm, and shape/index operations.
+- These non-math kernels are not always large individually, but they create
+  launch fragmentation, graph/operator boundaries, and intermediate HBM traffic.
+
+### 14.3 Compute-Bound vs Memory-Bound Classification
+
+Strict compute-bound/memory-bound classification requires Nsight Compute
+hardware counters such as SM throughput, Tensor Core utilization, DRAM
+throughput, L2 throughput, occupancy, register pressure, shared-memory pressure,
+and warp stall breakdown. I did not find a public GR00T N1.6 Nsight Compute
+roofline table. The table below is a reasoned classification from operator type
+and torch-profiler evidence, not a final roofline result.
+
+| operator / kernel type | expected bottleneck | reason |
+|---|---|---|
+| VLM/DiT GEMM, `addmm`, `mm`, `matmul` | compute-heavy / Tensor Core bound when shape is large enough | BF16 dense matmul dominates math time |
+| DiT FFN fused `addmm_gelu` | compute-heavy | large fused matmul path in action head |
+| Q/K/V/O projections | compute-heavy | dense GEMM |
+| FlashAttention / SDPA / FMHA | mixed | can be compute-heavy for larger shapes, but small batch/short sequence exposes shared/L2/occupancy effects |
+| LayerNorm / RMSNorm / AdaLayerNorm | memory-bound | low arithmetic intensity, activation reads/writes and reductions dominate |
+| residual add / scale / mask / elementwise | memory-bound or launch-bound | low compute per byte |
+| copy / cast / `to` / contiguous / cat | memory-bandwidth or dispatcher-bound | data movement and format conversion |
+| slice / index / gather / padding / mask | memory/L2-bound | irregular or low-arithmetic indexing |
+| view / reshape / transpose / as_strided | metadata / dispatcher-bound | often no GPU kernel, but contributes to graph/operator boundary |
+| explicit memcpy / memset | memory-bound | pure transfer or initialization |
+
+Practical conclusion:
+
+```text
+The VLA stack is not purely compute-bound. The dense math is compute-heavy, but
+the request path contains enough low-arithmetic kernels, copies, casts, shape
+ops, and boundaries to motivate MPK-style fusion and persistent data-plane
+scheduling.
+```
+
+## 15. Predictability-Driven Sync-Free / Prefetch / Preallocation Space
+
+The strongest system-level reason VLA Serving is a good Mega Kernel target is
+request predictability.
+
+The premise should be stated as:
+
+```text
+VLA requests are not perfectly fixed arrivals, but they have predictable
+windows. Action consumption, horizon, robot frequency, and phase control allow
+the system to shape requests into fixed-phase, fixed-shape, fixed-buffer work.
+```
+
+This predictability creates optimization opportunities ordinary LLM serving
+does not have.
+
+### 15.1 Request-Path Sync-Free Data Plane
+
+Traditional host-driven path:
+
+```text
+CPU prepares tensors
+CPU launches VLM kernels
+CPU syncs or reaches a boundary
+CPU launches DiT kernels
+CPU copies / decodes result
+```
+
+Target MPK path:
+
+```text
+CPU writes lightweight descriptors:
+  robot_id, phase, horizon, deadline, input_ptr, output_ptr, valid_bit
+
+GPU persistent data plane:
+  polls/consumes descriptors
+  prefetches input and stage buffers
+  schedules VLM/DiT tasks by phase/deadline
+  enforces stage/resource credits
+  writes action outputs and completion flags
+
+CPU control plane:
+  admission, safety, robot state, low-rate monitoring
+```
+
+This does not mean there is literally no synchronization. It means:
+
+```text
+The latency-critical request path should not require per-request CPU kernel
+launches or per-stage CPU-GPU synchronization.
+```
+
+### 15.2 Preallocation Opportunities
+
+Fixed request windows allow the runtime to preallocate and reuse:
+
+| Buffer / state | Optimization |
+|---|---|
+| input image/state buffers | fixed per robot or per lane |
+| token/image embedding buffers | fixed shape buckets and padding |
+| VLM hidden buffers | producer-consumer handoff to DiT |
+| DiT action/noise/state buffers | one arena per lane and denoising step |
+| scratch buffers | stage-local reusable workspaces |
+| output action buffers | fixed completion slots |
+| descriptor and completion rings | CPU-GPU lightweight synchronization |
+| model weights and packed layouts | permanent GPU residency |
+
+Expected benefits:
+
+- remove allocator overhead and address churn,
+- make CUDA Graph / MPK capture easier,
+- reduce dynamic shape recompilation,
+- enable static pointer descriptors,
+- enable graph memory / pool reuse.
+
+Relevant CUDA mechanisms:
+
+- CUDA Graph memory nodes provide fixed-address graph allocations and
+  GPU-ordered lifetimes.
+- `cudaMallocAsync` and stream-ordered memory pools support reusable allocation
+  patterns.
+- CUDA Graph replay can reuse fixed input addresses with updated contents.
+
+### 15.3 Prefetch / Load Opportunities
+
+Predictable phases make prefetching useful at several levels:
+
+| Level | Possible optimization |
+|---|---|
+| host to device | pre-stage next image/state into pinned or mapped buffers |
+| global memory | prefetch next stage inputs and weights into cache-friendly layouts |
+| shared memory | use `cp.async` / TMA-style tile prefetch for linear/attention/FFN |
+| register/shared handoff | fuse norm/activation/residual/linear epilogues |
+| stage handoff | keep VLM hidden or DiT intermediate data in fixed buffers |
+| lane scheduling | avoid same-stage collision by phase offsets and credit |
+
+Important caveat:
+
+- Data that has not arrived from sensors cannot be prefetched as content.
+- The system can still preallocate the destination and prefetch static weights,
+  layouts, and next-stage resources.
+- Sensor/network jitter should be handled by slack windows, not by assuming
+  exact deterministic arrival.
+
+### 15.4 Single-Inference vs Serving-System Benefits
+
+| Layer | Benefit from predictability |
+|---|---|
+| single inference latency | fewer launches, fewer graph boundaries, less allocation, less materialization, more fusion and tile prefetch |
+| serving throughput | more frequent service slots, less batch waiting, better phase alignment |
+| deadline behavior | execution can be scheduled by action exhaustion rather than FIFO queue order |
+| fairness | 10Hz/20Hz/30Hz robots can receive balanced acceptance instead of batch-size-biased admission |
+| CPU utilization | CPU becomes a low-rate control plane rather than a per-request execution engine |
+
+The most defensible claim is:
+
+```text
+Predictability does not eliminate VLM/DiT math. It makes the execution plan,
+memory plan, and synchronization plan static enough to move the latency-critical
+serving path into a GPU-resident persistent data plane.
+```
+
+## 16. Implementation Roadmap
 
 The recommended roadmap is deliberately incremental.
 
@@ -1118,7 +1444,7 @@ Required ablations:
 - full VLA replay,
 - CPU/edge overlap enabled versus disabled.
 
-## 14. Key Limitations
+## 17. Key Limitations
 
 Current limitations:
 
@@ -1131,8 +1457,15 @@ Current limitations:
   the practical next step.
 - CPU offload is only attractive for control/pre/post/fallback or future sparse
   modules, not for current dense VLM/DiT core math.
+- Public timing tables and local torch-profiler traces do not replace Nsight
+  Compute roofline evidence. Compute-bound versus memory-bound classification
+  must be validated with hardware counters before making final kernel-level
+  resource claims.
+- Request predictability is a window property, not an absolute guarantee. Real
+  sensors, network delay, CPU preprocessing, and safety logic still introduce
+  jitter.
 
-## 15. Short Conclusion
+## 18. Short Conclusion
 
 The most defensible roadmap is:
 
@@ -1156,5 +1489,17 @@ even when each lane's active latency is charged as traditional batch4/batch5
 inference latency.
 ```
 
-That is the core system insight to preserve while the lower-level VLM/DiT MPK
-kernels are built.
+The strongest single-inference motivation is:
+
+```text
+Official clean-stack profiling and VLM graph replay show a large removable
+timeline/boundary gap around otherwise unchanged VLM/DiT math. CUDA Graph can
+remove part of the launch/runtime overhead, while MPK-style persistent execution
+targets the deeper graph/operator boundary and data-movement overhead.
+```
+
+The final paper framing should preserve both layers:
+
+1. VLA predictability enables a GPU-resident sync-light serving data plane.
+2. MPK/Mirage-style task fusion can reduce the single-request overhead inside
+   that data plane.

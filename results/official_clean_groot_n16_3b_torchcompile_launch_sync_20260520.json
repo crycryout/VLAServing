@@ -1,0 +1,468 @@
+{
+  "meta": {
+    "date": "2026-05-20",
+    "scope": "Fresh official Isaac-GR00T n1.6-release torch.compile launch/sync probe. The code import path is the clean clone, not the local VLAServing or edited Isaac-GR00T tree.",
+    "official_root": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520",
+    "official_git_rev": "ead52833afbbf4243f8cd5e7664f48a94de03b19",
+    "gr00t_import_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py",
+    "benchmark_module_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/scripts/deployment/benchmark_inference.py",
+    "model_path": "nvidia/GR00T-N1.6-3B",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/demo_data/gr1.PickNPlace",
+    "embodiment_tag": "gr1",
+    "device": "NVIDIA GeForce RTX 4090",
+    "torch_version": "2.7.1+cu126",
+    "compile_mode": "max-autotune",
+    "iterations": 8,
+    "warmup": 4,
+    "profile_iterations": 2,
+    "measurement_notes": {
+      "host_enqueue_ms": "wall time for the Python/PyTorch call to enqueue work, without synchronizing at return",
+      "sync_wait_after_enqueue_ms": "explicit torch.cuda.synchronize wait after the call returns; this mostly waits for outstanding GPU work",
+      "cuda_event_timeline_ms": "CUDA event elapsed time around the call; includes kernel execution and stream idle gaps caused by host-side handoff",
+      "cuda_kernel_self_per_iter_ms": "torch.profiler sum of CUDA kernel self time per iteration; proxy for pure kernel compute time",
+      "timeline_gap_proxy_p50_ms": "cuda_event_timeline p50 minus profiler kernel-sum per iteration; proxy for launch, stream idle, device runtime, and non-kernel gaps"
+    }
+  },
+  "data_processing_wall_ms": {
+    "mean": 4.357220372185111,
+    "p50": 4.354066215455532,
+    "p95": 4.438827093690634,
+    "min": 4.278307780623436,
+    "max": 4.462381824851036,
+    "num_samples": 8
+  },
+  "targets": {
+    "backbone": {
+      "host_enqueue_ms": {
+        "mean": 31.621366972103715,
+        "p50": 31.463028863072395,
+        "p95": 32.23329223692417,
+        "min": 31.36521764099598,
+        "max": 32.43039548397064,
+        "num_samples": 8
+      },
+      "sync_wait_after_enqueue_ms": {
+        "mean": 0.632960582152009,
+        "p50": 0.6370376795530319,
+        "p95": 0.6411204114556313,
+        "min": 0.6168652325868607,
+        "max": 0.6416719406843185,
+        "num_samples": 8
+      },
+      "wall_sync_ms": {
+        "mean": 32.254327554255724,
+        "p50": 32.102291472256184,
+        "p95": 32.85890640690923,
+        "min": 32.00079686939716,
+        "max": 33.04736316204071,
+        "num_samples": 8
+      },
+      "cuda_event_timeline_ms": {
+        "mean": 32.07804775238037,
+        "p50": 31.9444637298584,
+        "p95": 32.46454429626465,
+        "min": 31.86297607421875,
+        "max": 32.55705642700195,
+        "num_samples": 8
+      },
+      "profiler": {
+        "profile_iterations": 2,
+        "cuda_device_event_count": 3330,
+        "cuda_kernel_self_total_ms": 18.255855999999646,
+        "cuda_kernel_self_per_iter_ms": 9.127927999999823,
+        "cpu_profiler_self_total_ms": 71.89866199999999,
+        "cpu_profiler_self_per_iter_ms": 35.949330999999994,
+        "cpu_cuda_launch_total_ms": 14.135494000000014,
+        "cpu_cuda_launch_per_iter_ms": 7.067747000000007,
+        "cpu_cuda_copy_total_ms": 2.3809139999999354,
+        "cpu_cuda_copy_per_iter_ms": 1.1904569999999677,
+        "cpu_cuda_event_record_total_ms": 0.0,
+        "cpu_cuda_event_record_per_iter_ms": 0.0,
+        "cpu_cuda_sync_total_ms": 1.1171179999999186,
+        "cpu_cuda_sync_per_iter_ms": 0.5585589999999593,
+        "runtime_rows_top": [
+          {
+            "key": "cudaLaunchKernel",
+            "cpu_self_total_ms": 13.166106999999993,
+            "cuda_self_total_ms": 0.0,
+            "count": 2816
+          },
+          {
+            "key": "cudaMemcpyAsync",
+            "cpu_self_total_ms": 1.7311719999999677,
+            "cuda_self_total_ms": 0.0,
+            "count": 176
+          },
+          {
+            "key": "cuLaunchKernel",
+            "cpu_self_total_ms": 0.9693870000000198,
+            "cuda_self_total_ms": 0.0,
+            "count": 216
+          },
+          {
+            "key": "cudaMemsetAsync",
+            "cpu_self_total_ms": 0.6497419999999674,
+            "cuda_self_total_ms": 0.0,
+            "count": 124
+          },
+          {
+            "key": "cudaStreamSynchronize",
+            "cpu_self_total_ms": 0.5873999999999251,
+            "cuda_self_total_ms": 0.0,
+            "count": 120
+          },
+          {
+            "key": "cudaDeviceSynchronize",
+            "cpu_self_total_ms": 0.5297179999999935,
+            "cuda_self_total_ms": 0.0,
+            "count": 2
+          },
+          {
+            "key": "cudaMalloc",
+            "cpu_self_total_ms": 0.25204599999999483,
+            "cuda_self_total_ms": 0.0,
+            "count": 1
+          },
+          {
+            "key": "cudaDeviceGetAttribute",
+            "cpu_self_total_ms": 0.1841779999999353,
+            "cuda_self_total_ms": 0.0,
+            "count": 650
+          },
+          {
+            "key": "cudaFuncSetAttribute",
+            "cpu_self_total_ms": 0.11465800000000673,
+            "cuda_self_total_ms": 0.0,
+            "count": 86
+          },
+          {
+            "key": "cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags",
+            "cpu_self_total_ms": 0.045758999999992736,
+            "cuda_self_total_ms": 0.0,
+            "count": 54
+          },
+          {
+            "key": "cudaPeekAtLastError",
+            "cpu_self_total_ms": 0.01899800000002324,
+            "cuda_self_total_ms": 0.0,
+            "count": 240
+          },
+          {
+            "key": "cudaOccupancyMaxActiveBlocksPerMultiprocessor",
+            "cpu_self_total_ms": 0.004262000000009721,
+            "cuda_self_total_ms": 0.0,
+            "count": 2
+          },
+          {
+            "key": "cudaStreamIsCapturing",
+            "cpu_self_total_ms": 0.0016000000000058207,
+            "cuda_self_total_ms": 0.0,
+            "count": 1
+          }
+        ],
+        "timeline_gap_proxy_p50_ms": 22.816535729858575,
+        "kernel_sum_fraction_of_cuda_event_p50": 0.28574366053507966
+      }
+    },
+    "action_head": {
+      "host_enqueue_ms": {
+        "mean": 7.507289061322808,
+        "p50": 7.134874351322651,
+        "p95": 8.921656850725412,
+        "min": 6.893264129757881,
+        "max": 9.163128212094307,
+        "num_samples": 8
+      },
+      "sync_wait_after_enqueue_ms": {
+        "mean": 9.675943525508046,
+        "p50": 9.924652054905891,
+        "p95": 10.021777730435133,
+        "min": 8.399711921811104,
+        "max": 10.024987161159515,
+        "num_samples": 8
+      },
+      "wall_sync_ms": {
+        "mean": 17.183232586830854,
+        "p50": 17.053437419235706,
+        "p95": 17.685392778366804,
+        "min": 16.909081488847733,
+        "max": 17.751382663846016,
+        "num_samples": 8
+      },
+      "cuda_event_timeline_ms": {
+        "mean": 16.176679849624634,
+        "p50": 16.08505630493164,
+        "p95": 16.585655689239502,
+        "min": 16.042911529541016,
+        "max": 16.797279357910156,
+        "num_samples": 8
+      },
+      "profiler": {
+        "profile_iterations": 2,
+        "cuda_device_event_count": 2903,
+        "cuda_kernel_self_total_ms": 45.13662000003806,
+        "cuda_kernel_self_per_iter_ms": 22.56831000001903,
+        "cpu_profiler_self_total_ms": 8929.154163000005,
+        "cpu_profiler_self_per_iter_ms": 4464.577081500002,
+        "cpu_cuda_launch_total_ms": 7.283770000003689,
+        "cpu_cuda_launch_per_iter_ms": 3.6418850000018446,
+        "cpu_cuda_copy_total_ms": 0.33917699999827894,
+        "cpu_cuda_copy_per_iter_ms": 0.16958849999913947,
+        "cpu_cuda_event_record_total_ms": 0.01771100000105798,
+        "cpu_cuda_event_record_per_iter_ms": 0.00885550000052899,
+        "cpu_cuda_sync_total_ms": 14.179848000001162,
+        "cpu_cuda_sync_per_iter_ms": 7.089924000000581,
+        "runtime_rows_top": [
+          {
+            "key": "cudaDeviceSynchronize",
+            "cpu_self_total_ms": 14.179848000001162,
+            "cuda_self_total_ms": 0.0,
+            "count": 25
+          },
+          {
+            "key": "cudaGraphLaunch",
+            "cpu_self_total_ms": 3.300548999996856,
+            "cuda_self_total_ms": 0.0,
+            "count": 7
+          },
+          {
+            "key": "cudaLaunchKernel",
+            "cpu_self_total_ms": 2.2837169999986746,
+            "cuda_self_total_ms": 0.0,
+            "count": 424
+          },
+          {
+            "key": "cuLaunchKernel",
+            "cpu_self_total_ms": 1.6995040000081585,
+            "cuda_self_total_ms": 0.0,
+            "count": 580
+          },
+          {
+            "key": "cudaGraphInstantiateWithFlags",
+            "cpu_self_total_ms": 1.1826129999998958,
+            "cuda_self_total_ms": 0.0,
+            "count": 1
+          },
+          {
+            "key": "cudaFree",
+            "cpu_self_total_ms": 0.7091880000010132,
+            "cuda_self_total_ms": 0.0,
+            "count": 2
+          },
+          {
+            "key": "cudaMalloc",
+            "cpu_self_total_ms": 0.3507229999992996,
+            "cuda_self_total_ms": 0.0,
+            "count": 2
+          },
+          {
+            "key": "cudaMemcpyAsync",
+            "cpu_self_total_ms": 0.33917699999827894,
+            "cuda_self_total_ms": 0.0,
+            "count": 35
+          },
+          {
+            "key": "cudaGraphDestroy",
+            "cpu_self_total_ms": 0.12474000000022352,
+            "cuda_self_total_ms": 0.0,
+            "count": 1
+          },
+          {
+            "key": "cudaStreamIsCapturing",
+            "cpu_self_total_ms": 0.06428499999882252,
+            "cuda_self_total_ms": 0.0,
+            "count": 55
+          },
+          {
+            "key": "cudagraphify.get_container (dynamo_timed)",
+            "cpu_self_total_ms": 0.06278500000014901,
+            "cuda_self_total_ms": 0.0,
+            "count": 1
+          },
+          {
+            "key": "cudaStreamGetCaptureInfo_v2",
+            "cpu_self_total_ms": 0.04469899999536574,
+            "cuda_self_total_ms": 0.0,
+            "count": 131
+          },
+          {
+            "key": "cudaFuncSetAttribute",
+            "cpu_self_total_ms": 0.030544999996200205,
+            "cuda_self_total_ms": 0.0,
+            "count": 32
+          },
+          {
+            "key": "cudaOccupancyMaxActiveBlocksPerMultiprocessor",
+            "cpu_self_total_ms": 0.025421000000089407,
+            "cuda_self_total_ms": 0.0,
+            "count": 8
+          },
+          {
+            "key": "cudaStreamEndCapture",
+            "cpu_self_total_ms": 0.022722000000998378,
+            "cuda_self_total_ms": 0.0,
+            "count": 1
+          },
+          {
+            "key": "cudaStreamWaitEvent",
+            "cpu_self_total_ms": 0.020577999998815356,
+            "cuda_self_total_ms": 0.0,
+            "count": 5
+          }
+        ],
+        "timeline_gap_proxy_p50_ms": -6.483253695087388,
+        "kernel_sum_fraction_of_cuda_event_p50": 1.4030606776986934
+      }
+    },
+    "model_gpu_only": {
+      "host_enqueue_ms": {
+        "mean": 47.13973589241505,
+        "p50": 47.04587068408728,
+        "p95": 47.84220876172185,
+        "min": 46.63359560072422,
+        "max": 47.943443059921265,
+        "num_samples": 8
+      },
+      "sync_wait_after_enqueue_ms": {
+        "mean": 9.035435738041997,
+        "p50": 8.838379755616188,
+        "p95": 9.64869549497962,
+        "min": 8.404502645134926,
+        "max": 9.699847549200058,
+        "num_samples": 8
+      },
+      "wall_sync_ms": {
+        "mean": 56.175171630457044,
+        "p50": 56.08020257204771,
+        "p95": 57.04405466094613,
+        "min": 55.42499199509621,
+        "max": 57.115910574793816,
+        "num_samples": 8
+      },
+      "cuda_event_timeline_ms": {
+        "mean": 55.580936431884766,
+        "p50": 55.470943450927734,
+        "p95": 58.27246856689453,
+        "min": 53.73542404174805,
+        "max": 58.89926528930664,
+        "num_samples": 8
+      },
+      "profiler": {
+        "profile_iterations": 2,
+        "cuda_device_event_count": 6230,
+        "cuda_kernel_self_total_ms": 47.305496999999164,
+        "cuda_kernel_self_per_iter_ms": 23.652748499999582,
+        "cpu_profiler_self_total_ms": 106.00671000000004,
+        "cpu_profiler_self_per_iter_ms": 53.00335500000002,
+        "cpu_cuda_launch_total_ms": 20.609481999999787,
+        "cpu_cuda_launch_per_iter_ms": 10.304740999999893,
+        "cpu_cuda_copy_total_ms": 2.7923919999999818,
+        "cpu_cuda_copy_per_iter_ms": 1.3961959999999909,
+        "cpu_cuda_event_record_total_ms": 0.0,
+        "cpu_cuda_event_record_per_iter_ms": 0.0,
+        "cpu_cuda_sync_total_ms": 8.673320000000032,
+        "cpu_cuda_sync_per_iter_ms": 4.336660000000016,
+        "runtime_rows_top": [
+          {
+            "key": "cudaLaunchKernel",
+            "cpu_self_total_ms": 16.259363999999835,
+            "cuda_self_total_ms": 0.0,
+            "count": 3174
+          },
+          {
+            "key": "cudaDeviceSynchronize",
+            "cpu_self_total_ms": 7.296280999999988,
+            "cuda_self_total_ms": 0.0,
+            "count": 2
+          },
+          {
+            "key": "cudaGraphLaunch",
+            "cpu_self_total_ms": 3.175181999999986,
+            "cuda_self_total_ms": 0.0,
+            "count": 8
+          },
+          {
+            "key": "cudaMalloc",
+            "cpu_self_total_ms": 2.6411120000000157,
+            "cuda_self_total_ms": 0.0,
+            "count": 15
+          },
+          {
+            "key": "cudaMemcpyAsync",
+            "cpu_self_total_ms": 2.0920569999999916,
+            "cuda_self_total_ms": 0.0,
+            "count": 216
+          },
+          {
+            "key": "cudaStreamSynchronize",
+            "cpu_self_total_ms": 1.3770390000000434,
+            "cuda_self_total_ms": 0.0,
+            "count": 120
+          },
+          {
+            "key": "cuLaunchKernel",
+            "cpu_self_total_ms": 1.174935999999966,
+            "cuda_self_total_ms": 0.0,
+            "count": 240
+          },
+          {
+            "key": "cudaMemsetAsync",
+            "cpu_self_total_ms": 0.70033499999999,
+            "cuda_self_total_ms": 0.0,
+            "count": 124
+          },
+          {
+            "key": "cudaDeviceGetAttribute",
+            "cpu_self_total_ms": 0.22692999999982658,
+            "cuda_self_total_ms": 0.0,
+            "count": 674
+          },
+          {
+            "key": "cudaFuncSetAttribute",
+            "cpu_self_total_ms": 0.12436899999992966,
+            "cuda_self_total_ms": 0.0,
+            "count": 86
+          },
+          {
+            "key": "cudaOccupancyMaxActiveBlocksPerMultiprocessorWithFlags",
+            "cpu_self_total_ms": 0.04631400000004669,
+            "cuda_self_total_ms": 0.0,
+            "count": 54
+          },
+          {
+            "key": "cudaStreamIsCapturing",
+            "cpu_self_total_ms": 0.031641000000046916,
+            "cuda_self_total_ms": 0.0,
+            "count": 27
+          },
+          {
+            "key": "cudaOccupancyMaxActiveBlocksPerMultiprocessor",
+            "cpu_self_total_ms": 0.02209100000000035,
+            "cuda_self_total_ms": 0.0,
+            "count": 10
+          },
+          {
+            "key": "cudaPeekAtLastError",
+            "cpu_self_total_ms": 0.019669999999976425,
+            "cuda_self_total_ms": 0.0,
+            "count": 240
+          },
+          {
+            "key": "cudaFuncGetAttributes",
+            "cpu_self_total_ms": 0.011251000000003841,
+            "cuda_self_total_ms": 0.0,
+            "count": 2
+          },
+          {
+            "key": "cudaDriverGetVersion",
+            "cpu_self_total_ms": 0.0010090000000054714,
+            "cuda_self_total_ms": 0.0,
+            "count": 8
+          }
+        ],
+        "timeline_gap_proxy_p50_ms": 31.818194950928152,
+        "kernel_sum_fraction_of_cuda_event_p50": 0.42639888612898647
+      }
+    }
+  }
+}
