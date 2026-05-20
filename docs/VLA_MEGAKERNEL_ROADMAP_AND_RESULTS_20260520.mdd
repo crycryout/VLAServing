@@ -1,0 +1,643 @@
+# VLA Mega Kernel Roadmap and Evidence
+
+Date: 2026-05-20
+
+This note summarizes the current VLA Mega Kernel idea, the staged implementation
+roadmap, and the supporting evidence collected so far in the VLAServing
+workspace.
+
+The central claim is not that a full GR00T VLM+DiT Mega Kernel is already
+implemented. The current evidence supports a narrower but useful conclusion:
+VLA Serving has predictable phase/deadline structure, and a persistent
+MPK-style GPU data plane can exploit that structure better than traditional
+host-driven batch serving. The full high-performance VLM+DiT Mega Kernel remains
+future implementation work.
+
+## 1. Problem Setting
+
+The current GR00T N1.6 VLA Serving workload is a closed-loop robot workload:
+
+- Multiple robots share one GPU.
+- Robots consume actions at different frequencies, such as 10Hz, 20Hz, and 30Hz.
+- Each robot periodically requests a new action chunk before its action buffer is
+  exhausted.
+- Requests have horizon/deadline semantics, not only best-effort latency
+  targets.
+- The serving system can sometimes move request phases, but late service can
+  reduce task success under the penalty-aware horizon policy.
+
+The current horizon interpretation used by the Admission/Horizon experiments is:
+
+- If `horizon <= 8`, legal completion is within consumed actions `[8, 16]`, but
+  only consumed action `8` is penalty-free. Serving later inside `[8, 16]`
+  receives increasing success penalty.
+- If `horizon > 8`, completion in `[8, 16]` is legal and penalty-free.
+
+This makes VLA Serving different from ordinary LLM serving. The workload is not
+only a queue of independent requests; it is a phase/deadline scheduling problem
+with predictable next-use times and robot-level fairness constraints.
+
+## 2. Mega Kernel Idea
+
+The proposed design separates the system into two planes:
+
+```text
+VLA-aware control plane:
+  admission / horizon / phase / fairness / edge-CPU-GPU decisions
+
+MPK-style persistent data plane:
+  GPU-resident request queues
+  fixed-phase inference lanes
+  per-stage resource credit
+  VLM / DiT task execution
+  GPU-side completion reporting
+```
+
+The key change is to move high-frequency serving decisions from host-side CUDA
+stream launch/synchronization into a persistent GPU data plane.
+
+The intended data plane is not just a larger CUDA Graph. It should support:
+
+- multiple fixed-phase inference lanes inside one outer persistent kernel,
+- GPU-side request selection by phase/deadline,
+- per-stage credit for SM/HBM/L2/shared/register pressure,
+- lower host scheduling overhead,
+- fewer kernel-boundary and graph-boundary gaps,
+- coarser CPU-GPU synchronization through request/completion rings.
+
+The most useful near-term target is a five-phase batch1 lane design:
+
+```text
+one outer persistent MPK
+  lane 0 starts at phase 0
+  lane 1 starts at phase L / 5
+  lane 2 starts at phase 2L / 5
+  lane 3 starts at phase 3L / 5
+  lane 4 starts at phase 4L / 5
+
+Each lane is internally serial.
+Each request still has full active latency L.
+The system receives a new acceptance slot roughly every L / 5.
+```
+
+The important point is that `L / 5` is the slot spacing, not the latency of one
+request. Each request still pays the full active inference latency.
+
+## 3. Why This Is Plausible For VLA Serving
+
+VLA Serving has structure that ordinary request serving does not:
+
+- Robot request timing is induced by action consumption.
+- Future deadlines are predictable after each action chunk starts.
+- 10Hz, 20Hz, and 30Hz robots create repeated temporal cohorts.
+- Admission can move phases and choose which robot to admit.
+- Batch waiting is not free because late return can reduce success.
+
+Traditional group-batch serving can increase GPU utilization, but it creates
+batch wait and frequency bias. A persistent five-phase data plane can provide
+more frequent batch1 service slots and therefore reduce waiting without relying
+on large batches.
+
+## 4. Current Strong Baseline
+
+The current stable GR00T serving baseline remains:
+
+```text
+fused_conservative = VLM(batch1) + DiT microbatch / step graph
+```
+
+This baseline is important because previous multistage/MPS routes can look good
+under optimistic pipeline models but become weaker under conservative
+request-path modeling.
+
+The local official-style compiled GR00T benchmark from 2026-05-10 measured:
+
+| Component | p50 |
+|---|---:|
+| data processing | 5.60 ms |
+| VLM / backbone | 32.26 ms |
+| DiT action head | 16.69 ms |
+| E2E | 55.10 ms |
+
+Result path:
+
+- `results/gr00t_official_compile_benchmark_20260510.json`
+
+This is a local VLAServing harness measurement, not a universal NVIDIA official
+latency claim.
+
+## 5. Evidence: VLM Has Removable Data-Plane Gap
+
+The strongest current single-request VLM evidence is the fixed-shape VLM
+data-plane proxy:
+
+- `results/gr00t_vlm_mpk_dataplane_proxy_20260510.json`
+
+Key result:
+
+| Metric | Value |
+|---|---:|
+| VLM uncaptured CUDA p50 | 26.78 ms |
+| VLM graph replay CUDA p50 | 10.82 ms |
+| speedup | 2.47x |
+| math kernel sum ratio | 0.967 |
+| timeline gap reduction | 25.47 ms |
+
+Interpretation:
+
+- The VLM path contains substantial GPU timeline gap / launch boundary /
+  dispatcher overhead.
+- Graph replay shows that much of this gap is removable without changing the
+  model math.
+- This supports MPK-style data-plane potential on VLM.
+- It is still a graph replay/proxy result, not a full VLM Mega Kernel.
+
+## 6. Evidence: Single-Request MPK Potential Proxy
+
+The MPK potential proxy from 2026-05-10 estimated:
+
+- `results/gr00t_official_mpk_potential_graphproxy_20260510.json`
+
+| Metric | Value |
+|---|---:|
+| local-harness estimated E2E p50 | 53.63 ms |
+| model CUDA kernel sum | 23.64 ms |
+| idealized E2E lower bound | 29.91 ms |
+| potential speedup | 1.79x |
+
+Interpretation:
+
+- This is an upper-bound/proxy for removable timeline gap.
+- It should not be reported as implemented MPK speedup.
+- It motivates the data-plane direction, especially for VLM, where the measured
+  gap is significant.
+
+## 7. Evidence: Synthetic MPK Admission Profile
+
+The serving-level synthetic MPK experiment asks:
+
+If an MPK-style data plane preserves math efficiency while reducing enough
+kernel boundary / timeline gap, does that translate into Admission/Horizon
+benefit?
+
+Result path:
+
+- `results/gr00t_mpk_synthetic_admission_profile_20260511.json`
+- `docs/GR00T_MPK_SYNTHETIC_SERVING_PROFILE_20260511.md`
+
+Configuration:
+
+- Same fine-tuned policy identity for all robots:
+  `gr00t_n1d6_same_finetuned_policy`
+- Robot action frequencies: 10Hz, 20Hz, 30Hz
+- `chunk_size = 16`
+- `horizon_floor = 8`
+- `max_batch = 8`
+- 20s prediction window and 20s truth window
+
+Synthetic service curves:
+
+| batch | no-MPK fused | synthetic MPK |
+|---:|---:|---:|
+| 1 | 45.50 ms | 29.05 ms |
+| 2 | 49.65 ms | 32.70 ms |
+| 3 | 52.98 ms | 35.64 ms |
+| 4 | 56.57 ms | 38.80 ms |
+| 5 | 59.71 ms | 41.57 ms |
+| 6 | 61.42 ms | 43.08 ms |
+| 7 | 70.44 ms | 51.03 ms |
+| 8 | 72.85 ms | 53.16 ms |
+
+Admission results:
+
+| metric | no-MPK fused | batched synthetic MPK | five-phase MPK lanes |
+|---|---:|---:|---:|
+| stable robot count | 12.67 | 19.00 | 32.50 |
+| request p95 | 72.85 ms | 53.16 ms | 53.16 ms |
+| queued request p95 | 842.87 ms | 1040.41 ms | 705.37 ms |
+| queue wait p95 | 788.78 ms | 996.95 ms | 652.21 ms |
+| mean batch size | 6.19 | 7.37 | 1.00 |
+| accept-rate gap | 0.203 | 0.207 | 0.0075 |
+| lane utilization | n/a | n/a | 0.879 |
+
+Interpretation:
+
+- Batched synthetic MPK improves raw service latency but still relies on large
+  batches, so queueing can remain high after admitting more robots.
+- Five-phase MPK lanes preserve the same per-request service p95 as batched MPK
+  in this conservative model, but improve queueing and fairness by avoiding
+  batch wait.
+- This is simulator evidence for the serving mechanism, not a real MPK kernel
+  benchmark.
+
+## 8. Evidence: Equal-Latency Five-Phase Ablation
+
+The equal-latency ablation removes the assumption that MPK is faster than normal
+inference. It tests whether the five-phase serving shape alone still helps.
+
+Result path:
+
+- `results/gr00t_phase5_equal_latency_admission_20260511.json`
+- script: `src/gr00t/eval/bench_gr00t_phase5_equal_latency_admission.py`
+
+The control uses exactly the no-MPK fused service curve, so `batched_equal` and
+`no-MPK` are identical.
+
+| mode | stable robots | request p95 | queued p95 | queue wait p95 | mean batch | accept-rate gap |
+|---|---:|---:|---:|---:|---:|---:|
+| no-MPK fused | 12.67 | 72.85 ms | 842.87 ms | 788.78 ms | 6.19 | 0.203 |
+| batched equal-latency control | 12.67 | 72.85 ms | 842.87 ms | 788.78 ms | 6.19 | 0.203 |
+| five-phase, latency=batch1 | 38.17 | 45.50 ms | 712.85 ms | 667.35 ms | 1.00 | 0.016 |
+| five-phase, latency=batch4 | 30.67 | 56.57 ms | 719.34 ms | 662.77 ms | 1.00 | 0.0046 |
+| five-phase, latency=batch5 | 29.50 | 59.71 ms | 723.44 ms | 663.74 ms | 1.00 | 0.0607 |
+| five-phase, latency=batch8 | 22.33 | 72.85 ms | 743.11 ms | 670.25 ms | 1.00 | 0.0719 |
+
+The batch4 and batch5 rows match the intended interpretation:
+
+```text
+Five inference lanes run concurrently.
+Any one request in those five lanes has active latency equal to the traditional
+batch=4 or batch=5 inference latency.
+The lane interval is L / 5, but each request still has latency L.
+```
+
+Conclusion:
+
+- Even when each five-phase request is charged the traditional batch4 or batch5
+  latency, five-phase serving remains better than ordinary group-batch serving
+  in stable robot count, queue wait, and fairness.
+- This isolates the value of the serving shape from the value of faster kernels.
+
+Frequency fairness under equal-latency ablation:
+
+Offered robots across six groups:
+
+| frequency | offered |
+|---|---:|
+| 10Hz | 111 |
+| 20Hz | 107 |
+| 30Hz | 106 |
+
+Accepted robots:
+
+| mode | 10Hz | 20Hz | 30Hz |
+|---|---:|---:|---:|
+| no-MPK fused | 11 / 18.97% | 15 / 25.86% | 32 / 55.17% |
+| five-phase, latency=batch4 | 57 / 34.34% | 55 / 33.13% | 54 / 32.53% |
+| five-phase, latency=batch5 | 57 / 35.85% | 54 / 33.96% | 48 / 30.19% |
+
+Per-frequency acceptance rate:
+
+| mode | 10Hz | 20Hz | 30Hz | gap |
+|---|---:|---:|---:|---:|
+| no-MPK fused | 9.91% | 14.02% | 30.19% | 0.203 |
+| five-phase, latency=batch4 | 51.35% | 51.40% | 50.94% | 0.0046 |
+| five-phase, latency=batch5 | 51.35% | 50.47% | 45.28% | 0.0607 |
+
+Interpretation:
+
+- Ordinary batch serving is biased toward 30Hz robots.
+- Five-phase lanes make admission much more balanced across frequencies.
+
+## 9. Evidence: Persistent Five-Phase Scheduler MVP
+
+The synthetic persistent scheduler MVP tests whether phase release and stage
+credit can reduce collisions inside a persistent kernel-like execution model.
+
+Representative result:
+
+| mode | steady E2E p50 | active E2E p50 | queue p50 | max same-stage |
+|---|---:|---:|---:|---:|
+| solo | 3.186 ms | 3.186 ms | 0.000 ms | 1 / 1 |
+| cyclic burst no credit | 5.477 ms | 3.357 ms | 2.111 ms | 5 / 5 |
+| cyclic burst credit=3 | 4.299 ms | 3.271 ms | 1.030 ms | 3 / 3 |
+| cyclic phase no credit | 3.649 ms | 3.270 ms | 0.391 ms | 4 / 4 |
+| cyclic phase credit=3 | 3.794 ms | 3.273 ms | 0.525 ms | 3 / 3 |
+| cyclic phase credit=2 | 7.124 ms | 3.369 ms | 3.455 ms | 2 / 2 |
+
+Result paths:
+
+- `results/gr00t_phase5_cyclic_fixedlane_mpk_mvp_20260511.json`
+- `results/gr00t_phase5_persistent_credit_mpk_mvp_20260511.json`
+- `docs/GR00T_PHASE5_CYCLIC_FIXEDLANE_MPK_MVP_20260511.md`
+- `docs/GR00T_PHASE5_PERSISTENT_CREDIT_MPK_MVP_20260511.md`
+
+Interpretation:
+
+- Phase release is better than burst release because it reduces queueing and
+  same-stage collision.
+- Credit is useful when burst/collision exists, but too strict a credit limit
+  can destroy throughput.
+- This validates the control mechanism concept, not the final GR00T VLM/DiT
+  compute kernel.
+
+## 10. Current Mirage / MPK Compilation Status
+
+Current results show feasibility and task plumbing, not a production-speed full
+kernel.
+
+| Item | Status | Evidence |
+|---|---|---|
+| DiT attention Mirage compile | self/cross padded attention compile and run | `results/gr00t_mirage_compiler_dit_attention_probe_*_20260510.json` |
+| DiT MPK attention bridge | task-variant bridge correctness close | `results/gr00t_mpk_bridge_attention_*_20260510.json` |
+| VLM postprefill attention core | Qwen3 GQA shape compile started | `results/gr00t_vlm_postprefill_mpk_subgraph_probe_20260511.json` |
+| VLM postprefill block skeleton | one decoder-block skeleton compile started | `results/gr00t_vlm_postprefill_mpk_subgraph_block_compile_20260511.json` |
+| DiT hand-MPK single step | functional but far too slow | `results/gr00t_dit_single_step_hand_mpk_mvp_cutlass_linear_tiled_attention_auto_profile_20260510.json` |
+
+Notable DiT hand-MPK result:
+
+| path | latency |
+|---|---:|
+| official step | 17.88 ms |
+| CUDA Graph step | 4.73 ms |
+| hand-MPK step | 190.07 ms |
+
+Interpretation:
+
+- The current hand-MPK path proves plumbing but is not a performance path.
+- The main implementation gap is replacing scalar/generic task bodies with
+  high-performance shape-specific attention/linear/FFN tasks, preferably through
+  Mirage/MPK compiler generation or CUTLASS-style kernels.
+
+## 11. CPU-GPU and Edge Co-Processing Direction
+
+KTransformers is useful as inspiration but should not be copied directly.
+
+KTransformers targets MoE LLM inference:
+
+- hot/shared experts on GPU,
+- routed/cold experts on CPU,
+- AMX/AVX CPU kernels,
+- asynchronous CPU-GPU scheduling,
+- Expert Deferral to improve overlap.
+
+Current GR00T VLA is mostly dense VLM + DiT. Directly offloading dense
+VLM/DiT matmul to CPU is unlikely to win because PCIe/NUMA transfer and
+barriers can dominate the tens-of-ms VLA deadline.
+
+Better VLA-specific co-processing targets:
+
+| Component | Recommended role |
+|---|---|
+| CPU preprocessing | overlap image decode/resize/normalization/token/mask prep with GPU inference |
+| CPU postprocessing | action denormalization, safety checks, controller handoff |
+| CPU control plane | admission, horizon, phase, fairness, edge/network decisions |
+| GPU Mega Kernel | persistent VLM/DiT inference data plane |
+| edge device | sensor preprocessing, optional vision encoder, fallback policy |
+
+Synchronization goal:
+
+```text
+Do not synchronize CPU/GPU more frequently.
+Instead, reduce CPU-GPU synchronization count and move high-frequency scheduling
+inside the GPU persistent data plane.
+```
+
+The expected interface is:
+
+```text
+CPU writes request descriptors into pinned/ring-buffer memory.
+GPU persistent kernel pulls descriptors, schedules lanes, runs tasks, and writes completions.
+CPU periodically consumes completions and updates robot state.
+```
+
+## 12. Implementation Roadmap
+
+The recommended roadmap is deliberately incremental.
+
+### Stage 0: Freeze Baselines
+
+Goal:
+
+- Make all comparisons reproducible.
+
+Artifacts:
+
+- official torch.compile E2E baseline,
+- fused conservative service curve,
+- five-phase synthetic admission,
+- equal-latency ablation,
+- persistent scheduler MVP.
+
+Pass criteria:
+
+- All numbers can be regenerated from scripts and JSON files.
+- Each reported number is labeled as GPU benchmark, simulator result, or proxy.
+
+### Stage 1: Persistent Scheduler MVP
+
+Goal:
+
+- Implement the serving data plane without real VLM/DiT compute.
+
+Artifacts:
+
+- one persistent kernel,
+- five lanes,
+- fixed phase offset,
+- dummy compute/HBM stages,
+- per-stage credit.
+
+Pass criteria:
+
+- Each lane's active latency is measurable.
+- Slot interval is stable at `L / 5`.
+- Phase release improves queueing versus burst release.
+- Credit limits same-stage collision without over-throttling.
+
+### Stage 2: CPU-GPU Request Ring
+
+Goal:
+
+- Remove per-request host launch from the serving path.
+
+Artifacts:
+
+- CPU request descriptor ring,
+- GPU completion ring,
+- pinned memory or mapped control buffer,
+- descriptor fields for robot id, deadline, horizon, phase, input/output pointers.
+
+Pass criteria:
+
+- Host launch overhead does not scale with request count.
+- The GPU data plane can keep running while CPU updates admission state.
+- End-to-end simulator traces can be replayed through the runtime.
+
+### Stage 3: Resource-Credit Runtime
+
+Goal:
+
+- Make the Mega Kernel resource-aware.
+
+Artifacts:
+
+- per-stage credit for compute-heavy and memory-heavy stages,
+- counters for active lanes per stage,
+- optional per-lane backpressure.
+
+Pass criteria:
+
+- Burst mode shows collision.
+- Phase mode reduces collision.
+- Credit improves collision cases without destroying throughput.
+- Too-strict credit is shown to hurt throughput, matching current MVP evidence.
+
+### Stage 4: DiT Real Task Integration
+
+Goal:
+
+- Replace dummy tasks with the first real GR00T compute path.
+
+Order:
+
+1. DiT single-step task.
+2. Mixed-step task so requests at different denoising steps can still share the
+   runtime.
+3. Four-step loop.
+
+Pass criteria:
+
+- block-level and step-level correctness against official output,
+- same-scope comparison against CUDA Graph step baseline,
+- latency close enough that the scheduler benefit is not erased.
+
+Current risk:
+
+- Existing hand-MPK DiT task is far too slow.
+- Shape-specific high-performance linear/attention/FFN tasks are required.
+
+### Stage 5: VLM Postprefill Task Integration
+
+Goal:
+
+- Add VLM value without attempting full VLM first.
+
+Order:
+
+1. Qwen3 postprefill GQA attention core.
+2. One decoder block.
+3. 28-layer postprefill stack.
+4. Integration with VLM stage boundary.
+
+Pass criteria:
+
+- correct mask, scale, RoPE, padding, and slice semantics,
+- block-level numerical agreement,
+- same-scope comparison against official compiled or graph replay baseline.
+
+Reason not to start from full VLM:
+
+- full VLM includes image preprocessing, vision encoder, masks, dynamic shape
+  glue, and HF module plumbing;
+- postprefill has more fixed shape and is a better MPK/Mirage target.
+
+### Stage 6: Five-Phase VLA Runtime
+
+Goal:
+
+- Combine real compute tasks with five-phase serving.
+
+Artifacts:
+
+- five lanes,
+- VLM/DiT pipeline per lane,
+- GPU-side selection by deadline/phase,
+- CPU admission replay integration.
+
+Pass criteria:
+
+- real replay shows lower queue wait or higher stable capacity than group-batch
+  serving under the same latency assumptions;
+- frequency fairness improves for 10Hz/20Hz/30Hz robots;
+- request-level p95 and queued p95 remain within horizon stability rules.
+
+### Stage 7: CPU/Edge Co-Processing
+
+Goal:
+
+- Exploit CPU and edge resources where they fit the VLA workload.
+
+Artifacts:
+
+- CPU preprocessing overlap,
+- CPU postprocessing overlap,
+- network/edge latency simulator,
+- optional edge vision/fallback emulator.
+
+Pass criteria:
+
+- stable robot count improves or deadline miss rate decreases under network and
+  CPU load sweeps;
+- CPU-GPU sync overhead is reduced by persistent rings rather than added by
+  fine-grained host callbacks.
+
+### Stage 8: Paper-Quality System Evaluation
+
+Goal:
+
+- Turn the idea into a publishable systems contribution.
+
+Core claims to prove:
+
+1. VLA workloads expose predictable phase/deadline structure.
+2. Group-batch GPU serving is suboptimal for mixed-frequency closed-loop robots.
+3. Persistent phase-aware GPU data planes can improve capacity and fairness even
+   without per-request latency improvement.
+4. MPK-style task fusion/data-plane execution can additionally reduce VLM/DiT
+   boundary gaps.
+5. CPU/edge co-processing should live in the control/pre/post/fallback path, not
+   as naive dense matmul offload.
+
+Required ablations:
+
+- no-MPK fused baseline,
+- batched equal-latency control,
+- five-phase with batch4/batch5/batch8 active latency,
+- burst versus phase release,
+- no credit versus credit,
+- DiT only,
+- VLM postprefill only,
+- full VLA replay,
+- CPU/edge overlap enabled versus disabled.
+
+## 13. Key Limitations
+
+Current limitations:
+
+- No full high-performance VLM+DiT Mega Kernel exists yet.
+- Current DiT hand-MPK is much slower than CUDA Graph.
+- Mirage/MPK compilation has reached subgraphs, not full production E2E.
+- Synthetic admission results validate the scheduling mechanism, not physical
+  kernel speed.
+- Full VLM graph is still not the right first target; VLM postprefill subgraph is
+  the practical next step.
+- CPU offload is only attractive for control/pre/post/fallback or future sparse
+  modules, not for current dense VLM/DiT core math.
+
+## 14. Short Conclusion
+
+The most defensible roadmap is:
+
+```text
+persistent five-phase scheduler
+-> CPU-GPU request/completion ring
+-> stage credit/resource control
+-> DiT real task
+-> VLM postprefill task
+-> five-phase real VLA runtime
+-> CPU/edge cooperative serving
+-> paper-quality evaluation
+```
+
+The strongest current result is not "full MPK is already faster." The strongest
+current result is:
+
+```text
+Five-phase persistent serving can improve VLA admission, queueing, and fairness
+even when each lane's active latency is charged as traditional batch4/batch5
+inference latency.
+```
+
+That is the core system insight to preserve while the lower-level VLM/DiT MPK
+kernels are built.
