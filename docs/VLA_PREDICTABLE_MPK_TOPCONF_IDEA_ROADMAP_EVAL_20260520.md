@@ -80,6 +80,79 @@ The contribution is a VLA-aware GPU serving architecture, not only a custom CUDA
 kernel.
 ```
 
+### 2.1 Comparison With Traditional Serving Systems
+
+Traditional serving systems usually optimize one of three abstractions:
+
+1. request/response model serving,
+2. queue-first dynamic batching,
+3. coarse GPU sharing or graph replay.
+
+Those abstractions miss the most useful property of VLA serving: the system can
+predict future action-refresh windows and can shape phases before requests hit
+the execution path.
+
+| Traditional serving mechanism | What it optimizes | Why it is insufficient for VLA | Proposed VLA optimization |
+|---|---|---|---|
+| FIFO / request-response model serving | simple online latency | ignores action exhaustion, horizon penalty, and robot phase | lease/deadline-aware request model |
+| dynamic batching | throughput by waiting for more requests | batch wait consumes action budget and can bias toward high-frequency robots | phase-aware batch1 lanes and deadline admission |
+| continuous batching in LLM serving | token-level throughput and KV reuse | VLA action chunks have hard refresh windows, not just decode token queues | action-horizon scheduling and phase movement |
+| CUDA Graph replay | lower host launch overhead for fixed graphs | replay is still host-triggered and does not manage multi-robot phase/resource contention | GPU-resident persistent request data plane |
+| TensorRT / optimized inference engine | faster single-model kernels | does not solve fleet-level admission, fairness, or phase waiting | combine optimized kernels with VLA-aware serving control |
+| MPS / multi-stream overlap | coarse concurrency | can create stage backlog, prefill overrun, and uncontrolled resource contention | per-stage credit and phase-local deadlines |
+| MIG / spatial partitioning | hard resource isolation | partitions capacity statically and ignores temporal phase slack | elastic phase-aware lanes sharing one model |
+| generic pipeline parallelism | overlap stages | ordinary pipeline does not know robot deadlines or success penalty | horizon-aware VLM/DiT stage scheduling |
+| CPU/GPU co-processing | use more heterogeneous resources | dense VLM/DiT CPU offload is usually too slow; sync can dominate | CPU as low-rate control/pre/post plane, GPU as persistent data plane |
+
+The key mismatch:
+
+```text
+Traditional serving treats requests as arrivals to a queue.
+VLA serving should treat future action refreshes as schedulable leases.
+```
+
+### 2.2 Main Optimization Points Over Traditional Serving
+
+The proposed system optimizes at three layers.
+
+Single-inference layer:
+
+| Optimization | Traditional behavior | VLA MegaKernel behavior | Expected benefit |
+|---|---|---|---|
+| host launch removal | CPU launches many kernels or graph replays per request | CPU writes descriptor; GPU persistent data plane runs tasks | lower request-path CPU overhead |
+| graph/operator boundary reduction | VLM/DiT executes many GEMM/norm/copy/shape kernels | MPK/Mirage fuses task boundaries where practical | lower timeline gaps and HBM round trips |
+| preallocation | tensor allocation and dynamic addresses appear in request path | fixed per-lane arenas and pointer-stable buffers | less allocator overhead, easier capture |
+| fixed-shape buckets | dynamic shape handling and graph breaks | pad/mask into finite shape classes | more graph/MPK reuse |
+| prefetch/load | data and weights loaded reactively | prefetch static weights, stage buffers, and next-lane scratch by phase | lower memory wait and better cache locality |
+
+Serving-system layer:
+
+| Optimization | Traditional behavior | VLA MegaKernel behavior | Expected benefit |
+|---|---|---|---|
+| phase-aware admission | admit by queue capacity or average latency | admit by future action-exhaustion windows | higher stable robot count |
+| five-phase lanes | wait for group batch | frequent batch1 service slots with full active latency charged | less queue wait and better deadline behavior |
+| fairness-aware scheduling | high-frequency robots can dominate admission | acceptance constrained across 10Hz/20Hz/30Hz classes | lower accept-rate gap |
+| horizon penalty awareness | latency objective only | serving time tied to success penalty | better fleet score and task success |
+| queue-to-lease conversion | reactive queueing | pre-scheduled leases with phase movement | fewer surprise overloads |
+
+Resource-control layer:
+
+| Optimization | Traditional behavior | VLA MegaKernel behavior | Expected benefit |
+|---|---|---|---|
+| stage credit | MPS/streams let stages compete implicitly | explicit per-stage concurrency limits | controlled SM/HBM/L2/shared/register contention |
+| phase release | burst arrivals collide in same stage | lane starts are phase-shifted | fewer same-stage collisions |
+| GPU-side scheduling | CPU orders streams and launches | persistent kernel selects ready lane/stage | lower host scheduling overhead |
+| model residency | serving system treats requests independently | one shared GR00T model with fixed buffers | less repeated setup and better cache/layout reuse |
+| request/completion rings | CPU synchronizes per request or stage | lightweight descriptor/completion protocol | fewer CPU-GPU sync points |
+
+The cleanest top-level comparison:
+
+```text
+Dynamic batching improves throughput by waiting.
+Predictable VLA MegaKernel improves throughput and deadlines by scheduling
+future leases before they become urgent.
+```
+
 ## 3. Core Insight
 
 The key insight is that VLA serving exposes useful predictability at several
