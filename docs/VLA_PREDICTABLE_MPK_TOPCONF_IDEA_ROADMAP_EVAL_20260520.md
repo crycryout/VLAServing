@@ -609,7 +609,115 @@ Interpretation:
 - Too-strict credit damages throughput.
 - This proves the control mechanism concept, not the final GR00T compute path.
 
-### 10.8 Mirage / MPK Compilation Status
+### 10.8 Long-Running Five-Phase Request-Ring MVP
+
+Sources:
+
+- `src/gr00t/eval/bench_gr00t_phase5_persistent_request_ring_mvp.py`
+- `results/gr00t_phase5_persistent_request_ring_mvp_20260520.json`
+
+This experiment is the first real GPU persistent request-ring test for the
+five-phase VLA serving idea. It is still not a full GR00T `VLM + DiT` MPK
+implementation. The kernel body uses synthetic compute and HBM stages to model
+stage pressure, but the runtime mechanism is real:
+
+- one persistent CUDA kernel stays resident,
+- CPU writes small request descriptors into a device-memory request ring,
+- the GPU polls descriptors and runs five phase-shifted lanes,
+- each lane processes multiple requests over time,
+- compute/HBM stages are internally serial per request,
+- per-stage credit limits same-stage concurrency,
+- GPU writes completion records into mapped pinned host memory,
+- there is no per-request host kernel launch.
+
+Runtime configuration:
+
+| Item | Value |
+|---|---:|
+| GPU | RTX 4090 |
+| SM count | `128` |
+| lanes | `5` |
+| requests per lane | `24` |
+| repeats | `3` |
+| workers per lane | `39` |
+| approximate lane SM budget | `30%` |
+| phase gap | `0.1204 ms` |
+| compute stage | synthetic FMA loop |
+| memory stage | synthetic HBM read/write loop |
+
+Measured runtime summary:
+
+| mode | GPU active p50 | host E2E p50 | max compute lanes | max HBM lanes |
+|---|---:|---:|---:|---:|
+| solo | `0.602 ms` | `7.55 ms` | `1` | `1` |
+| burst no credit | `0.661 ms` | `1.79 ms` | `5` | `5` |
+| burst credit=3 | `0.652 ms` | `1.81 ms` | `3` | `3` |
+| phase no credit | `0.580 ms` | `0.608 ms` | `2` | `4` |
+| phase credit=3 | `0.649 ms` | `1.33 ms` | `2` | `3` |
+| phase credit=2 | `0.561 ms` | `1.21 ms` | `2` | `2` |
+
+Important interpretation:
+
+- `solo host E2E` includes request-ring backlog in the single-lane immediate
+  mode, so it is not used as the lane slowdown signal.
+- Admission uses `GPU active` slowdown, which better represents the request's
+  active device service time.
+- Phase release converts burst same-stage collision from `5/5` down to
+  compute `2`, HBM `4`.
+- Adding `credit=3` clamps HBM same-stage concurrency to `3`, but it adds queue
+  wait in this run.
+- `credit=2` is too strict for throughput even though active GPU time remains
+  small.
+
+Measured slowdown used for serving simulation:
+
+| Slowdown model | Value |
+|---|---:|
+| phase credit=3 GPU-active p50 / solo | `1.077x` |
+| phase credit=3 GPU-active p95 / solo | `1.338x` |
+| phase no-credit GPU-active p50 / solo | `0.963x` |
+| phase credit=3 scaled lane service p50 | `49.02 ms` |
+| phase credit=3 scaled lane service p95 | `60.87 ms` |
+
+Admission/Horizon results after feeding measured slowdown back into the same
+penalized GR00T policy:
+
+| policy | stable robots | request p95 | queued p95 | queue wait p95 | accept-rate gap |
+|---|---:|---:|---:|---:|---:|
+| no-MPK fused conservative | `12.67` | `72.85 ms` | `842.87 ms` | `788.78 ms` | `0.203` |
+| phase5 measured p50 slowdown | `35.50` | `49.02 ms` | `706.82 ms` | `657.80 ms` | `0.051` |
+| phase5 measured p95 slowdown | `27.67` | `60.87 ms` | `734.46 ms` | `673.60 ms` | `0.127` |
+| phase5 no-credit slowdown | `39.83` | `43.83 ms` | `711.52 ms` | `667.69 ms` | `0.016` |
+| equal-latency batch4 reference | `30.67` | `56.57 ms` | `719.34 ms` | `662.77 ms` | `0.0046` |
+| equal-latency batch5 reference | `29.50` | `59.71 ms` | `723.44 ms` | `663.74 ms` | `0.061` |
+
+Key conclusion:
+
+```text
+The five-phase predictable serving data plane can run as a real long-lived GPU
+persistent request-ring runtime, and when measured p50 lane slowdown is used, it
+still beats traditional no-MPK fused batching in stable robot count, request
+p95, queued p95, queue wait, and fairness.
+```
+
+The conservative p95 slowdown case still beats no-MPK fused batching, but it no
+longer dominates the equal-latency batch4/batch5 reference on every metric. This
+is useful because it identifies the next real bottleneck: fixed `credit=3` adds
+tail wait. The next design should use adaptive per-stage credit rather than one
+static credit for all phases and stages.
+
+What this experiment proves:
+
+| Claim | Status |
+|---|---|
+| persistent GPU request data plane can run multiple request rounds | supported |
+| five phase releases can be implemented without per-request launches | supported |
+| stage credit can cap same-stage concurrency | supported |
+| measured lane slowdown can be fed into Admission/Horizon | supported |
+| full GR00T VLM/DiT MPK exists | not supported |
+| current synthetic kernel proves final GR00T math speed | not supported |
+
+### 10.9 Mirage / MPK Compilation Status
 
 | Item | Current status |
 |---|---|
@@ -635,7 +743,7 @@ performance path. The project needs shape-specific high-performance
 linear/attention/FFN tasks, preferably Mirage/MPK-compiled or CUTLASS-style.
 ```
 
-### 10.9 CPU-GPU Co-Processing Evidence
+### 10.10 CPU-GPU Co-Processing Evidence
 
 Sources:
 
@@ -798,6 +906,7 @@ CPU/edge metrics:
 | phase vs burst persistent MVP | phase release reduces collision | persistent dummy kernel trace |
 | credit sweep | credit helps only when not over-throttled | persistent dummy kernel trace |
 | request ring | CPU/GPU sync path is lightweight | ring microbenchmark |
+| long-running five-phase request ring | persistent data plane can process repeated phase releases and feed measured lane slowdown into Admission/Horizon | `gr00t_phase5_persistent_request_ring_mvp_20260520.json` |
 | DiT task integration | real compute task feasibility | correctness + latency |
 | VLM postprefill integration | VLM-side MPK value | correctness + latency |
 | full five-phase replay | end-to-end serving benefit | runtime replay |
@@ -868,6 +977,26 @@ Exit criteria:
 - no per-request host kernel launch,
 - phase release produces stable slot interval,
 - ring overhead is below the serving deadline budget.
+
+Current status:
+
+- A long-running five-phase persistent request-ring MVP exists in
+  `src/gr00t/eval/bench_gr00t_phase5_persistent_request_ring_mvp.py`.
+- It processes repeated request rounds with one resident CUDA kernel and no
+  per-request kernel launches.
+- It supports burst release, phase release, `credit=2`, and `credit=3`.
+- It writes completion records through mapped pinned host memory.
+- It feeds measured lane slowdown into the penalized GR00T Admission/Horizon
+  simulator.
+- It still uses synthetic compute/HBM stages, not real GR00T VLM/DiT tasks.
+
+Next Stage 2 refinement:
+
+- replace fixed credit with adaptive per-stage credit,
+- reduce descriptor submit and completion polling overhead,
+- record richer traces for same-stage collision and lane tail latency,
+- calibrate synthetic compute/HBM pressure against real VLM/DiT operator
+  profiles.
 
 ### Stage 3: DiT Real Task Integration
 
@@ -997,6 +1126,9 @@ Safe claims:
   launch/runtime exposure.
 - Persistent scheduler MVP supports phase release and stage credit as control
   mechanisms.
+- Long-running request-ring MVP shows that five-phase GPU-resident scheduling can
+  process repeated phase releases and that measured p50 lane slowdown still
+  improves Admission/Horizon versus no-MPK fused batching.
 - Full high-performance VLM+DiT MPK remains implementation work.
 
 ## 17. Paper Narrative
@@ -1024,21 +1156,26 @@ predictable real-time GPU data-plane problem, not as generic queue batching.
    - official clean torch.compile E2E,
    - VLM graph replay,
    - DiT step CUDA Graph,
-   - persistent five-phase dummy scheduler.
+   - persistent five-phase request-ring scheduler.
 2. Produce Nsight Compute roofline table for:
    - VLM attention,
    - VLM MLP/linear,
    - DiT attention,
    - DiT FFN,
    - norm/copy/index kernels.
-3. Extend persistent scheduler MVP to a long-running cyclic request ring:
-   - no finite burst-only measurement,
-   - fixed phase interval,
-   - per-lane active latency and queue latency.
-4. Replace the slow hand-MPK DiT task with a shape-specific compiled task.
-5. Continue VLM postprefill MPK rather than full VLM mega-kernel.
-6. Feed real measured lane slowdown back into Admission/Horizon.
-7. Add real rollout or high-fidelity simulator success-rate validation.
+3. Replace fixed `credit=3` with adaptive per-stage credit:
+   - credit should react to measured HBM/compute contention,
+   - phase release should be the default collision reducer,
+   - credit should only clamp stages when collision is real.
+4. Replace the synthetic stage body in the request-ring MVP with one real DiT
+   step task, then with VLM postprefill tasks.
+5. Replace the slow hand-MPK DiT task with a shape-specific compiled task.
+6. Continue VLM postprefill MPK rather than full VLM mega-kernel.
+7. Run simulator-to-runtime replay:
+   - use the admitted fleets from Admission/Horizon,
+   - replay their phase schedule through the persistent ring,
+   - feed measured tail slowdown back into admission.
+8. Add real rollout or high-fidelity simulator success-rate validation.
 
 ## 19. Artifact Index
 
@@ -1058,6 +1195,7 @@ Key result files:
 - `results/gr00t_phase5_equal_latency_admission_20260511.json`
 - `results/gr00t_phase5_cyclic_fixedlane_mpk_mvp_20260511.json`
 - `results/gr00t_phase5_persistent_credit_mpk_mvp_20260511.json`
+- `results/gr00t_phase5_persistent_request_ring_mvp_20260520.json`
 - `results/official_clean_groot_n16_3b_torchcompile_launch_sync_20260520.json`
 - `results/official_clean_groot_n16_noncompute_overhead_breakdown_20260520.json`
 - `results/official_clean_groot_n16_operator_inventory_20260520.json`
@@ -1071,6 +1209,7 @@ Related implementation/probe scripts:
 - `src/gr00t/eval/bench_gr00t_phase5_equal_latency_admission.py`
 - `src/gr00t/eval/bench_gr00t_phase5_cyclic_fixedlane_mpk_mvp.py`
 - `src/gr00t/eval/bench_gr00t_phase5_persistent_credit_mpk_mvp.py`
+- `src/gr00t/eval/bench_gr00t_phase5_persistent_request_ring_mvp.py`
 - `src/gr00t/eval/bench_official_clean_groot_n16_launch_sync.py`
 - `src/gr00t/eval/bench_official_clean_groot_n16_overhead_breakdown.py`
 - `src/gr00t/eval/bench_official_clean_groot_n16_operator_inventory.py`
@@ -1093,8 +1232,10 @@ The near-term publishable claim should be:
 
 ```text
 Five-phase persistent VLA serving improves admission, queueing, and fairness
-under equal-latency assumptions, and profiling shows enough VLM/DiT data-plane
-gap to motivate MPK-style implementation.
+under equal-latency assumptions. A real GPU persistent request-ring MVP also
+shows that measured p50 lane slowdown still improves Admission/Horizon versus
+no-MPK fused batching. Profiling shows enough VLM/DiT data-plane gap to
+motivate MPK-style implementation.
 ```
 
 The long-term implementation claim should be:
