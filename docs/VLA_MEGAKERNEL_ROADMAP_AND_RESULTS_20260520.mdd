@@ -830,6 +830,69 @@ Reason:
 - CPU/edge work should be justified through overlap and deadline robustness, not
   naive dense matmul offload.
 
+Current no-Nsight result, 2026-05-20:
+
+| Probe | Result | Interpretation |
+|---|---:|---|
+| CPU preprocessing p50 | `4.74 ms` | small but not free |
+| GPU model CUDA-event p50 | `46.05 ms` | GPU remains dominant |
+| sequential preprocess + GPU throughput | `19.88 req/s` | request path pays CPU + GPU |
+| overlap GPU current + prepare next throughput | `22.17 req/s` | `+11.5%` throughput in this harness |
+| sequential per-request p50 | `50.26 ms` | close to CPU + GPU |
+| overlapped steady iteration p50 | `44.78 ms` | CPU prep is mostly hidden by GPU work |
+
+Source:
+
+- `results/gr00t_cpu_gpu_coprocessing_profile_iter8_20260520.json`
+
+Transfer profiling says CPU/edge split tensors are not the first bottleneck if
+pinned memory is used:
+
+| Tensor proxy | Size | pinned H2D p50 | pinned D2H p50 |
+|---|---:|---:|---:|
+| raw `1x256x256x3` uint8 image | `0.188 MiB` | `0.017 ms` | `0.016 ms` |
+| fp16 `1x3x256x256` image tensor | `0.375 MiB` | `0.023 ms` | `0.021 ms` |
+| VLM hidden `203x2048` bf16 | `0.793 MiB` | `0.040 ms` | `0.038 ms` |
+| larger tokens `1024x2048` bf16 | `4.000 MiB` | `0.175 ms` | `0.166 ms` |
+| action chunk `16x32` fp32 | `0.002 MiB` | `0.017 ms` | `0.017 ms` |
+
+Dense-op proxy says naive CPU offload of current VLM/DiT dense math is not the
+right target:
+
+| Proxy op | CPU bf16 p50 | GPU bf16 p50 | CPU/GPU ratio |
+|---|---:|---:|---:|
+| VLM postprefill dense `203x2048x2048` | `0.49 ms` | `0.027 ms` | `18.4x` |
+| VLM larger-token dense `1024x2048x2048` | `2.30 ms` | `0.070 ms` | `33.1x` |
+| DiT small dense `16x1024x4096` | `0.19 ms` | `0.022 ms` | `8.9x` |
+| DiT medium dense `64x1024x4096` | `0.26 ms` | `0.024 ms` | `11.1x` |
+
+Source:
+
+- `results/gr00t_cpu_gpu_coprocessing_dense_proxy_20260520.json`
+
+Admission/Horizon proxy:
+
+| Service model | mean final robots | mean p95 | mean batch | accept-rate gap |
+|---|---:|---:|---:|---:|
+| GPU-only fused reference | `12.67` | `72.85 ms` | `6.19` | `0.203` |
+| CPU+GPU sequential request path | `11.00` | `77.59 ms` | `5.85` | `0.220` |
+| CPU-prep/GPU pipelined overlap | `12.67` | `72.85 ms` | `6.19` | `0.203` |
+
+Source:
+
+- `results/gr00t_cpu_gpu_coprocessing_admission_proxy_20260520.json`
+
+Conclusion:
+
+- CPU-GPU co-processing is useful in the current VLA Serving setting mainly as
+  pipeline overlap for preprocessing, postprocessing, admission, request rings,
+  and fallback/edge stages.
+- It should not be framed as a replacement for GPU VLM/DiT dense kernels unless
+  the model exposes sparse/MoE-like CPU-friendly work.
+- In Admission/Horizon, CPU preprocessing overlap is valuable because it avoids
+  losing robot capacity when CPU request-path work is included; it does not by
+  itself exceed the GPU-only fused serving curve.
+
 ### 12.10 Profiling Deliverables Before Full Implementation
 
 Before writing a full VLM+DiT Mega Kernel, the project should have these
