@@ -401,15 +401,467 @@ GPU persistent kernel pulls descriptors, schedules lanes, runs tasks, and writes
 CPU periodically consumes completions and updates robot state.
 ```
 
-## 12. Implementation Roadmap
+## 12. Pre-Implementation Profiling and Test Plan
+
+Before implementing the full VLA Mega Kernel, the most important work is to
+prove that the idea has a real performance target and that the proposed data
+plane addresses the right bottleneck.
+
+The profiling strategy should follow two levels:
+
+- Use Nsight Systems for end-to-end timeline evidence: CUDA API calls, kernel
+  launches, CUDA Graph replay, memcpy, CPU thread scheduling, NVTX ranges, and
+  GPU idle gaps.
+- Use Nsight Compute for kernel-level evidence: SM throughput, memory
+  throughput, L2 behavior, occupancy, register/shared-memory pressure, warp
+  stalls, and per-kernel bottlenecks.
+
+Relevant official references:
+
+- NVIDIA Nsight Systems User Guide:
+  `https://docs.nvidia.com/nsight-systems/UserGuide/index.html`
+- NVIDIA Nsight Compute Profiling Guide:
+  `https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html`
+- CUDA C Programming Guide:
+  `https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html`
+
+### 12.1 Timeline Gap and Launch Boundary Profiling
+
+Question:
+
+```text
+Does the official / current compiled VLA path really contain removable GPU-side
+timeline gap, launch boundary, host scheduling, or graph boundary overhead?
+```
+
+Concrete work:
+
+- Add NVTX ranges around:
+  - CPU preprocessing,
+  - VLM prefill / postprefill,
+  - DiT step 0/1/2/3,
+  - postprocessing,
+  - request queue wait,
+  - CPU admission and dispatch.
+- Run Nsight Systems on:
+  - official-style `torch.compile` E2E,
+  - current `fused_conservative`,
+  - DiT step CUDA Graph,
+  - VLM graph replay proxy,
+  - five-phase dummy persistent scheduler.
+- Export per-request timeline metrics:
+  - CPU API time,
+  - kernel launch count,
+  - GPU active time,
+  - GPU idle gap between kernels,
+  - CUDA Graph replay duration,
+  - graph boundary gaps,
+  - memcpy / D2H / H2D time,
+  - p50/p95/p99 request latency.
+
+Reason:
+
+- The Mega Kernel is only justified if there is enough boundary/gap/scheduling
+  time to remove.
+- If most of E2E is already dense Tensor Core math with little gap, a Mega Kernel
+  will not produce large single-request speedup.
+
+Go/no-go evidence:
+
+- Show a table like:
+
+| path | E2E p50 | GPU active p50 | boundary/gap p50 | CPU API p50 | kernel count |
+|---|---:|---:|---:|---:|---:|
+| official compiled | TBD | TBD | TBD | TBD | TBD |
+| DiT step graph | TBD | TBD | TBD | TBD | TBD |
+| VLM graph proxy | TBD | TBD | TBD | TBD | TBD |
+| persistent dummy lane | TBD | TBD | TBD | TBD | TBD |
+
+Implementation should proceed only if the target gap is large enough to matter
+relative to VLA deadlines.
+
+### 12.2 Stage-Level Compute/Memory Resource Profiling
+
+Question:
+
+```text
+Can five phase-shifted lanes coexist because different stages stress different
+resources, or will they simply contend for the same SM/HBM/L2 bottleneck?
+```
+
+Concrete work:
+
+- Profile representative kernels using Nsight Compute:
+  - VLM postprefill attention,
+  - VLM MLP / linear,
+  - DiT self-attention,
+  - DiT cross-attention,
+  - DiT FFN / linear,
+  - norm / residual / activation kernels,
+  - dummy compute-bound and HBM-bound tasks from the phase5 MVP.
+- Record:
+  - achieved occupancy,
+  - SM throughput,
+  - DRAM throughput,
+  - L2 hit rate / L2 throughput,
+  - register count,
+  - shared-memory usage,
+  - warp stall breakdown,
+  - tensor-core utilization where applicable.
+
+Reason:
+
+- The five-phase argument depends on resource complementarity.
+- If every stage is already saturating SM and HBM simultaneously, five concurrent
+  lanes will mostly create slowdown.
+- If some stages are compute-heavy and others are memory-heavy, a phase schedule
+  can reduce same-stage collision and improve effective throughput.
+
+Required output:
+
+| stage | dominant bottleneck | SM util | HBM util | L2 pressure | reg/shared pressure | concurrency risk |
+|---|---|---:|---:|---:|---:|---|
+| VLM attention | TBD | TBD | TBD | TBD | TBD | TBD |
+| VLM MLP | TBD | TBD | TBD | TBD | TBD | TBD |
+| DiT attention | TBD | TBD | TBD | TBD | TBD | TBD |
+| DiT FFN | TBD | TBD | TBD | TBD | TBD | TBD |
+
+This table determines the initial per-stage credit settings.
+
+### 12.3 Request-Path Profiling Under Admission/Horizon
+
+Question:
+
+```text
+Does improving local stage latency actually improve closed-loop VLA serving
+capacity, or does the gain disappear in queueing and horizon penalties?
+```
+
+Concrete work:
+
+- Run the same Admission/Horizon simulator and replay harness for:
+  - no-MPK fused baseline,
+  - batched equal-latency control,
+  - five-phase batch4-latency lanes,
+  - five-phase batch5-latency lanes,
+  - five-phase batch8-latency lanes,
+  - synthetic MPK speedup lanes.
+- Record:
+  - stable robot count,
+  - request p95,
+  - queued request p95,
+  - queue wait p95,
+  - mean batch size,
+  - accept-rate gap,
+  - final frequency mix,
+  - reply-over count,
+  - miss-autohorizon ratio,
+  - fleet score and min robot score.
+
+Reason:
+
+- A systems paper cannot rely on kernel latency alone.
+- The actual serving goal is more stable robots, lower queue wait, lower deadline
+  penalty, and fairer mixed-frequency admission.
+
+Current supporting result:
+
+- `results/gr00t_phase5_equal_latency_admission_20260511.json`
+
+Key equal-latency evidence:
+
+| mode | stable robots | request p95 | queued p95 | queue wait p95 | accept-rate gap |
+|---|---:|---:|---:|---:|---:|
+| no-MPK fused | 12.67 | 72.85 ms | 842.87 ms | 788.78 ms | 0.203 |
+| five-phase, latency=batch4 | 30.67 | 56.57 ms | 719.34 ms | 662.77 ms | 0.0046 |
+| five-phase, latency=batch5 | 29.50 | 59.71 ms | 723.44 ms | 663.74 ms | 0.0607 |
+| five-phase, latency=batch8 | 22.33 | 72.85 ms | 743.11 ms | 670.25 ms | 0.0719 |
+
+This test is essential because it shows the five-phase data-plane shape can help
+even before claiming any MPK kernel speedup.
+
+### 12.4 Persistent Scheduler Microbenchmark
+
+Question:
+
+```text
+Can a persistent GPU-side scheduler actually enforce phase release and stage
+credit without relying on host stream ordering?
+```
+
+Concrete work:
+
+- Keep the synthetic phase5 persistent kernel, but make it a real gate:
+  - five lanes,
+  - cyclic release,
+  - burst release,
+  - per-stage compute/HBM tasks,
+  - `credit = unlimited / 5 / 4 / 3 / 2 / 1`,
+  - per-lane active latency measurement with GPU global timer,
+  - queue wait and steady-state latency measurement.
+- Run Nsight Systems to verify:
+  - one persistent kernel stays resident,
+  - no per-request kernel launch exists,
+  - lane releases are phase-shifted,
+  - completions are written without host round-trips.
+
+Reason:
+
+- This proves the data-plane mechanism before adding VLM/DiT complexity.
+- It also separates scheduler value from model-kernel performance.
+
+Current supporting result:
+
+- `results/gr00t_phase5_cyclic_fixedlane_mpk_mvp_20260511.json`
+- `results/gr00t_phase5_persistent_credit_mpk_mvp_20260511.json`
+
+Required next test:
+
+- A long-running cyclic test, not only a finite burst, where new requests arrive
+  every phase interval and the kernel never exits during the measurement window.
+
+### 12.5 CPU-GPU Synchronization and Request-Ring Profiling
+
+Question:
+
+```text
+Does the proposed CPU-GPU request/completion ring reduce synchronization
+overhead, or does polling/doorbell overhead become a new bottleneck?
+```
+
+Concrete work:
+
+- Implement a minimal CPU-GPU ring without real VLM/DiT:
+  - CPU writes descriptors,
+  - GPU persistent kernel polls or consumes descriptors,
+  - GPU writes completions,
+  - CPU consumes completions and updates robot state.
+- Compare against:
+  - host-launched kernel per request,
+  - CUDA stream sequence,
+  - CUDA Graph replay,
+  - `cudaLaunchHostFunc` / host callback style coordination where applicable.
+- Record:
+  - descriptor submit-to-start latency,
+  - completion-to-CPU-visible latency,
+  - CPU utilization,
+  - GPU idle time while waiting for descriptors,
+  - p95/p99 sync latency,
+  - request throughput under burst and phase traffic.
+
+Reason:
+
+- The Mega Kernel is supposed to reduce host scheduling and synchronization
+  overhead.
+- A request ring that creates high CPU polling overhead or high p99 wakeup delay
+  would invalidate the control-plane design.
+
+Pass criterion:
+
+- The persistent ring should make host overhead mostly independent of request
+  count, while preserving p95/p99 deadline behavior.
+
+### 12.6 Correctness and Numerical Drift Tests
+
+Question:
+
+```text
+Can each MPK/Mirage task reproduce official GR00T outputs closely enough before
+it is inserted into the serving runtime?
+```
+
+Concrete work:
+
+- For every candidate task, store:
+  - exact shape,
+  - dtype,
+  - strides,
+  - mask semantics,
+  - scale,
+  - RoPE/cos/sin handling,
+  - padding and slice semantics,
+  - official reference output.
+- Test levels:
+  - single operator,
+  - attention block,
+  - decoder/DiT block,
+  - DiT single step,
+  - DiT four-step loop,
+  - VLM postprefill block stack,
+  - full VLA action output.
+- Report:
+  - max absolute error,
+  - mean absolute error,
+  - relative error,
+  - action-level drift,
+  - task success sensitivity if available.
+
+Reason:
+
+- A faster Mega Kernel is not useful if it changes action outputs enough to
+  reduce policy success.
+- Previous hand-MPK work already showed that correctness and performance must be
+  handled together.
+
+Current caution:
+
+- The DiT hand-MPK single-step MVP is functional but slow and has nontrivial
+  drift. It should not be treated as a final compute path.
+
+### 12.7 Subgraph Replacement Performance Gates
+
+Question:
+
+```text
+Which VLM/DiT subgraph should be replaced first, and when is a replacement good
+enough to enter the persistent runtime?
+```
+
+Concrete work:
+
+- For each candidate subgraph, run a same-scope comparison:
+  - official compiled path,
+  - CUDA Graph path if applicable,
+  - Mirage/MPK task path,
+  - graph replay/proxy upper bound.
+- Required candidates:
+  - DiT single-step attention,
+  - DiT mixed-step attention,
+  - DiT FFN/linear,
+  - VLM postprefill GQA attention,
+  - one VLM postprefill decoder block,
+  - VLM postprefill stack.
+- Record:
+  - correctness metrics,
+  - p50/p95 latency,
+  - kernel count,
+  - GPU active time,
+  - boundary/gap time,
+  - achieved occupancy and memory throughput.
+
+Reason:
+
+- The current known bottleneck in the Mirage-backed path is low-efficiency
+  generic/scalar tasks such as generic linear.
+- Subgraph replacement should only proceed when the candidate is both correct
+  and competitive against the same-scope official compiled/CUDA Graph baseline.
+
+Gate:
+
+```text
+Do not integrate a subgraph into the five-phase runtime if it is slower than the
+CUDA Graph baseline by enough to erase the serving-level scheduler benefit.
+```
+
+### 12.8 Slowdown Sensitivity and Lane-Count Robustness
+
+Question:
+
+```text
+How much per-request slowdown can the five-phase design tolerate before it loses
+to ordinary group-batch serving?
+```
+
+Concrete work:
+
+- Sweep:
+  - lane count: 1, 2, 3, 4, 5, 6, 8,
+  - active latency multiplier: 1.0x to 2.0x,
+  - lane service equal to traditional batch1/batch4/batch5/batch8 latency,
+  - jitter levels,
+  - frequency mixes: balanced, 30Hz-heavy, 10Hz-heavy, bursty arrivals.
+- Report:
+  - stable robot count,
+  - queue p95/p99,
+  - reply-over count,
+  - accept-rate gap,
+  - lane utilization.
+
+Reason:
+
+- A real five-lane MPK may slow down each individual inference because lanes
+  share SM/HBM/L2.
+- The design is only robust if it still wins under realistic slowdown.
+
+Current supporting result:
+
+- `results/gr00t_phase5_equal_latency_admission_20260511.json` already tests
+  batch4/batch5/batch8 active-latency assumptions.
+
+Needed next result:
+
+- Measure real slowdown using the persistent dummy compute/HBM kernel under
+  Nsight, then feed the measured slowdown curve back into Admission/Horizon.
+
+### 12.9 CPU / Edge Co-Processing Tests
+
+Question:
+
+```text
+Can CPU or edge resources improve VLA Serving without creating new deadline or
+bandwidth bottlenecks?
+```
+
+Concrete work:
+
+- CPU overlap tests:
+  - preprocessing overlapped with GPU inference,
+  - postprocessing overlapped with GPU inference,
+  - CPU admission overlapped with GPU persistent execution.
+- Edge tests:
+  - network latency sweep,
+  - bandwidth sweep,
+  - image-compression versus embedding-transfer size,
+  - edge preprocessing,
+  - optional edge vision encoder proxy,
+  - local fallback policy under deadline risk.
+- Record:
+  - server GPU queue wait,
+  - end-to-end action refresh latency,
+  - network p95/p99,
+  - CPU utilization,
+  - stable robot count,
+  - miss/deadline ratio.
+
+Reason:
+
+- KTransformers-style CPU/GPU co-processing is useful inspiration, but current
+  GR00T VLA is dense VLM+DiT rather than MoE.
+- CPU/edge work should be justified through overlap and deadline robustness, not
+  naive dense matmul offload.
+
+### 12.10 Profiling Deliverables Before Full Implementation
+
+Before writing a full VLM+DiT Mega Kernel, the project should have these
+artifacts:
+
+| Deliverable | Why it is needed |
+|---|---|
+| Official compiled Nsight Systems trace | proves the actual request timeline and boundary/gap target |
+| VLM graph replay trace | validates removable VLM data-plane gap |
+| DiT CUDA Graph trace | anchors the action-head baseline |
+| Nsight Compute table for VLM/DiT top kernels | shows SM/HBM/L2/register/shared pressure |
+| Persistent five-lane dummy trace | proves GPU-side phase scheduling without host launch |
+| Request-ring sync microbenchmark | proves CPU-GPU synchronization does not dominate |
+| Equal-latency Admission/Horizon ablation | proves five-phase serving works without kernel speedup |
+| Slowdown sensitivity sweep | proves robustness if five concurrent lanes slow each other down |
+| Subgraph correctness suite | prevents silent policy/action drift |
+| CPU/edge overlap study | decides whether heterogeneous co-processing is worth adding |
+
+Only after these profiling gates pass should the implementation move toward a
+full real-compute five-phase VLA runtime.
+
+## 13. Implementation Roadmap
 
 The recommended roadmap is deliberately incremental.
 
-### Stage 0: Freeze Baselines
+### Stage 0: Freeze Baselines and Profiling Gates
 
 Goal:
 
 - Make all comparisons reproducible.
+- Produce the profiling evidence listed in Section 12 before committing to the
+  full kernel implementation.
 
 Artifacts:
 
@@ -423,6 +875,8 @@ Pass criteria:
 
 - All numbers can be regenerated from scripts and JSON files.
 - Each reported number is labeled as GPU benchmark, simulator result, or proxy.
+- Each claimed bottleneck has a corresponding Nsight Systems or Nsight Compute
+  artifact.
 
 ### Stage 1: Persistent Scheduler MVP
 
@@ -601,7 +1055,7 @@ Required ablations:
 - full VLA replay,
 - CPU/edge overlap enabled versus disabled.
 
-## 13. Key Limitations
+## 14. Key Limitations
 
 Current limitations:
 
@@ -615,7 +1069,7 @@ Current limitations:
 - CPU offload is only attractive for control/pre/post/fallback or future sparse
   modules, not for current dense VLM/DiT core math.
 
-## 14. Short Conclusion
+## 15. Short Conclusion
 
 The most defensible roadmap is:
 
