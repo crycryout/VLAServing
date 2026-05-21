@@ -1,0 +1,1620 @@
+{
+  "meta": {
+    "date": "2026-05-20",
+    "scope": "Fresh official Isaac-GR00T n1.6-release torch.compile non-compute overhead breakdown using CUDA events plus torch.profiler raw CUDA events.",
+    "official_root": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520",
+    "official_git_rev": "ead52833afbbf4243f8cd5e7664f48a94de03b19",
+    "gr00t_import_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py",
+    "model_path": "nvidia/GR00T-N1.6-3B",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/demo_data/gr1.PickNPlace",
+    "embodiment_tag": "gr1",
+    "device": "NVIDIA GeForce RTX 4090",
+    "torch_version": "2.7.1+cu126",
+    "compile_mode": "max-autotune",
+    "iterations": 6,
+    "warmup": 3,
+    "profile_repeats": 2,
+    "limitations": [
+      "torch.profiler perturbs execution and can change torch.compile/cudagraph behavior; baseline CUDA-event numbers are the timing anchor.",
+      "device_idle_gap_sum_ms is measured from raw CUDA event gaps inside profiler and includes kernel boundary, stream idle, launch delay, and graph/runtime handoff gaps.",
+      "intermediate tensor materialization through HBM inside kernels is not directly measurable with torch.profiler; only explicit memcpy/memset and allocator/runtime proxies are reported."
+    ]
+  },
+  "data_processing_wall_ms": {
+    "mean": 5.2999987577398615,
+    "p50": 5.2909934893250465,
+    "p95": 5.356090143322945,
+    "min": 5.2493177354335785,
+    "max": 5.3576938807964325,
+    "num_samples": 6
+  },
+  "targets": {
+    "backbone_prepared": {
+      "baseline": {
+        "host_enqueue_ms": {
+          "mean": 25.66806972026825,
+          "p50": 25.64897481352091,
+          "p95": 25.986309628933668,
+          "min": 25.355488061904907,
+          "max": 26.04120969772339,
+          "num_samples": 6
+        },
+        "sync_wait_after_enqueue_ms": {
+          "mean": 0.6647125507394472,
+          "p50": 0.6643692031502724,
+          "p95": 0.6681629456579685,
+          "min": 0.6615649908781052,
+          "max": 0.6684530526399612,
+          "num_samples": 6
+        },
+        "wall_sync_ms": {
+          "mean": 26.332782271007698,
+          "p50": 26.31398383527994,
+          "p95": 26.649802457541227,
+          "min": 26.019155979156494,
+          "max": 26.70343592762947,
+          "num_samples": 6
+        },
+        "cuda_event_timeline_ms": {
+          "mean": 26.305007934570312,
+          "p50": 26.289151191711426,
+          "p95": 26.609407424926758,
+          "min": 25.996192932128906,
+          "max": 26.657791137695312,
+          "num_samples": 6
+        }
+      },
+      "profiled": {
+        "summary": {
+          "device_timeline_span_ms": {
+            "mean": 48.9523475,
+            "p50": 48.9523475,
+            "p95": 49.04821595,
+            "min": 48.845827,
+            "max": 49.058868,
+            "num_samples": 2
+          },
+          "device_active_union_ms": {
+            "mean": 9.088091999999982,
+            "p50": 9.088091999999982,
+            "p95": 9.090369900000022,
+            "min": 9.085560999999936,
+            "max": 9.090623000000026,
+            "num_samples": 2
+          },
+          "device_idle_gap_sum_ms": {
+            "mean": 39.86425550000001,
+            "p50": 39.86425550000001,
+            "p95": 39.95784604999997,
+            "min": 39.76026600000006,
+            "max": 39.96824499999997,
+            "num_samples": 2
+          },
+          "device_kernel_sum_ms": {
+            "mean": 8.903810499999977,
+            "p50": 8.903810499999977,
+            "p95": 8.905925050000022,
+            "min": 8.90146099999993,
+            "max": 8.906160000000026,
+            "num_samples": 2
+          },
+          "device_kernel_union_ms": {
+            "mean": 8.903810499999977,
+            "p50": 8.903810499999977,
+            "p95": 8.905925050000022,
+            "min": 8.90146099999993,
+            "max": 8.906160000000026,
+            "num_samples": 2
+          },
+          "device_memcpy_sum_ms": {
+            "mean": 0.15551049999998917,
+            "p50": 0.15551049999998917,
+            "p95": 0.15569994999997352,
+            "min": 0.15530000000000654,
+            "max": 0.1557209999999718,
+            "num_samples": 2
+          },
+          "device_memcpy_union_ms": {
+            "mean": 0.15551049999998917,
+            "p50": 0.15551049999998917,
+            "p95": 0.15569994999997352,
+            "min": 0.15530000000000654,
+            "max": 0.1557209999999718,
+            "num_samples": 2
+          },
+          "device_memset_sum_ms": {
+            "mean": 0.02877100000001201,
+            "p50": 0.02877100000001201,
+            "p95": 0.028797099999999725,
+            "min": 0.028742000000025657,
+            "max": 0.02879999999999836,
+            "num_samples": 2
+          },
+          "device_memset_union_ms": {
+            "mean": 0.02877100000001201,
+            "p50": 0.02877100000001201,
+            "p95": 0.028797099999999725,
+            "min": 0.028742000000025657,
+            "max": 0.02879999999999836,
+            "num_samples": 2
+          },
+          "cpu_cuda_launch_runtime_ms": {
+            "mean": 6.816739000000106,
+            "p50": 6.816739000000106,
+            "p95": 6.8921410000000884,
+            "min": 6.732959000000125,
+            "max": 6.900519000000086,
+            "num_samples": 2
+          },
+          "cpu_cuda_kernel_launch_runtime_ms": {
+            "mean": 6.816739000000106,
+            "p50": 6.816739000000106,
+            "p95": 6.8921410000000884,
+            "min": 6.732959000000125,
+            "max": 6.900519000000086,
+            "num_samples": 2
+          },
+          "cpu_cuda_graph_launch_runtime_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_sync_runtime_ms": {
+            "mean": 0.7753095000000083,
+            "p50": 0.7753095000000083,
+            "p95": 0.7780819500000057,
+            "min": 0.7722290000000113,
+            "max": 0.7783900000000054,
+            "num_samples": 2
+          },
+          "cpu_cuda_memcpy_runtime_ms": {
+            "mean": 0.752973000000005,
+            "p50": 0.752973000000005,
+            "p95": 0.7717622999999983,
+            "min": 0.7320960000000124,
+            "max": 0.7738499999999976,
+            "num_samples": 2
+          },
+          "cpu_cuda_memset_runtime_ms": {
+            "mean": 0.34227899999999684,
+            "p50": 0.34227899999999684,
+            "p95": 0.34924949999997795,
+            "min": 0.3345340000000178,
+            "max": 0.35002399999997585,
+            "num_samples": 2
+          },
+          "cpu_cuda_alloc_free_runtime_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_event_count": {
+            "mean": 1653.0,
+            "p50": 1653.0,
+            "p95": 1653.0,
+            "min": 1653.0,
+            "max": 1653.0,
+            "num_samples": 2
+          },
+          "device_kernel_count": {
+            "mean": 1481.0,
+            "p50": 1481.0,
+            "p95": 1481.0,
+            "min": 1481.0,
+            "max": 1481.0,
+            "num_samples": 2
+          },
+          "device_memcpy_count": {
+            "mean": 111.0,
+            "p50": 111.0,
+            "p95": 111.0,
+            "min": 111.0,
+            "max": 111.0,
+            "num_samples": 2
+          },
+          "device_memset_count": {
+            "mean": 61.0,
+            "p50": 61.0,
+            "p95": 61.0,
+            "min": 61.0,
+            "max": 61.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_launch_runtime_count": {
+            "mean": 1516.0,
+            "p50": 1516.0,
+            "p95": 1516.0,
+            "min": 1516.0,
+            "max": 1516.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_kernel_launch_count": {
+            "mean": 1516.0,
+            "p50": 1516.0,
+            "p95": 1516.0,
+            "min": 1516.0,
+            "max": 1516.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_graph_launch_count": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_sync_runtime_count": {
+            "mean": 50.0,
+            "p50": 50.0,
+            "p95": 50.0,
+            "min": 50.0,
+            "max": 50.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_memcpy_runtime_count": {
+            "mean": 76.0,
+            "p50": 76.0,
+            "p95": 76.0,
+            "min": 76.0,
+            "max": 76.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_memset_runtime_count": {
+            "mean": 62.0,
+            "p50": 62.0,
+            "p95": 62.0,
+            "min": 62.0,
+            "max": 62.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_alloc_free_count": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_idle_gap_p50_each_gap_ms": {
+            "mean": 0.015024499999998739,
+            "p50": 0.015024499999998739,
+            "p95": 0.015096949999999481,
+            "min": 0.014943999999997914,
+            "max": 0.015104999999999563,
+            "num_samples": 2
+          },
+          "device_idle_gap_p95_each_gap_ms": {
+            "mean": 0.08872837499999918,
+            "p50": 0.08872837499999918,
+            "p95": 0.08883689249999947,
+            "min": 0.08860779999999885,
+            "max": 0.08884894999999951,
+            "num_samples": 2
+          }
+        },
+        "repeats": [
+          {
+            "device_timeline_span_ms": 49.058868,
+            "device_active_union_ms": 9.090623000000026,
+            "device_idle_gap_sum_ms": 39.96824499999997,
+            "device_idle_gap_stats_ms": {
+              "mean": 0.024193852905568993,
+              "p50": 0.014943999999997914,
+              "p95": 0.08860779999999885,
+              "min": 0.0005429999999978463,
+              "max": 0.3891970000000001,
+              "num_samples": 1652
+            },
+            "device_kernel_sum_ms": 8.906160000000026,
+            "device_kernel_union_ms": 8.906160000000026,
+            "device_memcpy_sum_ms": 0.1557209999999718,
+            "device_memcpy_union_ms": 0.1557209999999718,
+            "device_memset_sum_ms": 0.028742000000025657,
+            "device_memset_union_ms": 0.028742000000025657,
+            "device_event_count": 1653,
+            "device_kernel_count": 1481,
+            "device_memcpy_count": 111,
+            "device_memset_count": 61,
+            "cpu_cuda_launch_runtime_ms": 6.732959000000125,
+            "cpu_cuda_launch_runtime_count": 1516,
+            "cpu_cuda_kernel_launch_runtime_ms": 6.732959000000125,
+            "cpu_cuda_kernel_launch_count": 1516,
+            "cpu_cuda_graph_launch_runtime_ms": 0.0,
+            "cpu_cuda_graph_launch_count": 0,
+            "cpu_cuda_sync_runtime_ms": 0.7783900000000054,
+            "cpu_cuda_sync_runtime_count": 50,
+            "cpu_cuda_memcpy_runtime_ms": 0.7320960000000124,
+            "cpu_cuda_memcpy_runtime_count": 76,
+            "cpu_cuda_memset_runtime_ms": 0.3345340000000178,
+            "cpu_cuda_memset_runtime_count": 62,
+            "cpu_cuda_alloc_free_runtime_ms": 0.0,
+            "cpu_cuda_alloc_free_count": 0,
+            "top_device_events": [
+              {
+                "name": "ampere_bf16_s1688gemm_bf16_64x128_sliced1x2_ldg8_f2f_tn",
+                "class": "device_kernel",
+                "start_us": 50714.166,
+                "end_us": 51479.697,
+                "duration_us": 765.5310000000027
+              },
+              {
+                "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+                "class": "device_kernel",
+                "start_us": 3390.462,
+                "end_us": 3452.704,
+                "duration_us": 62.24200000000019
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 37249.576,
+                "end_us": 37289.642,
+                "duration_us": 40.065999999998894
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 41511.578,
+                "end_us": 41551.612,
+                "duration_us": 40.03399999999965
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 45729.579,
+                "end_us": 45769.485,
+                "duration_us": 39.90600000000268
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 42808.167,
+                "end_us": 42847.976,
+                "duration_us": 39.809000000001106
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 31742.091,
+                "end_us": 31781.805,
+                "duration_us": 39.71399999999994
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 28905.514,
+                "end_us": 28945.163,
+                "duration_us": 39.64900000000125
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 33166.236,
+                "end_us": 33205.821,
+                "duration_us": 39.5850000000064
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 35927.675,
+                "end_us": 35967.132,
+                "duration_us": 39.45699999999488
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 34543.307,
+                "end_us": 34582.733,
+                "duration_us": 39.425999999999476
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 47256.288,
+                "end_us": 47295.713,
+                "duration_us": 39.42500000000291
+              }
+            ]
+          },
+          {
+            "device_timeline_span_ms": 48.845827,
+            "device_active_union_ms": 9.085560999999936,
+            "device_idle_gap_sum_ms": 39.76026600000006,
+            "device_idle_gap_stats_ms": {
+              "mean": 0.024067957627118684,
+              "p50": 0.015104999999999563,
+              "p95": 0.08884894999999951,
+              "min": 0.0005439999999980501,
+              "max": 0.33101900000000023,
+              "num_samples": 1652
+            },
+            "device_kernel_sum_ms": 8.90146099999993,
+            "device_kernel_union_ms": 8.90146099999993,
+            "device_memcpy_sum_ms": 0.15530000000000654,
+            "device_memcpy_union_ms": 0.15530000000000654,
+            "device_memset_sum_ms": 0.02879999999999836,
+            "device_memset_union_ms": 0.02879999999999836,
+            "device_event_count": 1653,
+            "device_kernel_count": 1481,
+            "device_memcpy_count": 111,
+            "device_memset_count": 61,
+            "cpu_cuda_launch_runtime_ms": 6.900519000000086,
+            "cpu_cuda_launch_runtime_count": 1516,
+            "cpu_cuda_kernel_launch_runtime_ms": 6.900519000000086,
+            "cpu_cuda_kernel_launch_count": 1516,
+            "cpu_cuda_graph_launch_runtime_ms": 0.0,
+            "cpu_cuda_graph_launch_count": 0,
+            "cpu_cuda_sync_runtime_ms": 0.7722290000000113,
+            "cpu_cuda_sync_runtime_count": 50,
+            "cpu_cuda_memcpy_runtime_ms": 0.7738499999999976,
+            "cpu_cuda_memcpy_runtime_count": 76,
+            "cpu_cuda_memset_runtime_ms": 0.35002399999997585,
+            "cpu_cuda_memset_runtime_count": 62,
+            "cpu_cuda_alloc_free_runtime_ms": 0.0,
+            "cpu_cuda_alloc_free_count": 0,
+            "top_device_events": [
+              {
+                "name": "ampere_bf16_s1688gemm_bf16_64x128_sliced1x2_ldg8_f2f_tn",
+                "class": "device_kernel",
+                "start_us": 48841.812,
+                "end_us": 49602.158,
+                "duration_us": 760.346000000005
+              },
+              {
+                "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+                "class": "device_kernel",
+                "start_us": 1776.238,
+                "end_us": 1838.352,
+                "duration_us": 62.11400000000003
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 28416.443,
+                "end_us": 28456.316,
+                "duration_us": 39.87299999999959
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 31149.145,
+                "end_us": 31188.89,
+                "duration_us": 39.74499999999898
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 32502.183,
+                "end_us": 32541.928,
+                "duration_us": 39.74499999999898
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 40609.851,
+                "end_us": 40649.501,
+                "duration_us": 39.64999999999418
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 43539.615,
+                "end_us": 43579.264,
+                "duration_us": 39.64900000000489
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 39361.713,
+                "end_us": 39401.33,
+                "duration_us": 39.61699999999837
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 46906.418,
+                "end_us": 46946.004,
+                "duration_us": 39.58600000000297
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 40707.967,
+                "end_us": 40747.392,
+                "duration_us": 39.42500000000291
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 29672.614,
+                "end_us": 29712.039,
+                "duration_us": 39.42499999999927
+              },
+              {
+                "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x128_32x6_tn_align8::Params)",
+                "class": "device_kernel",
+                "start_us": 29771.497,
+                "end_us": 29810.89,
+                "duration_us": 39.39300000000003
+              }
+            ]
+          }
+        ]
+      },
+      "normalized_to_baseline_cuda_event_p50": {
+        "device_kernel_union_ms": 8.903810499999977,
+        "device_memcpy_union_ms": 0.15551049999998917,
+        "device_memset_union_ms": 0.02877100000001201,
+        "device_idle_gap_sum_ms": 39.86425550000001,
+        "cpu_cuda_launch_runtime_ms": 6.816739000000106,
+        "cpu_cuda_sync_runtime_ms": 0.7753095000000083,
+        "unattributed_vs_baseline_ms": -22.663196308288565
+      }
+    },
+    "action_head_prepared": {
+      "baseline": {
+        "host_enqueue_ms": {
+          "mean": 6.711286182204883,
+          "p50": 6.703395396471024,
+          "p95": 6.820793729275465,
+          "min": 6.583767011761665,
+          "max": 6.830831989645958,
+          "num_samples": 6
+        },
+        "sync_wait_after_enqueue_ms": {
+          "mean": 10.159422953923544,
+          "p50": 10.176222771406174,
+          "p95": 10.209048632532358,
+          "min": 10.097336024045944,
+          "max": 10.213769972324371,
+          "num_samples": 6
+        },
+        "wall_sync_ms": {
+          "mean": 16.870709136128426,
+          "p50": 16.840673051774502,
+          "p95": 16.971214674413204,
+          "min": 16.797536984086037,
+          "max": 16.985563561320305,
+          "num_samples": 6
+        },
+        "cuda_event_timeline_ms": {
+          "mean": 16.83737595876058,
+          "p50": 16.813376426696777,
+          "p95": 16.919407844543457,
+          "min": 16.7708797454834,
+          "max": 16.926719665527344,
+          "num_samples": 6
+        }
+      },
+      "profiled": {
+        "summary": {
+          "device_timeline_span_ms": {
+            "mean": 17.768107999999998,
+            "p50": 17.768107999999998,
+            "p95": 17.9392673,
+            "min": 17.577931,
+            "max": 17.958285,
+            "num_samples": 2
+          },
+          "device_active_union_ms": {
+            "mean": 14.894711000000056,
+            "p50": 14.894711000000056,
+            "p95": 15.29255690000005,
+            "min": 14.452660000000062,
+            "max": 15.33676200000005,
+            "num_samples": 2
+          },
+          "device_idle_gap_sum_ms": {
+            "mean": 2.8733969999999447,
+            "p50": 2.8733969999999447,
+            "p95": 3.442402199999939,
+            "min": 2.241168999999951,
+            "max": 3.505624999999938,
+            "num_samples": 2
+          },
+          "device_kernel_sum_ms": {
+            "mean": 14.849750500000056,
+            "p50": 14.849750500000056,
+            "p95": 15.246474550000045,
+            "min": 14.408946000000066,
+            "max": 15.290555000000044,
+            "num_samples": 2
+          },
+          "device_kernel_union_ms": {
+            "mean": 14.849750500000056,
+            "p50": 14.849750500000056,
+            "p95": 15.246474550000045,
+            "min": 14.408946000000066,
+            "max": 15.290555000000044,
+            "num_samples": 2
+          },
+          "device_memcpy_sum_ms": {
+            "mean": 0.044960500000001735,
+            "p50": 0.044960500000001735,
+            "p95": 0.046082350000006614,
+            "min": 0.043713999999996304,
+            "max": 0.04620700000000716,
+            "num_samples": 2
+          },
+          "device_memcpy_union_ms": {
+            "mean": 0.044960500000001735,
+            "p50": 0.044960500000001735,
+            "p95": 0.046082350000006614,
+            "min": 0.043713999999996304,
+            "max": 0.04620700000000716,
+            "num_samples": 2
+          },
+          "device_memset_sum_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_memset_union_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_launch_runtime_ms": {
+            "mean": 2.8567129999999965,
+            "p50": 2.8567129999999965,
+            "p95": 2.9617843999999938,
+            "min": 2.739967,
+            "max": 2.9734589999999934,
+            "num_samples": 2
+          },
+          "cpu_cuda_kernel_launch_runtime_ms": {
+            "mean": 1.3190184999999945,
+            "p50": 1.3190184999999945,
+            "p95": 1.3736723499999908,
+            "min": 1.2582919999999984,
+            "max": 1.3797449999999905,
+            "num_samples": 2
+          },
+          "cpu_cuda_graph_launch_runtime_ms": {
+            "mean": 1.537694500000001,
+            "p50": 1.537694500000001,
+            "p95": 1.588112050000001,
+            "min": 1.4816750000000012,
+            "max": 1.593714000000001,
+            "num_samples": 2
+          },
+          "cpu_cuda_sync_runtime_ms": {
+            "mean": 7.782614,
+            "p50": 7.782614,
+            "p95": 8.464173199999998,
+            "min": 7.0253260000000015,
+            "max": 8.539901999999998,
+            "num_samples": 2
+          },
+          "cpu_cuda_memcpy_runtime_ms": {
+            "mean": 0.19331799999999794,
+            "p50": 0.19331799999999794,
+            "p95": 0.20379939999999566,
+            "min": 0.1816720000000005,
+            "max": 0.2049639999999954,
+            "num_samples": 2
+          },
+          "cpu_cuda_memset_runtime_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_alloc_free_runtime_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_event_count": {
+            "mean": 1450.0,
+            "p50": 1450.0,
+            "p95": 1450.0,
+            "min": 1450.0,
+            "max": 1450.0,
+            "num_samples": 2
+          },
+          "device_kernel_count": {
+            "mean": 1418.0,
+            "p50": 1418.0,
+            "p95": 1418.0,
+            "min": 1418.0,
+            "max": 1418.0,
+            "num_samples": 2
+          },
+          "device_memcpy_count": {
+            "mean": 32.0,
+            "p50": 32.0,
+            "p95": 32.0,
+            "min": 32.0,
+            "max": 32.0,
+            "num_samples": 2
+          },
+          "device_memset_count": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_launch_runtime_count": {
+            "mean": 195.0,
+            "p50": 195.0,
+            "p95": 195.0,
+            "min": 195.0,
+            "max": 195.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_kernel_launch_count": {
+            "mean": 191.0,
+            "p50": 191.0,
+            "p95": 191.0,
+            "min": 191.0,
+            "max": 191.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_graph_launch_count": {
+            "mean": 4.0,
+            "p50": 4.0,
+            "p95": 4.0,
+            "min": 4.0,
+            "max": 4.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_sync_runtime_count": {
+            "mean": 2.0,
+            "p50": 2.0,
+            "p95": 2.0,
+            "min": 2.0,
+            "max": 2.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_memcpy_runtime_count": {
+            "mean": 20.0,
+            "p50": 20.0,
+            "p95": 20.0,
+            "min": 20.0,
+            "max": 20.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_memset_runtime_count": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_alloc_free_count": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_idle_gap_p50_each_gap_ms": {
+            "mean": 6.349999999929424e-05,
+            "p50": 6.349999999929424e-05,
+            "p95": 6.394999999856736e-05,
+            "min": 6.300000000010186e-05,
+            "max": 6.39999999984866e-05,
+            "num_samples": 2
+          },
+          "device_idle_gap_p95_each_gap_ms": {
+            "mean": 0.0007039999999988141,
+            "p50": 0.0007039999999988141,
+            "p95": 0.0007327999999989516,
+            "min": 0.0006719999999986612,
+            "max": 0.0007359999999989669,
+            "num_samples": 2
+          }
+        },
+        "repeats": [
+          {
+            "device_timeline_span_ms": 17.577931,
+            "device_active_union_ms": 15.33676200000005,
+            "device_idle_gap_sum_ms": 2.241168999999951,
+            "device_idle_gap_stats_ms": {
+              "mean": 0.001549909405255844,
+              "p50": 6.39999999984866e-05,
+              "p95": 0.0007359999999989669,
+              "min": 3.0999999999039574e-05,
+              "max": 0.7408249999999998,
+              "num_samples": 1446
+            },
+            "device_kernel_sum_ms": 15.290555000000044,
+            "device_kernel_union_ms": 15.290555000000044,
+            "device_memcpy_sum_ms": 0.04620700000000716,
+            "device_memcpy_union_ms": 0.04620700000000716,
+            "device_memset_sum_ms": 0.0,
+            "device_memset_union_ms": 0.0,
+            "device_event_count": 1450,
+            "device_kernel_count": 1418,
+            "device_memcpy_count": 32,
+            "device_memset_count": 0,
+            "cpu_cuda_launch_runtime_ms": 2.739967,
+            "cpu_cuda_launch_runtime_count": 195,
+            "cpu_cuda_kernel_launch_runtime_ms": 1.2582919999999984,
+            "cpu_cuda_kernel_launch_count": 191,
+            "cpu_cuda_graph_launch_runtime_ms": 1.4816750000000012,
+            "cpu_cuda_graph_launch_count": 4,
+            "cpu_cuda_sync_runtime_ms": 8.539901999999998,
+            "cpu_cuda_sync_runtime_count": 2,
+            "cpu_cuda_memcpy_runtime_ms": 0.1816720000000005,
+            "cpu_cuda_memcpy_runtime_count": 20,
+            "cpu_cuda_memset_runtime_ms": 0.0,
+            "cpu_cuda_memset_runtime_count": 0,
+            "cpu_cuda_alloc_free_runtime_ms": 0.0,
+            "cpu_cuda_alloc_free_count": 0,
+            "top_device_events": [
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 5004.542,
+                "end_us": 5047.744,
+                "duration_us": 43.201999999999316
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 9799.934,
+                "end_us": 9843.072,
+                "duration_us": 43.13800000000083
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 15053.07,
+                "end_us": 15096.207,
+                "duration_us": 43.137000000000626
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 16638.563,
+                "end_us": 16681.669,
+                "duration_us": 43.106000000003405
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 14136.08,
+                "end_us": 14179.185,
+                "duration_us": 43.10499999999956
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 18929.904,
+                "end_us": 18973.009,
+                "duration_us": 43.10499999999956
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 10718.237,
+                "end_us": 10761.279,
+                "duration_us": 43.04200000000128
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 11176.684,
+                "end_us": 11219.726,
+                "duration_us": 43.04200000000128
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 18471.552,
+                "end_us": 18514.594,
+                "duration_us": 43.04200000000128
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 7295.083,
+                "end_us": 7338.124,
+                "duration_us": 43.04100000000017
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 14593.663,
+                "end_us": 14636.704,
+                "duration_us": 43.04099999999926
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 8882.336,
+                "end_us": 8925.313,
+                "duration_us": 42.97700000000077
+              }
+            ]
+          },
+          {
+            "device_timeline_span_ms": 17.958285,
+            "device_active_union_ms": 14.452660000000062,
+            "device_idle_gap_sum_ms": 3.505624999999938,
+            "device_idle_gap_stats_ms": {
+              "mean": 0.0024277181440442797,
+              "p50": 6.300000000010186e-05,
+              "p95": 0.0006719999999986612,
+              "min": 3.0999999999039574e-05,
+              "max": 1.5389649999999997,
+              "num_samples": 1444
+            },
+            "device_kernel_sum_ms": 14.408946000000066,
+            "device_kernel_union_ms": 14.408946000000066,
+            "device_memcpy_sum_ms": 0.043713999999996304,
+            "device_memcpy_union_ms": 0.043713999999996304,
+            "device_memset_sum_ms": 0.0,
+            "device_memset_union_ms": 0.0,
+            "device_event_count": 1450,
+            "device_kernel_count": 1418,
+            "device_memcpy_count": 32,
+            "device_memset_count": 0,
+            "cpu_cuda_launch_runtime_ms": 2.9734589999999934,
+            "cpu_cuda_launch_runtime_count": 195,
+            "cpu_cuda_kernel_launch_runtime_ms": 1.3797449999999905,
+            "cpu_cuda_kernel_launch_count": 191,
+            "cpu_cuda_graph_launch_runtime_ms": 1.593714000000001,
+            "cpu_cuda_graph_launch_count": 4,
+            "cpu_cuda_sync_runtime_ms": 7.0253260000000015,
+            "cpu_cuda_sync_runtime_count": 2,
+            "cpu_cuda_memcpy_runtime_ms": 0.2049639999999954,
+            "cpu_cuda_memcpy_runtime_count": 20,
+            "cpu_cuda_memset_runtime_ms": 0.0,
+            "cpu_cuda_memset_runtime_count": 0,
+            "cpu_cuda_alloc_free_runtime_ms": 0.0,
+            "cpu_cuda_alloc_free_count": 0,
+            "top_device_events": [
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 14458.493,
+                "end_us": 14501.47,
+                "duration_us": 42.97699999999895
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 18542.858,
+                "end_us": 18585.739,
+                "duration_us": 42.88100000000122
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 6713.425,
+                "end_us": 6756.274,
+                "duration_us": 42.84900000000016
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 10369.839,
+                "end_us": 10412.656,
+                "duration_us": 42.81700000000092
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 7144.159,
+                "end_us": 7186.945,
+                "duration_us": 42.78600000000006
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 15954.064,
+                "end_us": 15996.85,
+                "duration_us": 42.78600000000006
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 9504.849,
+                "end_us": 9547.634,
+                "duration_us": 42.784999999999854
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 16817.23,
+                "end_us": 16859.984,
+                "duration_us": 42.754000000000815
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 12300.466,
+                "end_us": 12343.156,
+                "duration_us": 42.69000000000051
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 17681.42,
+                "end_us": 17724.109,
+                "duration_us": 42.689000000002125
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 14027.534,
+                "end_us": 14070.191,
+                "duration_us": 42.65700000000106
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 7575.566,
+                "end_us": 7618.192,
+                "duration_us": 42.626000000000204
+              }
+            ]
+          }
+        ]
+      },
+      "normalized_to_baseline_cuda_event_p50": {
+        "device_kernel_union_ms": 14.849750500000056,
+        "device_memcpy_union_ms": 0.044960500000001735,
+        "device_memset_union_ms": 0.0,
+        "device_idle_gap_sum_ms": 2.8733969999999447,
+        "cpu_cuda_launch_runtime_ms": 2.8567129999999965,
+        "cpu_cuda_sync_runtime_ms": 7.782614,
+        "unattributed_vs_baseline_ms": -0.9547315733032249
+      }
+    },
+    "full_model_prepared": {
+      "baseline": {
+        "host_enqueue_ms": {
+          "mean": 41.78210720419884,
+          "p50": 39.3914096057415,
+          "p95": 47.60621627792716,
+          "min": 38.5455209761858,
+          "max": 47.967106103897095,
+          "num_samples": 6
+        },
+        "sync_wait_after_enqueue_ms": {
+          "mean": 9.900065138936043,
+          "p50": 10.183973237872124,
+          "p95": 10.2279307320714,
+          "min": 9.281288832426071,
+          "max": 10.235460475087166,
+          "num_samples": 6
+        },
+        "wall_sync_ms": {
+          "mean": 51.68217234313488,
+          "p50": 49.575382843613625,
+          "p95": 57.14031681418419,
+          "min": 48.15493896603584,
+          "max": 57.277459651231766,
+          "num_samples": 6
+        },
+        "cuda_event_timeline_ms": {
+          "mean": 51.63542938232422,
+          "p50": 49.53424072265625,
+          "p95": 57.05855941772461,
+          "min": 48.11276626586914,
+          "max": 57.17772674560547,
+          "num_samples": 6
+        }
+      },
+      "profiled": {
+        "summary": {
+          "device_timeline_span_ms": {
+            "mean": 69.851906,
+            "p50": 69.851906,
+            "p95": 73.7440505,
+            "min": 65.527301,
+            "max": 74.176511,
+            "num_samples": 2
+          },
+          "device_active_union_ms": {
+            "mean": 23.589753500000008,
+            "p50": 23.589753500000008,
+            "p95": 23.594639150000027,
+            "min": 23.58432499999999,
+            "max": 23.59518200000003,
+            "num_samples": 2
+          },
+          "device_idle_gap_sum_ms": {
+            "mean": 46.262152499999985,
+            "p50": 46.262152499999985,
+            "p95": 50.14941134999997,
+            "min": 41.942976,
+            "max": 50.58132899999997,
+            "num_samples": 2
+          },
+          "device_kernel_sum_ms": {
+            "mean": 23.327794500000003,
+            "p50": 23.327794500000003,
+            "p95": 23.33285655000004,
+            "min": 23.32216999999996,
+            "max": 23.333419000000045,
+            "num_samples": 2
+          },
+          "device_kernel_union_ms": {
+            "mean": 23.327794500000003,
+            "p50": 23.327794500000003,
+            "p95": 23.33285655000004,
+            "min": 23.32216999999996,
+            "max": 23.333419000000045,
+            "num_samples": 2
+          },
+          "device_memcpy_sum_ms": {
+            "mean": 0.23311549999999986,
+            "p50": 0.23311549999999986,
+            "p95": 0.23330585000000592,
+            "min": 0.23290399999999317,
+            "max": 0.23332700000000658,
+            "num_samples": 2
+          },
+          "device_memcpy_union_ms": {
+            "mean": 0.23311549999999986,
+            "p50": 0.23311549999999986,
+            "p95": 0.23330585000000592,
+            "min": 0.23290399999999317,
+            "max": 0.23332700000000658,
+            "num_samples": 2
+          },
+          "device_memset_sum_ms": {
+            "mean": 0.028843500000004952,
+            "p50": 0.028843500000004952,
+            "p95": 0.02885744999999265,
+            "min": 0.02882800000001862,
+            "max": 0.028858999999991284,
+            "num_samples": 2
+          },
+          "device_memset_union_ms": {
+            "mean": 0.028843500000004952,
+            "p50": 0.028843500000004952,
+            "p95": 0.02885744999999265,
+            "min": 0.02882800000001862,
+            "max": 0.028858999999991284,
+            "num_samples": 2
+          },
+          "cpu_cuda_launch_runtime_ms": {
+            "mean": 10.116631500000098,
+            "p50": 10.116631500000098,
+            "p95": 11.065114050000103,
+            "min": 9.062762000000093,
+            "max": 11.170501000000103,
+            "num_samples": 2
+          },
+          "cpu_cuda_kernel_launch_runtime_ms": {
+            "mean": 8.219708500000095,
+            "p50": 8.219708500000095,
+            "p95": 8.904631450000092,
+            "min": 7.458683000000099,
+            "max": 8.980734000000092,
+            "num_samples": 2
+          },
+          "cpu_cuda_graph_launch_runtime_ms": {
+            "mean": 1.8969230000000061,
+            "p50": 1.8969230000000061,
+            "p95": 2.1604826000000137,
+            "min": 1.6040789999999978,
+            "max": 2.1897670000000145,
+            "num_samples": 2
+          },
+          "cpu_cuda_sync_runtime_ms": {
+            "mean": 6.6645450000000075,
+            "p50": 6.6645450000000075,
+            "p95": 7.311547799999989,
+            "min": 5.9456530000000285,
+            "max": 7.3834369999999865,
+            "num_samples": 2
+          },
+          "cpu_cuda_memcpy_runtime_ms": {
+            "mean": 1.4391545000000066,
+            "p50": 1.4391545000000066,
+            "p95": 1.5108309499999897,
+            "min": 1.3595140000000254,
+            "max": 1.518794999999988,
+            "num_samples": 2
+          },
+          "cpu_cuda_memset_runtime_ms": {
+            "mean": 0.33242949999997895,
+            "p50": 0.33242949999997895,
+            "p95": 0.3368633499999766,
+            "min": 0.3275029999999815,
+            "max": 0.33735599999997634,
+            "num_samples": 2
+          },
+          "cpu_cuda_alloc_free_runtime_ms": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_event_count": {
+            "mean": 3114.0,
+            "p50": 3114.0,
+            "p95": 3114.0,
+            "min": 3114.0,
+            "max": 3114.0,
+            "num_samples": 2
+          },
+          "device_kernel_count": {
+            "mean": 2900.0,
+            "p50": 2900.0,
+            "p95": 2900.0,
+            "min": 2900.0,
+            "max": 2900.0,
+            "num_samples": 2
+          },
+          "device_memcpy_count": {
+            "mean": 153.0,
+            "p50": 153.0,
+            "p95": 153.0,
+            "min": 153.0,
+            "max": 153.0,
+            "num_samples": 2
+          },
+          "device_memset_count": {
+            "mean": 61.0,
+            "p50": 61.0,
+            "p95": 61.0,
+            "min": 61.0,
+            "max": 61.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_launch_runtime_count": {
+            "mean": 1711.0,
+            "p50": 1711.0,
+            "p95": 1711.0,
+            "min": 1711.0,
+            "max": 1711.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_kernel_launch_count": {
+            "mean": 1707.0,
+            "p50": 1707.0,
+            "p95": 1707.0,
+            "min": 1707.0,
+            "max": 1707.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_graph_launch_count": {
+            "mean": 4.0,
+            "p50": 4.0,
+            "p95": 4.0,
+            "min": 4.0,
+            "max": 4.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_sync_runtime_count": {
+            "mean": 62.0,
+            "p50": 62.0,
+            "p95": 62.0,
+            "min": 62.0,
+            "max": 62.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_memcpy_runtime_count": {
+            "mean": 108.0,
+            "p50": 108.0,
+            "p95": 108.0,
+            "min": 108.0,
+            "max": 108.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_memset_runtime_count": {
+            "mean": 62.0,
+            "p50": 62.0,
+            "p95": 62.0,
+            "min": 62.0,
+            "max": 62.0,
+            "num_samples": 2
+          },
+          "cpu_cuda_alloc_free_count": {
+            "mean": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "num_samples": 2
+          },
+          "device_idle_gap_p50_each_gap_ms": {
+            "mean": 0.0010242500000022118,
+            "p50": 0.0010242500000022118,
+            "p95": 0.0013408250000036786,
+            "min": 0.0006725000000005821,
+            "max": 0.0013760000000038416,
+            "num_samples": 2
+          },
+          "device_idle_gap_p95_each_gap_ms": {
+            "mean": 0.06455447499999828,
+            "p50": 0.06455447499999828,
+            "p95": 0.07112188749999937,
+            "min": 0.05725734999999707,
+            "max": 0.07185159999999949,
+            "num_samples": 2
+          }
+        },
+        "repeats": [
+          {
+            "device_timeline_span_ms": 65.527301,
+            "device_active_union_ms": 23.58432499999999,
+            "device_idle_gap_sum_ms": 41.942976,
+            "device_idle_gap_stats_ms": {
+              "mean": 0.013495166023166024,
+              "p50": 0.0006725000000005821,
+              "p95": 0.05725734999999707,
+              "min": 3.0999999988125636e-05,
+              "max": 1.3055490000000063,
+              "num_samples": 3108
+            },
+            "device_kernel_sum_ms": 23.32216999999996,
+            "device_kernel_union_ms": 23.32216999999996,
+            "device_memcpy_sum_ms": 0.23332700000000658,
+            "device_memcpy_union_ms": 0.23332700000000658,
+            "device_memset_sum_ms": 0.02882800000001862,
+            "device_memset_union_ms": 0.02882800000001862,
+            "device_event_count": 3114,
+            "device_kernel_count": 2900,
+            "device_memcpy_count": 153,
+            "device_memset_count": 61,
+            "cpu_cuda_launch_runtime_ms": 9.062762000000093,
+            "cpu_cuda_launch_runtime_count": 1711,
+            "cpu_cuda_kernel_launch_runtime_ms": 7.458683000000099,
+            "cpu_cuda_kernel_launch_count": 1707,
+            "cpu_cuda_graph_launch_runtime_ms": 1.6040789999999978,
+            "cpu_cuda_graph_launch_count": 4,
+            "cpu_cuda_sync_runtime_ms": 7.3834369999999865,
+            "cpu_cuda_sync_runtime_count": 62,
+            "cpu_cuda_memcpy_runtime_ms": 1.3595140000000254,
+            "cpu_cuda_memcpy_runtime_count": 108,
+            "cpu_cuda_memset_runtime_ms": 0.3275029999999815,
+            "cpu_cuda_memset_runtime_count": 62,
+            "cpu_cuda_alloc_free_runtime_ms": 0.0,
+            "cpu_cuda_alloc_free_count": 0,
+            "top_device_events": [
+              {
+                "name": "ampere_bf16_s1688gemm_bf16_64x128_sliced1x2_ldg8_f2f_tn",
+                "class": "device_kernel",
+                "start_us": 49977.561,
+                "end_us": 50737.81,
+                "duration_us": 760.2489999999962
+              },
+              {
+                "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+                "class": "device_kernel",
+                "start_us": 4054.73,
+                "end_us": 4116.684,
+                "duration_us": 61.95400000000018
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 62891.341,
+                "end_us": 62934.351,
+                "duration_us": 43.01000000000204
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 53852.988,
+                "end_us": 53895.901,
+                "duration_us": 42.913000000000466
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 54717.113,
+                "end_us": 54760.026,
+                "duration_us": 42.913000000000466
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 55580.854,
+                "end_us": 55623.672,
+                "duration_us": 42.8179999999993
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 63753.194,
+                "end_us": 63796.012,
+                "duration_us": 42.8179999999993
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 56445.46,
+                "end_us": 56488.213,
+                "duration_us": 42.75300000000425
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 59672.48,
+                "end_us": 59715.202,
+                "duration_us": 42.721999999994296
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 65682.603,
+                "end_us": 65725.324,
+                "duration_us": 42.720999999990454
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 56013.573,
+                "end_us": 56056.263,
+                "duration_us": 42.69000000000233
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 60103.151,
+                "end_us": 60145.841,
+                "duration_us": 42.69000000000233
+              }
+            ]
+          },
+          {
+            "device_timeline_span_ms": 74.176511,
+            "device_active_union_ms": 23.59518200000003,
+            "device_idle_gap_sum_ms": 50.58132899999997,
+            "device_idle_gap_stats_ms": {
+              "mean": 0.01627979691020276,
+              "p50": 0.0013760000000038416,
+              "p95": 0.07185159999999949,
+              "min": 3.0999999988125636e-05,
+              "max": 2.3556330000000014,
+              "num_samples": 3107
+            },
+            "device_kernel_sum_ms": 23.333419000000045,
+            "device_kernel_union_ms": 23.333419000000045,
+            "device_memcpy_sum_ms": 0.23290399999999317,
+            "device_memcpy_union_ms": 0.23290399999999317,
+            "device_memset_sum_ms": 0.028858999999991284,
+            "device_memset_union_ms": 0.028858999999991284,
+            "device_event_count": 3114,
+            "device_kernel_count": 2900,
+            "device_memcpy_count": 153,
+            "device_memset_count": 61,
+            "cpu_cuda_launch_runtime_ms": 11.170501000000103,
+            "cpu_cuda_launch_runtime_count": 1711,
+            "cpu_cuda_kernel_launch_runtime_ms": 8.980734000000092,
+            "cpu_cuda_kernel_launch_count": 1707,
+            "cpu_cuda_graph_launch_runtime_ms": 2.1897670000000145,
+            "cpu_cuda_graph_launch_count": 4,
+            "cpu_cuda_sync_runtime_ms": 5.9456530000000285,
+            "cpu_cuda_sync_runtime_count": 62,
+            "cpu_cuda_memcpy_runtime_ms": 1.518794999999988,
+            "cpu_cuda_memcpy_runtime_count": 108,
+            "cpu_cuda_memset_runtime_ms": 0.33735599999997634,
+            "cpu_cuda_memset_runtime_count": 62,
+            "cpu_cuda_alloc_free_runtime_ms": 0.0,
+            "cpu_cuda_alloc_free_count": 0,
+            "top_device_events": [
+              {
+                "name": "ampere_bf16_s1688gemm_bf16_64x128_sliced1x2_ldg8_f2f_tn",
+                "class": "device_kernel",
+                "start_us": 51142.024,
+                "end_us": 51909.986,
+                "duration_us": 767.9619999999995
+              },
+              {
+                "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+                "class": "device_kernel",
+                "start_us": 3001.355,
+                "end_us": 3063.533,
+                "duration_us": 62.177999999999884
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 67084.462,
+                "end_us": 67127.471,
+                "duration_us": 43.00900000000547
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 74388.33,
+                "end_us": 74431.307,
+                "duration_us": 42.97699999999895
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 65790.273,
+                "end_us": 65833.155,
+                "duration_us": 42.88199999999779
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 68580.801,
+                "end_us": 68623.683,
+                "duration_us": 42.88199999999779
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 64928.643,
+                "end_us": 64971.493,
+                "duration_us": 42.85000000000582
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 66652.831,
+                "end_us": 66695.68,
+                "duration_us": 42.84899999998743
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 72228.511,
+                "end_us": 72271.329,
+                "duration_us": 42.8179999999993
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 57425.025,
+                "end_us": 57467.842,
+                "duration_us": 42.81699999999546
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 58723.438,
+                "end_us": 58766.255,
+                "duration_us": 42.81699999999546
+              },
+              {
+                "name": "triton_red_fused_addmm_13",
+                "class": "device_kernel",
+                "start_us": 73093.021,
+                "end_us": 73135.807,
+                "duration_us": 42.786000000007334
+              }
+            ]
+          }
+        ]
+      },
+      "normalized_to_baseline_cuda_event_p50": {
+        "device_kernel_union_ms": 23.327794500000003,
+        "device_memcpy_union_ms": 0.23311549999999986,
+        "device_memset_union_ms": 0.028843500000004952,
+        "device_idle_gap_sum_ms": 46.262152499999985,
+        "cpu_cuda_launch_runtime_ms": 10.116631500000098,
+        "cpu_cuda_sync_runtime_ms": 6.6645450000000075,
+        "unattributed_vs_baseline_ms": -20.317665277343743
+      }
+    }
+  }
+}

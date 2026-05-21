@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "date": "2026-05-21",
+    "scope": "Official README benchmark scope: data processing measured separately; backbone and action head measured component-wise with synchronize; E2E is component-array sum, not full request wall time.",
+    "official_root": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520",
+    "official_git_rev": "ead52833afbbf4243f8cd5e7664f48a94de03b19",
+    "gr00t_import_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py",
+    "benchmark_module_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/scripts/deployment/benchmark_inference.py",
+    "model_path": "nvidia/GR00T-N1.6-3B",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/demo_data/gr1.PickNPlace",
+    "embodiment_tag": "gr1",
+    "device": "NVIDIA GeForce RTX 4090",
+    "device_short_name": "RTX 4090",
+    "torch_version": "2.7.1+cu126",
+    "num_iterations": 20,
+    "warmup": 5,
+    "seed": 42,
+    "denoising_steps": 4,
+    "action_horizon": 50
+  },
+  "results": {
+    "PyTorch Eager": {
+      "data_processing": {
+        "mean_ms": 5.471731163561344,
+        "std_ms": 0.8161352820825941,
+        "p50_ms": 5.212533287703991,
+        "p95_ms": 6.670814845710995,
+        "min_ms": 5.141356959939003,
+        "max_ms": 8.78419540822506,
+        "num_samples": 20
+      },
+      "backbone": {
+        "mean_ms": 29.19941060245037,
+        "std_ms": 2.1716611393894887,
+        "p50_ms": 28.44869252294302,
+        "p95_ms": 33.925919979810715,
+        "min_ms": 27.3355171084404,
+        "max_ms": 34.79105606675148,
+        "num_samples": 20
+      },
+      "action_head": {
+        "mean_ms": 68.73959535732865,
+        "std_ms": 3.466950009181643,
+        "p50_ms": 68.00670456141233,
+        "p95_ms": 74.89416496828198,
+        "min_ms": 64.5621158182621,
+        "max_ms": 77.34560035169125,
+        "num_samples": 20
+      },
+      "e2e": {
+        "mean_ms": 103.41073712334037,
+        "std_ms": 3.6097545452505666,
+        "p50_ms": 102.1907040849328,
+        "p95_ms": 111.07652299106121,
+        "min_ms": 97.21769765019417,
+        "max_ms": 111.48181930184364,
+        "num_samples": 20
+      },
+      "frequency_hz_from_e2e_p50": 9.785625893808104
+    },
+    "torch.compile": {
+      "data_processing": {
+        "mean_ms": 5.471731163561344,
+        "std_ms": 0.8161352820825941,
+        "p50_ms": 5.212533287703991,
+        "p95_ms": 6.670814845710995,
+        "min_ms": 5.141356959939003,
+        "max_ms": 8.78419540822506,
+        "num_samples": 20
+      },
+      "backbone": {
+        "mean_ms": 28.085460420697927,
+        "std_ms": 0.7422707198417348,
+        "p50_ms": 27.865571901202202,
+        "p95_ms": 29.286016710102558,
+        "min_ms": 27.4039339274168,
+        "max_ms": 30.860334634780884,
+        "num_samples": 20
+      },
+      "action_head": {
+        "mean_ms": 16.728926356881857,
+        "std_ms": 0.36630744238409574,
+        "p50_ms": 16.69852063059807,
+        "p95_ms": 17.173144593834877,
+        "min_ms": 15.967179089784622,
+        "max_ms": 17.317919060587883,
+        "num_samples": 20
+      },
+      "e2e": {
+        "mean_ms": 50.28611794114113,
+        "std_ms": 1.4823207042864288,
+        "p50_ms": 49.94819965213537,
+        "p95_ms": 53.639484755694866,
+        "min_ms": 48.57981577515602,
+        "max_ms": 54.29183691740036,
+        "num_samples": 20
+      },
+      "frequency_hz_from_e2e_p50": 20.020741627616367
+    }
+  },
+  "readme_markdown_rows": {
+    "PyTorch Eager": {
+      "Device": "RTX 4090",
+      "Mode": "PyTorch Eager",
+      "Data Processing": "5 ms",
+      "Backbone": "28 ms",
+      "Action Head": "68 ms",
+      "E2E": "102 ms",
+      "Frequency": "9.8 Hz"
+    },
+    "torch.compile": {
+      "Device": "RTX 4090",
+      "Mode": "torch.compile",
+      "Data Processing": "5 ms",
+      "Backbone": "28 ms",
+      "Action Head": "17 ms",
+      "E2E": "50 ms",
+      "Frequency": "20.0 Hz"
+    }
+  }
+}

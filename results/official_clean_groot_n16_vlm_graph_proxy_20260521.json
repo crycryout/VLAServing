@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "date": "2026-05-21",
+    "scope": "Fresh official Isaac-GR00T n1.6-release prepared VLM/backbone CUDA Graph proxy. This uses the clean official checkout and does not import VLAServing UnifiedRuntime.",
+    "official_root": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520",
+    "official_git_rev": "ead52833afbbf4243f8cd5e7664f48a94de03b19",
+    "gr00t_import_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py",
+    "model_path": "nvidia/GR00T-N1.6-3B",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/demo_data/gr1.PickNPlace",
+    "embodiment_tag": "gr1",
+    "device": "NVIDIA GeForce RTX 4090",
+    "torch_version": "2.7.1+cu126",
+    "iterations": 8,
+    "warmup": 4,
+    "profile_iterations": 2
+  },
+  "uncaptured_prepared_backbone": {
+    "timing": {
+      "wall_ms": {
+        "mean": 34.22230761498213,
+        "p50": 33.45689456909895,
+        "p95": 37.97423467040062,
+        "min": 32.17725455760956,
+        "max": 38.008878007531166,
+        "num_samples": 8
+      },
+      "cuda_event_ms": {
+        "mean": 34.18734407424927,
+        "p50": 33.42390441894531,
+        "p95": 37.94241371154785,
+        "min": 32.123775482177734,
+        "max": 37.9788818359375,
+        "num_samples": 8
+      }
+    },
+    "profile": {
+      "profile_iterations": 2,
+      "cuda_event_count": 3306,
+      "cuda_kernel_sum_per_iter_ms": 9.706561000000178,
+      "cpu_cuda_launch_per_iter_ms": 8.516529000000048,
+      "top_cuda_events": [
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_64x128_sliced1x2_ldg8_f2f_tn",
+          "duration_ms": 0.7680869999999995
+        },
+        {
+          "name": "ampere_bf16_s1688gemm_bf16_64x128_sliced1x2_ldg8_f2f_tn",
+          "duration_ms": 0.7559900000000053
+        },
+        {
+          "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+          "duration_ms": 0.0674910000000018
+        },
+        {
+          "name": "void at::native::im2col_kernel<c10::BFloat16>(long, c10::BFloat16 const*, long, long, long, long, long, long, long, long, long, long, long, long, c10::BFloat16*)",
+          "duration_ms": 0.06720299999999997
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.041440999999998895
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.04121799999999348
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.041216999999996916
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.040960999999995695
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.040896999999997206
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.040769000000000236
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.0406420000000071
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.040577000000004776
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.040385999999998604
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.04035399999999936
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.040353000000002796
+        },
+        {
+          "name": "void cutlass::Kernel2<cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8>(cutlass_80_tensorop_bf16_s16816gemm_relu_bf16_64x64_32x6_tn_align8::Params)",
+          "duration_ms": 0.04032100000000355
+        }
+      ]
+    }
+  },
+  "cuda_graph_prepared_backbone": {
+    "status": {
+      "captured": false,
+      "traceback": "Traceback (most recent call last):\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_official_clean_groot_n16_vlm_graph_proxy.py\", line 240, in main\n    graph_output = uncaptured_fn()\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_official_clean_groot_n16_vlm_graph_proxy.py\", line 221, in <lambda>\n    uncaptured_fn = lambda: policy.model.backbone(backbone_inputs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/model/modules/eagle_backbone.py\", line 110, in forward\n    outputs = self.model(**vl_input, output_hidden_states=True)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/.cache/huggingface/modules/transformers_modules/Eagle-Block2A-2B-v2/modeling_eagle3_vl.py\", line 238, in forward\n    vit_embeds = self.extract_feature(pixel_values, image_flags)\n  File \"/root/.cache/huggingface/modules/transformers_modules/Eagle-Block2A-2B-v2/modeling_eagle3_vl.py\", line 354, in extract_feature\n    vision_model_output = self.vision_model(\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/transformers/utils/generic.py\", line 965, in wrapper\n    output = func(self, *args, **kwargs)\n  File \"/root/.cache/huggingface/modules/transformers_modules/Eagle-Block2A-2B-v2/modeling_siglip2.py\", line 1567, in forward\n    return self.vision_model(\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/transformers/utils/generic.py\", line 965, in wrapper\n    output = func(self, *args, **kwargs)\n  File \"/root/.cache/huggingface/modules/transformers_modules/Eagle-Block2A-2B-v2/modeling_siglip2.py\", line 1232, in forward\n    self.embeddings(pixel_values)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1751, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py\", line 1762, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"/root/.cache/huggingface/modules/transformers_modules/Eagle-Block2A-2B-v2/modeling_siglip2.py\", line 687, in forward\n    self.split_patch_embeddings_to_windows_with_meta(\n  File \"/root/.cache/huggingface/modules/transformers_modules/Eagle-Block2A-2B-v2/modeling_siglip2.py\", line 541, in split_patch_embeddings_to_windows_with_meta\n    all_windows = all_windows[sorted_idx]\nRuntimeError: CUDA error: operation not permitted when stream is capturing\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/root/autodl-tmp/VLAServing/src/gr00t/eval/bench_official_clean_groot_n16_vlm_graph_proxy.py\", line 239, in main\n    with torch.cuda.graph(graph):\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/cuda/graphs.py\", line 186, in __exit__\n    self.cuda_graph.capture_end()\n  File \"/root/autodl-tmp/Isaac-GR00T/.venv/lib/python3.10/site-packages/torch/cuda/graphs.py\", line 84, in capture_end\n    super().capture_end()\nRuntimeError: CUDA error: operation failed due to a previous error during capture\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n\n"
+    },
+    "timing": null,
+    "profile": null,
+    "correctness_vs_uncaptured": null
+  }
+}

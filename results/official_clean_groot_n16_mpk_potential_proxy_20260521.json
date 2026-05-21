@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "date": "2026-05-21",
+    "scope": "Official clean Isaac-GR00T N1.6 MPK potential proxy assembled from clean launch/sync, noncompute breakdown, and VLM graph-capture probe. This is not implemented MPK speedup.",
+    "official_root": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520",
+    "official_git_rev": "ead52833afbbf4243f8cd5e7664f48a94de03b19",
+    "gr00t_import_file": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py",
+    "model_path": "nvidia/GR00T-N1.6-3B",
+    "dataset_path": "/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/demo_data/gr1.PickNPlace",
+    "device": "NVIDIA GeForce RTX 4090",
+    "torch_version": "2.7.1+cu126",
+    "input_scope": "GR1 PickNPlace demo observation, official benchmark_inference.py path, action head torch.compile max-autotune",
+    "limitations": [
+      "Lower bound uses torch.profiler kernel/mem union from prepared full model plus data-processing p50; profiler can perturb execution.",
+      "Full official VLM/backbone CUDA Graph capture failed because SigLIP2 dynamic indexed windowing is not capture-safe in the unmodified stack.",
+      "This proxy estimates removable boundary/gap potential; it is not a full VLM or VLA MegaKernel implementation."
+    ]
+  },
+  "component_p50_ms": {
+    "data_processing_wall": 5.1423972472548485,
+    "backbone_cuda_event": 32.29598426818848,
+    "action_head_cuda_event": 16.033711433410645,
+    "full_model_gpu_only_cuda_event": 53.51843070983887,
+    "full_model_gpu_only_wall_sync": 56.58659711480141,
+    "full_model_prepared_cuda_event": 49.53424072265625
+  },
+  "kernel_and_gap_proxy_ms": {
+    "full_model_prepared_kernel_union": 23.327794500000003,
+    "full_model_prepared_memcpy_memset_union": 0.2619590000000048,
+    "full_model_prepared_active_union_lower_proxy": 23.589753500000008,
+    "full_model_prepared_event_minus_active_union": 25.944487222656242,
+    "full_model_gpu_only_event_minus_profile_kernel_sum": 29.866771709838904,
+    "cpu_cuda_launch_runtime_per_iter_full_model_gpu_only": 10.064365000000072
+  },
+  "single_request_potential_proxy_ms": {
+    "official_clean_e2e_wall_sync_p50": 56.58659711480141,
+    "official_clean_e2e_cuda_event_p50": 53.51843070983887,
+    "official_clean_prepared_model_cuda_event_p50": 49.53424072265625,
+    "idealized_e2e_lower_bound_data_plus_active_union": 28.732150747254856,
+    "idealized_prepared_model_lower_bound_active_union": 23.589753500000008,
+    "potential_e2e_delta_vs_wall_sync": 27.85444636754655,
+    "potential_e2e_speedup_vs_wall_sync": 1.9694521865965025
+  },
+  "vlm_graph_capture_probe": {
+    "captured": false,
+    "uncaptured_prepared_backbone_cuda_event_p50": 33.42390441894531,
+    "uncaptured_prepared_backbone_kernel_sum_per_iter": 9.706561000000178,
+    "failure_summary": "Full official clean prepared backbone CUDA Graph capture failed in SigLIP2 dynamic indexed windowing: all_windows = all_windows[sorted_idx]."
+  },
+  "source_files": [
+    "results/official_clean_groot_n16_torchcompile_launch_sync_20260521.json",
+    "results/official_clean_groot_n16_noncompute_overhead_breakdown_20260521.json",
+    "results/official_clean_groot_n16_operator_inventory_20260521.json",
+    "results/official_clean_groot_n16_vlm_graph_proxy_20260521.json"
+  ]
+}

@@ -249,6 +249,39 @@ profiling path, around `54-56 ms` E2E. These two scopes must not be conflated.
 All comparisons need the same model, input shape, dtype, inference mode, and
 measurement boundary.
 
+Clean official README-scope remeasurement on 2026-05-21:
+
+- script: `src/gr00t/eval/bench_official_clean_groot_n16_readme_scope.py`
+- result: `results/official_clean_groot_n16_readme_scope_benchmark_20260521.json`
+- official checkout: `/root/autodl-tmp/Isaac-GR00T-official-clean-20260520`
+- commit: `ead52833afbbf4243f8cd5e7664f48a94de03b19`
+- imported package: `/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py`
+
+This run uses the official README benchmark boundary:
+
+```text
+E2E = data processing + backbone + action head
+```
+
+It is not the conservative full request-path wall time used by earlier
+launch/sync profiling.
+
+| Mode | data processing p50 | backbone p50 | action head p50 | E2E p50 | frequency |
+|---|---:|---:|---:|---:|---:|
+| PyTorch Eager | `5.21 ms` | `28.45 ms` | `68.01 ms` | `102.19 ms` | `9.79 Hz` |
+| `torch.compile` | `5.21 ms` | `27.87 ms` | `16.70 ms` | `49.95 ms` | `20.02 Hz` |
+
+Interpretation:
+
+- The action head matches the public README-style `17 ms` number.
+- Backbone is slightly slower than the public `25 ms` number on this run.
+- Data processing is `5.21 ms` here rather than the public `2 ms`, largely due
+  to local video/data backend and environment differences.
+- If public `2 ms` data processing is paired with this run's measured model
+  components, the component-sum E2E would be about `46.6 ms`.
+- Therefore the earlier `56 ms` full-call/request-path number should not be
+  used as the official README-scope baseline.
+
 ## 6. Proposed System Architecture
 
 The design has two planes.
@@ -412,6 +445,9 @@ Source:
 
 - `results/gr00t_vlm_mpk_dataplane_proxy_20260510.json`
 
+This is now treated as a legacy/local VLAServing proxy, not an official clean
+NVIDIA GR00T N1.6 result.
+
 | Metric | Value |
 |---|---:|
 | VLM uncaptured fixed-shape CUDA p50 | `26.78 ms` |
@@ -426,12 +462,44 @@ Interpretation:
 - Graph replay keeps essentially the same math work but reduces wall time.
 - This is strong evidence for MPK-style data-plane potential on VLM.
 - It is not yet a full VLM MPK mega-kernel.
+- It should not be used as the clean official N1.6 full-VLM graph result.
+
+Clean official re-profile on 2026-05-21:
+
+- `results/official_clean_groot_n16_vlm_graph_proxy_20260521.json`
+- `results/official_clean_groot_n16_torchcompile_launch_sync_20260521.json`
+
+| Metric | Clean official result |
+|---|---:|
+| prepared backbone CUDA event p50, launch/sync probe | `32.30 ms` |
+| prepared backbone uncaptured CUDA event p50, graph probe | `33.42 ms` |
+| prepared backbone profiler kernel-sum per iter | `9.71 ms` |
+| full prepared backbone CUDA Graph capture | failed |
+
+Failure reason:
+
+```text
+The unmodified official SigLIP2 path performs dynamic indexed windowing
+(`all_windows = all_windows[sorted_idx]`) during capture, which raises
+`operation not permitted when stream is capturing`.
+```
+
+Updated interpretation:
+
+```text
+The clean official VLM/backbone still has a large data-plane gap, but the full
+official VLM path is not directly CUDA-Graph-capturable without fixed-shape /
+static-indexing changes. Therefore the old 26.78 -> 10.82 ms graph-replay slide
+must be labeled as a local fixed-shape proxy, not official clean-stack evidence.
+```
 
 ### 10.2 Single-Request MPK Potential Proxy
 
 Source:
 
 - `results/gr00t_official_mpk_potential_graphproxy_20260510.json`
+
+This is also treated as a legacy/local-harness proxy.
 
 | Metric | Value |
 |---|---:|
@@ -446,10 +514,38 @@ Interpretation:
 - It should not be reported as implemented MPK speedup.
 - It motivates reducing boundary/gap overhead while preserving math efficiency.
 
+Clean official re-profile on 2026-05-21:
+
+- `results/official_clean_groot_n16_mpk_potential_proxy_20260521.json`
+
+| Metric | Clean official proxy |
+|---|---:|
+| data processing wall p50 | `5.14 ms` |
+| full model GPU-only wall-sync p50 | `56.59 ms` |
+| full model GPU-only CUDA event p50 | `53.52 ms` |
+| full model prepared CUDA event p50 | `49.53 ms` |
+| full prepared model active-union lower proxy | `23.59 ms` |
+| idealized E2E lower bound, data + active union | `28.73 ms` |
+| potential delta vs wall-sync | `27.85 ms` |
+| potential speedup vs wall-sync | `1.97x` |
+
+Updated interpretation:
+
+```text
+The clean official stack still shows a large removable-gap proxy, but the
+evidence is now more conservative and better scoped: MPK could theoretically
+move E2E toward the high-20ms/low-30ms region only if it can preserve the kernel
+math efficiency while removing boundary, launch, handoff, and materialization
+overhead. This is not an implemented MPK result.
+```
+
 ### 10.3 Official Clean Stack Launch / Sync Profiling
 
 Sources:
 
+- `results/official_clean_groot_n16_torchcompile_launch_sync_20260521.json`
+- `results/official_clean_groot_n16_noncompute_overhead_breakdown_20260521.json`
+- `results/official_clean_groot_n16_operator_inventory_20260521.json`
 - `results/official_clean_groot_n16_3b_torchcompile_launch_sync_20260520.json`
 - `results/official_clean_groot_n16_noncompute_overhead_breakdown_20260520.json`
 - `results/official_clean_groot_n16_operator_inventory_20260520.json`
@@ -464,6 +560,18 @@ Fresh official checkout:
 | model | `nvidia/GR00T-N1.6-3B` |
 | GPU | RTX 4090 |
 | torch | `2.7.1+cu126` |
+
+Updated 2026-05-21 launch/sync breakdown:
+
+| target | host enqueue | sync wait | wall sync | CUDA event | profiler kernel-sum | CPU CUDA launch/runtime |
+|---|---:|---:|---:|---:|---:|---:|
+| VLM/backbone | `31.16 ms` | `0.63 ms` | `31.80 ms` | `32.30 ms` | `9.11 ms` | `7.53 ms` |
+| DiT action head | `6.85 ms` | `10.16 ms` | `17.01 ms` | `16.03 ms` | `22.11 ms`* | `3.64 ms` |
+| full model GPU-only | `47.15 ms` | `9.37 ms` | `56.59 ms` | `53.52 ms` | `23.65 ms` | `10.06 ms` |
+
+`*` The action-head profiler kernel-sum is larger than the CUDA event timing
+because profiler collection perturbs torch.compile / CUDA Graph behavior; use
+CUDA event and prepared-overhead numbers as the timing anchor.
 
 Launch/sync breakdown:
 
@@ -485,13 +593,89 @@ Interpretation:
 
 Non-compute proxy:
 
-| target | CUDA event | profiler kernel union | estimated non-kernel gap |
-|---|---:|---:|---:|
-| backbone prepared | `26.653 ms` | `8.886 ms` | `~17.58 ms` |
-| action head prepared | `16.931 ms` | `14.835 ms` | `~2.05 ms` |
-| full model prepared | `49.836 ms` | `23.303 ms` | `~26.29 ms` |
+| target | CUDA event | profiler kernel union | memcpy+memset union | event minus active-union |
+|---|---:|---:|---:|---:|
+| backbone prepared | `26.29 ms` | `8.90 ms` | `0.18 ms` | `~17.20 ms` |
+| action head prepared | `16.81 ms` | `14.85 ms` | `0.04 ms` | `~1.92 ms` |
+| full model prepared | `49.53 ms` | `23.33 ms` | `0.26 ms` | `~25.94 ms` |
 
 This is torch-profiler proxy evidence, not Nsight Compute roofline evidence.
+
+### 10.3.1 Official-Scope CUDA Graph Control and Non-Kernel Overhead
+
+Sources:
+
+- `results/official_clean_groot_n16_cudagraph_overheads_20260521.json`
+- `results/official_clean_groot_n16_eager_cudagraph_control_20260521.json`
+
+Both runs use the clean official checkout:
+
+- `/root/autodl-tmp/Isaac-GR00T-official-clean-20260520`
+- commit `ead52833afbbf4243f8cd5e7664f48a94de03b19`
+- imported package `/root/autodl-tmp/Isaac-GR00T-official-clean-20260520/gr00t/__init__.py`
+
+Official README-scope torch.compile result in this run:
+
+| component | p50 |
+|---|---:|
+| data processing | `4.45 ms` |
+| backbone | `28.92 ms` |
+| action head | `16.78 ms` |
+| E2E component sum | `50.57 ms` |
+
+Torch.compile-only non-kernel overhead proxy:
+
+| target | CUDA event | host enqueue | sync wait | CPU launch/runtime | kernel launch | graph launch | cuda alloc/free | aten alloc-like |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| backbone prepared | `27.05 ms` | `26.43 ms` | `0.65 ms` | `7.34 ms` | `7.34 ms` | `0.00 ms` | `0.87 ms` | `4.88 ms` |
+| action head prepared | `16.74 ms` | `6.72 ms` | `10.00 ms` | `3.00 ms` | `1.22 ms` | `1.78 ms` | `0.00 ms` | `0.57 ms` |
+| full model prepared | `49.63 ms` | `40.57 ms` | `9.19 ms` | `9.89 ms` | `8.26 ms` | `1.63 ms` | `0.90 ms` | `5.49 ms` |
+
+Important interpretation:
+
+- `sync wait` is not pure CPU/GPU synchronization overhead; it mostly waits for
+  outstanding GPU work after the async enqueue returns.
+- The torch.compile action head already shows `cudaGraphLaunch` in the profile.
+  Therefore wrapping it in a second manual outer CUDA Graph fails with nested
+  graph-capture behavior:
+
+```text
+Cannot prepare for replay during capturing stage.
+Current cudaStreamCaptureStatus: cudaStreamCaptureStatusActive
+```
+
+- The unmodified full VLM/backbone graph is still not a valid full-graph
+  baseline in the clean official stack.
+
+Manual CUDA Graph control on the eager action head:
+
+| mode | action head CUDA event | host enqueue | sync wait | CPU kernel launch | CPU graph launch | aten alloc-like |
+|---|---:|---:|---:|---:|---:|---:|
+| eager action head | `64.99 ms` | `64.95 ms` | `0.08 ms` | `16.19 ms` | `0.00 ms` | `9.67 ms` |
+| eager action head manual CUDA Graph replay | `17.87 ms` | `0.57 ms` | `17.33 ms` | `0.70 ms` | `7.30 ms`* | `0.00 ms` |
+
+`*` The `cudaGraphLaunch` profiler CPU time is profiler-perturbed; the more
+stable request-path anchor is host enqueue, which drops to `0.57 ms`.
+
+Official-scope eager manual-graph hybrid:
+
+| metric | value |
+|---|---:|
+| eager official E2E p50 | `101.23 ms` |
+| data processing p50 | `6.40 ms` |
+| eager backbone p50 | `28.54 ms` |
+| manual CUDA Graph action head p50 | `17.87 ms` |
+| hybrid E2E p50 | `52.81 ms` |
+
+Conclusion:
+
+```text
+Manual CUDA Graph removes most of the eager action-head launch/dispatch/allocation
+overhead, but the official torch.compile action head already captures most of
+that benefit. The remaining opportunity for MPK is therefore not simply "add
+CUDA Graph"; it is reducing VLM/backbone graph breaks, cross-operator gaps,
+materialization, and GPU-side serving handoff.
+```
 
 ### 10.4 Operator Inventory
 
@@ -1196,6 +1380,14 @@ Key result files:
 - `results/gr00t_phase5_cyclic_fixedlane_mpk_mvp_20260511.json`
 - `results/gr00t_phase5_persistent_credit_mpk_mvp_20260511.json`
 - `results/gr00t_phase5_persistent_request_ring_mvp_20260520.json`
+- `results/official_clean_groot_n16_readme_scope_benchmark_20260521.json`
+- `results/official_clean_groot_n16_cudagraph_overheads_20260521.json`
+- `results/official_clean_groot_n16_eager_cudagraph_control_20260521.json`
+- `results/official_clean_groot_n16_torchcompile_launch_sync_20260521.json`
+- `results/official_clean_groot_n16_noncompute_overhead_breakdown_20260521.json`
+- `results/official_clean_groot_n16_operator_inventory_20260521.json`
+- `results/official_clean_groot_n16_vlm_graph_proxy_20260521.json`
+- `results/official_clean_groot_n16_mpk_potential_proxy_20260521.json`
 - `results/official_clean_groot_n16_3b_torchcompile_launch_sync_20260520.json`
 - `results/official_clean_groot_n16_noncompute_overhead_breakdown_20260520.json`
 - `results/official_clean_groot_n16_operator_inventory_20260520.json`
@@ -1210,9 +1402,13 @@ Related implementation/probe scripts:
 - `src/gr00t/eval/bench_gr00t_phase5_cyclic_fixedlane_mpk_mvp.py`
 - `src/gr00t/eval/bench_gr00t_phase5_persistent_credit_mpk_mvp.py`
 - `src/gr00t/eval/bench_gr00t_phase5_persistent_request_ring_mvp.py`
+- `src/gr00t/eval/bench_official_clean_groot_n16_readme_scope.py`
+- `src/gr00t/eval/bench_official_clean_groot_n16_cudagraph_overheads.py`
+- `src/gr00t/eval/bench_official_clean_groot_n16_eager_cudagraph_control.py`
 - `src/gr00t/eval/bench_official_clean_groot_n16_launch_sync.py`
 - `src/gr00t/eval/bench_official_clean_groot_n16_overhead_breakdown.py`
 - `src/gr00t/eval/bench_official_clean_groot_n16_operator_inventory.py`
+- `src/gr00t/eval/bench_official_clean_groot_n16_vlm_graph_proxy.py`
 - `src/gr00t/eval/probe_gr00t_vlm_postprefill_mpk_subgraph.py`
 - `src/gr00t/eval/probe_gr00t_mpk_task_compile_dit_attention.py`
 
